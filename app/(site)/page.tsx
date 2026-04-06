@@ -1,9 +1,8 @@
 "use client";
 
-import { toast, ToastContainer } from "react-toastify";
-
-const notify = () => toast("Wow so easy!");
+import styles from "./site.module.scss";
+import { siteMain } from "./siteFont";
 
 export default function Home() {
-  return <div>Home</div>;
+  return <div className={`${styles.container} ${siteMain.variable}`}>Home</div>;
 }

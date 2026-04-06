@@ -1,4 +1,23 @@
 :root {
+  /* fonts */
+  --font-title-desktop: 48px;
+  --font-title-tablet: 36px;
+  --font-title-mobile: 28px;
+  --font-section-title-desktop: 32px;
+  --font-section-title-tablet: 28px;
+  --font-section-title-mobile: 24px;
+  --font-subtitle-desktop: 24px;
+  --font-subtitle-tablet: 20px;
+  --font-subtitle-mobile: 18px;
+  --font-body-desktop: 16px;
+  --font-body-tablet: 14px;
+  --font-body-mobile: 12px;
+
+  /* colors */
+  --hippique-primary: #0a192f;
+  --hippique-secondary: #c5a059;
+  --hippique-tertiary: #8e6f3e;
+  --hippique-neutral: #f5f2ed;
 }
 
 html {
