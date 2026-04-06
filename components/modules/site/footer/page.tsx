@@ -12,22 +12,22 @@ export default function Footer() {
           </Link>
 
           <p className={styles.description}>
-            The premier destination for world-class sport horse auctions and
-            equestrian excellence.
+            De toonaangevende bestemming voor eersteklas sportpaardenveilingen
+            en uitmuntendheid in de paardensport.
           </p>
         </div>
 
         <div className={styles.column}>
-          <h3>Navigation</h3>
+          <h3>Navigatie</h3>
           <ul>
             <li>
               <Link href="/">Home</Link>
             </li>
             <li>
-              <Link href="/auctions">Auctions</Link>
+              <Link href="/auctions">Veilingen</Link>
             </li>
             <li>
-              <Link href="/news">News</Link>
+              <Link href="/news">Nieuws</Link>
             </li>
             <li>
               <Link href="/contact">Contact</Link>
@@ -36,13 +36,13 @@ export default function Footer() {
         </div>
 
         <div className={styles.column}>
-          <h3>Legal</h3>
+          <h3>Juridisch</h3>
           <ul>
             <li>
-              <Link href="/terms-of-service">Terms of Service</Link>
+              <Link href="/terms-of-service">Algemene voorwaarden</Link>
             </li>
             <li>
-              <Link href="/privacy-policy">Privacy Policy</Link>
+              <Link href="/privacy-policy">Privacybeleid</Link>
             </li>
             <li>
               <Link href="/cookies">Cookies</Link>
@@ -51,10 +51,10 @@ export default function Footer() {
         </div>
 
         <div className={styles.column}>
-          <h3>Contact Information</h3>
+          <h3>Contactgegevens</h3>
           <ul className={styles.contactList}>
-            <li>Telephone: 09090909</li>
-            <li>Address:</li>
+            <li>Telefoon: 09090909</li>
+            <li>Adres:</li>
           </ul>
         </div>
       </div>
