@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Globe } from "lucide-react";
@@ -26,6 +26,11 @@ declare global {
   }
 }
 
+type LanguageItem = {
+  label: string;
+  value: string;
+};
+
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Veilingen", href: "/auctions" },
@@ -33,7 +38,7 @@ const navItems = [
   { label: "Contact", href: "/contact" },
 ];
 
-const languages = [
+const fallbackLanguages: LanguageItem[] = [
   { label: "Nederlands", value: "nl" },
   { label: "English", value: "en" },
   { label: "Tiếng Việt", value: "vi" },
@@ -44,6 +49,8 @@ const languages = [
 export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [languages, setLanguages] = useState<LanguageItem[]>(fallbackLanguages);
+
   const pathname = usePathname();
   const langRef = useRef<HTMLDivElement | null>(null);
 
@@ -52,27 +59,89 @@ export default function Header() {
     return pathname === href || pathname.startsWith(`${href}/`);
   };
 
+  const cleanupGoogleTranslateUI = useMemo(
+    () => () => {
+      document.body.style.top = "0px";
+      document.body.style.position = "static";
+
+      const selectors = [
+        ".goog-te-banner-frame",
+        ".goog-te-banner-frame.skiptranslate",
+        ".goog-te-balloon-frame",
+        ".goog-tooltip",
+        ".goog-text-highlight",
+        "#goog-gt-tt",
+        "iframe.skiptranslate",
+      ];
+
+      selectors.forEach((selector) => {
+        document.querySelectorAll(selector).forEach((el) => {
+          const element = el as HTMLElement;
+          element.style.display = "none";
+          element.style.visibility = "hidden";
+          element.style.opacity = "0";
+          element.style.pointerEvents = "none";
+          element.style.height = "0";
+          element.style.maxHeight = "0";
+        });
+      });
+
+      document
+        .querySelectorAll("font.goog-text-highlight, span.goog-text-highlight")
+        .forEach((el) => {
+          const element = el as HTMLElement;
+          element.style.background = "transparent";
+          element.style.boxShadow = "none";
+          element.style.color = "inherit";
+        });
+    },
+    [],
+  );
+
   useEffect(() => {
     const existingScript = document.querySelector(
       'script[src="//translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"]',
     );
 
+    const loadLanguagesFromGoogle = () => {
+      const select = document.querySelector(
+        ".goog-te-combo",
+      ) as HTMLSelectElement | null;
+
+      if (!select) return;
+
+      const options = Array.from(select.options)
+        .filter((option) => option.value)
+        .map((option) => ({
+          label: option.text,
+          value: option.value,
+        }));
+
+      if (options.length > 0) {
+        setLanguages(options);
+      }
+    };
+
     window.googleTranslateElementInit = () => {
-      if (
-        !window.google?.translate?.TranslateElement ||
-        document.getElementById("google_translate_element")?.childElementCount
-      ) {
-        return;
+      if (!window.google?.translate?.TranslateElement) return;
+
+      const container = document.getElementById("google_translate_element");
+      if (!container) return;
+
+      if (!container.childElementCount) {
+        new window.google.translate.TranslateElement(
+          {
+            pageLanguage: "nl",
+            autoDisplay: false,
+          },
+          "google_translate_element",
+        );
       }
 
-      new window.google.translate.TranslateElement(
-        {
-          pageLanguage: "nl",
-          includedLanguages: "nl,en,vi,fr,de",
-          autoDisplay: false,
-        },
-        "google_translate_element",
-      );
+      window.setTimeout(loadLanguagesFromGoogle, 800);
+      window.setTimeout(loadLanguagesFromGoogle, 1500);
+      window.setTimeout(cleanupGoogleTranslateUI, 100);
+      window.setTimeout(cleanupGoogleTranslateUI, 500);
     };
 
     if (!existingScript) {
@@ -84,7 +153,11 @@ export default function Header() {
     } else if (window.google?.translate?.TranslateElement) {
       window.googleTranslateElementInit?.();
     }
-  }, []);
+
+    return () => {
+      cleanupGoogleTranslateUI();
+    };
+  }, [cleanupGoogleTranslateUI]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -107,43 +180,7 @@ export default function Header() {
     return () => {
       window.clearInterval(interval);
     };
-  }, []);
-
-  const cleanupGoogleTranslateUI = () => {
-    document.body.style.top = "0px";
-    document.body.style.position = "static";
-
-    const selectors = [
-      ".goog-te-banner-frame",
-      ".goog-te-banner-frame.skiptranslate",
-      ".goog-te-balloon-frame",
-      ".goog-tooltip",
-      ".goog-text-highlight",
-      "#goog-gt-tt",
-      "iframe.skiptranslate",
-    ];
-
-    selectors.forEach((selector) => {
-      document.querySelectorAll(selector).forEach((el) => {
-        const element = el as HTMLElement;
-        element.style.display = "none";
-        element.style.visibility = "hidden";
-        element.style.opacity = "0";
-        element.style.pointerEvents = "none";
-        element.style.height = "0";
-        element.style.maxHeight = "0";
-      });
-    });
-
-    document
-      .querySelectorAll("font.goog-text-highlight, span.goog-text-highlight")
-      .forEach((el) => {
-        const element = el as HTMLElement;
-        element.style.background = "transparent";
-        element.style.boxShadow = "none";
-        element.style.color = "inherit";
-      });
-  };
+  }, [cleanupGoogleTranslateUI]);
 
   const setGoogleTranslateLanguage = (lang: string) => {
     const select = document.querySelector(
@@ -160,17 +197,9 @@ export default function Header() {
 
     setLangOpen(false);
 
-    setTimeout(() => {
-      cleanupGoogleTranslateUI();
-    }, 50);
-
-    setTimeout(() => {
-      cleanupGoogleTranslateUI();
-    }, 300);
-
-    setTimeout(() => {
-      cleanupGoogleTranslateUI();
-    }, 1000);
+    window.setTimeout(cleanupGoogleTranslateUI, 50);
+    window.setTimeout(cleanupGoogleTranslateUI, 300);
+    window.setTimeout(cleanupGoogleTranslateUI, 1000);
   };
 
   return (
@@ -227,6 +256,7 @@ export default function Header() {
             <Link href="/sign-in" className={styles.signIn}>
               Registreren
             </Link>
+
             <Link href="/log-in" className={styles.logIn}>
               Inloggen
             </Link>
@@ -287,6 +317,7 @@ export default function Header() {
 
         <div className={styles.mobileLang}>
           <p className={styles.mobileLangTitle}>Taal</p>
+
           <div className={styles.mobileLangList}>
             {languages.map((language) => (
               <button
@@ -312,6 +343,7 @@ export default function Header() {
           >
             Registreren
           </Link>
+
           <Link
             href="/log-in"
             className={styles.mobileLogIn}
