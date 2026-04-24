@@ -1,0 +1,154 @@
+.section {
+  background: #f6f2eb;
+  padding: 72px 0 88px;
+  overflow: hidden;
+}
+
+.inner {
+  width: min(1320px, calc(100% - 48px));
+  margin: 0 auto;
+}
+
+.heading {
+  max-width: 860px;
+  margin: 0 auto 42px;
+  text-align: center;
+}
+
+.title {
+  margin: 0;
+  color: #071a3a;
+  font-size: clamp(40px, 4vw, 64px);
+  font-weight: 800;
+  line-height: 1.02;
+  letter-spacing: -0.03em;
+}
+
+.subtitle {
+  margin: 12px 0 0;
+  color: #2f2f2f;
+  font-size: clamp(18px, 1.6vw, 22px);
+  line-height: 1.45;
+}
+
+.slider {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+}
+
+.track {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  width: max-content;
+  animation: marquee 28s linear infinite;
+  will-change: transform;
+}
+
+.card {
+  flex: 0 0 auto;
+  width: 180px;
+  min-width: 180px;
+  height: 92px;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #ffffff;
+  border: 1px solid rgba(7, 26, 58, 0.06);
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(7, 26, 58, 0.04);
+}
+
+.logoWrap {
+  position: relative;
+  width: 100%;
+  height: 56px;
+}
+
+.logo {
+  object-fit: contain;
+}
+
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+
+  to {
+    transform: translateX(calc(-50% - 8px));
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .slider:hover .track {
+    animation-play-state: running;
+  }
+}
+
+@media (max-width: 1199px) {
+  .section {
+    padding: 64px 0 80px;
+  }
+
+  .inner {
+    width: min(100%, calc(100% - 40px));
+  }
+
+  .track {
+    gap: 14px;
+    animation-duration: 24s;
+  }
+
+  .card {
+    width: 170px;
+    min-width: 170px;
+    height: 88px;
+  }
+}
+
+@media (max-width: 767px) {
+  .section {
+    padding: 52px 0 64px;
+  }
+
+  .inner {
+    width: calc(100% - 24px);
+  }
+
+  .heading {
+    margin-bottom: 30px;
+  }
+
+  .title {
+    font-size: clamp(30px, 9vw, 44px);
+  }
+
+  .subtitle {
+    font-size: 16px;
+  }
+
+  .track {
+    gap: 12px;
+    animation-duration: 20s;
+  }
+
+  .card {
+    width: 150px;
+    min-width: 150px;
+    height: 80px;
+    padding: 14px;
+    border-radius: 10px;
+  }
+
+  .logoWrap {
+    height: 48px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+}

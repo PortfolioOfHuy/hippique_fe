@@ -1,0 +1,677 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import Script from "next/script";
+import { usePathname } from "next/navigation";
+import { Check, Globe, Menu, X } from "lucide-react";
+import styles from "./Header.module.scss";
+
+declare global {
+  interface Window {
+    google?: any;
+    googleTranslateElementInit?: () => void;
+  }
+}
+
+type LanguageItem = {
+  value: string;
+  label: string;
+};
+
+type LanguageWithTimezone = {
+  value: string;
+  label: string;
+  timezone: string;
+  utcLabel: string;
+};
+
+const navItems = [
+  { label: "Home", href: "/" },
+  { label: "Elite", href: "/elite" },
+  { label: "Veilingen", href: "/veilingen" },
+  { label: "Nieuws", href: "/nieuws" },
+  { label: "Contact", href: "/contact" },
+];
+
+const languageNameMap: Record<string, string> = {
+  nl: "Dutch",
+  en: "English",
+  fr: "French",
+  de: "German",
+  es: "Spanish",
+  it: "Italian",
+  pt: "Portuguese",
+  vi: "Vietnamese",
+  ja: "Japanese",
+  ko: "Korean",
+  "zh-CN": "Chinese (Simplified)",
+  "zh-TW": "Chinese (Traditional)",
+  ar: "Arabic",
+  ru: "Russian",
+  tr: "Turkish",
+  pl: "Polish",
+  cs: "Czech",
+  sk: "Slovak",
+  hu: "Hungarian",
+  ro: "Romanian",
+  bg: "Bulgarian",
+  el: "Greek",
+  uk: "Ukrainian",
+  sv: "Swedish",
+  no: "Norwegian",
+  da: "Danish",
+  fi: "Finnish",
+  et: "Estonian",
+  lv: "Latvian",
+  lt: "Lithuanian",
+  id: "Indonesian",
+  ms: "Malay",
+  th: "Thai",
+  hi: "Hindi",
+  bn: "Bengali",
+  ur: "Urdu",
+  fa: "Persian",
+  he: "Hebrew",
+  sw: "Swahili",
+  af: "Afrikaans",
+  ca: "Catalan",
+  hr: "Croatian",
+  sr: "Serbian",
+  sl: "Slovenian",
+  is: "Icelandic",
+  mt: "Maltese",
+  ga: "Irish",
+  cy: "Welsh",
+  mk: "Macedonian",
+  sq: "Albanian",
+};
+
+const timezoneMap: Record<string, { timezone: string; utcLabel: string }> = {
+  nl: { timezone: "Europe/Amsterdam", utcLabel: "UTC +1" },
+  en: { timezone: "Europe/London", utcLabel: "UTC +0" },
+  fr: { timezone: "Europe/Paris", utcLabel: "UTC +1" },
+  de: { timezone: "Europe/Berlin", utcLabel: "UTC +1" },
+  es: { timezone: "Europe/Madrid", utcLabel: "UTC +1" },
+  it: { timezone: "Europe/Rome", utcLabel: "UTC +1" },
+  pt: { timezone: "Europe/Lisbon", utcLabel: "UTC +0" },
+  vi: { timezone: "Asia/Ho_Chi_Minh", utcLabel: "UTC +7" },
+  ja: { timezone: "Asia/Tokyo", utcLabel: "UTC +9" },
+  ko: { timezone: "Asia/Seoul", utcLabel: "UTC +9" },
+  "zh-CN": { timezone: "Asia/Shanghai", utcLabel: "UTC +8" },
+  "zh-TW": { timezone: "Asia/Taipei", utcLabel: "UTC +8" },
+  ar: { timezone: "Asia/Dubai", utcLabel: "UTC +4" },
+  ru: { timezone: "Europe/Moscow", utcLabel: "UTC +3" },
+  tr: { timezone: "Europe/Istanbul", utcLabel: "UTC +3" },
+  pl: { timezone: "Europe/Warsaw", utcLabel: "UTC +1" },
+  cs: { timezone: "Europe/Prague", utcLabel: "UTC +1" },
+  sk: { timezone: "Europe/Bratislava", utcLabel: "UTC +1" },
+  hu: { timezone: "Europe/Budapest", utcLabel: "UTC +1" },
+  ro: { timezone: "Europe/Bucharest", utcLabel: "UTC +2" },
+  bg: { timezone: "Europe/Sofia", utcLabel: "UTC +2" },
+  el: { timezone: "Europe/Athens", utcLabel: "UTC +2" },
+  uk: { timezone: "Europe/Kyiv", utcLabel: "UTC +2" },
+  sv: { timezone: "Europe/Stockholm", utcLabel: "UTC +1" },
+  no: { timezone: "Europe/Oslo", utcLabel: "UTC +1" },
+  da: { timezone: "Europe/Copenhagen", utcLabel: "UTC +1" },
+  fi: { timezone: "Europe/Helsinki", utcLabel: "UTC +2" },
+  et: { timezone: "Europe/Tallinn", utcLabel: "UTC +2" },
+  lv: { timezone: "Europe/Riga", utcLabel: "UTC +2" },
+  lt: { timezone: "Europe/Vilnius", utcLabel: "UTC +2" },
+  id: { timezone: "Asia/Jakarta", utcLabel: "UTC +7" },
+  ms: { timezone: "Asia/Kuala_Lumpur", utcLabel: "UTC +8" },
+  th: { timezone: "Asia/Bangkok", utcLabel: "UTC +7" },
+  hi: { timezone: "Asia/Kolkata", utcLabel: "UTC +5:30" },
+  bn: { timezone: "Asia/Dhaka", utcLabel: "UTC +6" },
+  ur: { timezone: "Asia/Karachi", utcLabel: "UTC +5" },
+  fa: { timezone: "Asia/Tehran", utcLabel: "UTC +3:30" },
+  he: { timezone: "Asia/Jerusalem", utcLabel: "UTC +2" },
+  sw: { timezone: "Africa/Nairobi", utcLabel: "UTC +3" },
+  af: { timezone: "Africa/Johannesburg", utcLabel: "UTC +2" },
+  ca: { timezone: "Europe/Madrid", utcLabel: "UTC +1" },
+  hr: { timezone: "Europe/Zagreb", utcLabel: "UTC +1" },
+  sr: { timezone: "Europe/Belgrade", utcLabel: "UTC +1" },
+  sl: { timezone: "Europe/Ljubljana", utcLabel: "UTC +1" },
+  is: { timezone: "Atlantic/Reykjavik", utcLabel: "UTC +0" },
+  mt: { timezone: "Europe/Malta", utcLabel: "UTC +1" },
+  ga: { timezone: "Europe/Dublin", utcLabel: "UTC +0" },
+  cy: { timezone: "Europe/London", utcLabel: "UTC +0" },
+  mk: { timezone: "Europe/Skopje", utcLabel: "UTC +1" },
+  sq: { timezone: "Europe/Tirane", utcLabel: "UTC +1" },
+};
+
+const defaultTimezoneInfo = {
+  timezone: "Europe/Amsterdam",
+  utcLabel: "UTC +1",
+};
+
+function isActivePath(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function initGoogleTranslate() {
+  if (
+    typeof window === "undefined" ||
+    !window.google ||
+    !window.google.translate ||
+    !window.google.translate.TranslateElement
+  ) {
+    return;
+  }
+
+  const desktopEl = document.getElementById("google_translate_element_desktop");
+  const mobileEl = document.getElementById("google_translate_element_mobile");
+
+  if (desktopEl && desktopEl.childElementCount === 0) {
+    new window.google.translate.TranslateElement(
+      {
+        pageLanguage: "nl",
+        autoDisplay: false,
+      },
+      "google_translate_element_desktop",
+    );
+  }
+
+  if (mobileEl && mobileEl.childElementCount === 0) {
+    new window.google.translate.TranslateElement(
+      {
+        pageLanguage: "nl",
+        autoDisplay: false,
+      },
+      "google_translate_element_mobile",
+    );
+  }
+}
+
+function removeGoogleTranslateArtifacts() {
+  if (typeof window === "undefined") return;
+
+  document.body.style.top = "0px";
+  document.documentElement.style.marginTop = "0px";
+
+  const selectors = [
+    "iframe.goog-te-banner-frame",
+    ".goog-te-banner-frame",
+    ".skiptranslate",
+    "#goog-gt-tt",
+    ".goog-tooltip",
+    ".goog-text-highlight",
+    ".goog-te-balloon-frame",
+    ".VIpgJd-ZVi9od-aZ2wEe-wOHMyf",
+    ".VIpgJd-ZVi9od-aZ2wEe-OiiCO",
+    ".VIpgJd-ZVi9od-ORHb",
+  ];
+
+  selectors.forEach((selector) => {
+    document.querySelectorAll(selector).forEach((el) => {
+      if (el instanceof HTMLElement) {
+        el.style.display = "none";
+        el.style.visibility = "hidden";
+        el.style.opacity = "0";
+        el.style.pointerEvents = "none";
+      }
+    });
+  });
+}
+
+function readGoogleLanguages(): LanguageItem[] {
+  if (typeof window === "undefined") return [];
+
+  const select = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+  if (!select) return [];
+
+  return Array.from(select.options)
+    .map((option) => ({
+      value: option.value,
+      label: option.text.trim(),
+    }))
+    .filter((item) => item.value && item.label);
+}
+
+function triggerGoogleTranslate(lang: string) {
+  const selects = document.querySelectorAll(".goog-te-combo");
+
+  if (!selects.length) return false;
+
+  selects.forEach((select) => {
+    const el = select as HTMLSelectElement;
+    el.value = lang;
+    el.dispatchEvent(new Event("change"));
+  });
+
+  return true;
+}
+
+function getSavedLanguage() {
+  if (typeof window === "undefined") return "nl";
+  return window.localStorage.getItem("site-language") || "nl";
+}
+
+function getSavedTimezone() {
+  if (typeof window === "undefined") return "Europe/Amsterdam";
+  return window.localStorage.getItem("site-timezone") || "Europe/Amsterdam";
+}
+
+function formatCurrentTime(timezone: string) {
+  try {
+    return new Intl.DateTimeFormat("en-GB", {
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date());
+  } catch {
+    return "--:--";
+  }
+}
+
+function getTimezoneInfo(lang: string) {
+  return timezoneMap[lang] || defaultTimezoneInfo;
+}
+
+function getLanguageDisplayName(lang: string, fallbackLabel: string) {
+  return languageNameMap[lang] || fallbackLabel;
+}
+
+export default function Header() {
+  const pathname = usePathname();
+
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [langOpen, setLangOpen] = useState(false);
+  const [languages, setLanguages] = useState<LanguageItem[]>([]);
+  const [translateReady, setTranslateReady] = useState(false);
+  const [selectedLanguage, setSelectedLanguage] = useState("nl");
+  const [selectedTimezone, setSelectedTimezone] = useState("Europe/Amsterdam");
+  const [currentTime, setCurrentTime] = useState("--:--");
+
+  const langRef = useRef<HTMLDivElement | null>(null);
+  const pollRef = useRef<number | null>(null);
+
+  const languageOptions = useMemo<LanguageWithTimezone[]>(() => {
+    return languages.map((item) => {
+      const info = getTimezoneInfo(item.value);
+
+      return {
+        value: item.value,
+        label: getLanguageDisplayName(item.value, item.label),
+        timezone: info.timezone,
+        utcLabel: info.utcLabel,
+      };
+    });
+  }, [languages]);
+
+  const selectedLanguageItem = useMemo(() => {
+    return (
+      languageOptions.find((item) => item.value === selectedLanguage) ?? {
+        value: "nl",
+        label: "Dutch",
+        timezone: "Europe/Amsterdam",
+        utcLabel: "UTC +1",
+      }
+    );
+  }, [languageOptions, selectedLanguage]);
+
+  useEffect(() => {
+    setMobileOpen(false);
+    setLangOpen(false);
+  }, [pathname]);
+
+  useEffect(() => {
+    const savedLanguage = getSavedLanguage();
+    const savedTimezone = getSavedTimezone();
+
+    setSelectedLanguage(savedLanguage);
+    setSelectedTimezone(savedTimezone);
+  }, []);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileOpen]);
+
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (!langRef.current) return;
+      if (!langRef.current.contains(event.target as Node)) {
+        setLangOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    function updateTime() {
+      setCurrentTime(formatCurrentTime(selectedTimezone));
+    }
+
+    updateTime();
+
+    const timer = window.setInterval(updateTime, 30000);
+    return () => window.clearInterval(timer);
+  }, [selectedTimezone]);
+
+  useEffect(() => {
+    const cleanupTimer = window.setInterval(() => {
+      removeGoogleTranslateArtifacts();
+    }, 1000);
+
+    return () => window.clearInterval(cleanupTimer);
+  }, []);
+
+  useEffect(() => {
+    window.googleTranslateElementInit = () => {
+      initGoogleTranslate();
+      removeGoogleTranslateArtifacts();
+
+      if (pollRef.current) {
+        window.clearInterval(pollRef.current);
+      }
+
+      pollRef.current = window.setInterval(() => {
+        const items = readGoogleLanguages();
+
+        removeGoogleTranslateArtifacts();
+
+        if (items.length > 0) {
+          setLanguages(items);
+          setTranslateReady(true);
+
+          const savedLanguage = getSavedLanguage();
+          const info = getTimezoneInfo(savedLanguage);
+
+          setSelectedLanguage(savedLanguage);
+          setSelectedTimezone(info.timezone);
+          triggerGoogleTranslate(savedLanguage);
+
+          window.setTimeout(() => {
+            removeGoogleTranslateArtifacts();
+          }, 150);
+
+          if (pollRef.current) {
+            window.clearInterval(pollRef.current);
+            pollRef.current = null;
+          }
+        }
+      }, 300);
+    };
+
+    if (window.google?.translate?.TranslateElement) {
+      window.googleTranslateElementInit();
+    }
+
+    return () => {
+      if (pollRef.current) {
+        window.clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+    };
+  }, []);
+
+  function selectLanguage(item: LanguageWithTimezone) {
+    if (translateReady) {
+      triggerGoogleTranslate(item.value);
+    }
+
+    setSelectedLanguage(item.value);
+    setSelectedTimezone(item.timezone);
+    setLangOpen(false);
+
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem("site-language", item.value);
+      window.localStorage.setItem("site-timezone", item.timezone);
+    }
+
+    window.setTimeout(() => {
+      removeGoogleTranslateArtifacts();
+    }, 150);
+  }
+
+  return (
+    <>
+      <Script
+        id="google-translate-script"
+        src="https://translate.google.com/translate_a/element.js?cb=googleTranslateElementInit"
+        strategy="afterInteractive"
+      />
+
+      <header className={styles.header}>
+        <div className={styles.inner}>
+          <Link href="/" className={styles.logoLink} aria-label="Hippique Auctions">
+            <Image
+              src="/img/logo/logo.png"
+              alt="Hippique Auctions"
+              width={320}
+              height={90}
+              priority
+              className={styles.logo}
+            />
+          </Link>
+
+          <nav className={styles.desktopNav} aria-label="Hoofdnavigatie">
+            {navItems.map((item) => {
+              const active = isActivePath(pathname, item.href);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${styles.navLink} ${active ? styles.active : ""}`}
+                >
+                  <span>{item.label}</span>
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className={styles.desktopActions}>
+            <div className={styles.translateDropdown} ref={langRef}>
+              <button
+                type="button"
+                className={`${styles.translateIconButton} ${
+                  langOpen ? styles.translateIconButtonOpen : ""
+                }`}
+                aria-label="Choose language and timezone"
+                aria-expanded={langOpen}
+                onClick={() => setLangOpen((prev) => !prev)}
+              >
+                <Globe size={18} strokeWidth={2} />
+              </button>
+
+              <div
+                className={`${styles.translateDropdownMenu} ${
+                  langOpen ? styles.translateDropdownMenuOpen : ""
+                }`}
+              >
+                <div className={styles.translateDropdownHeader}>
+                  <div className={styles.translateHeaderTop}>
+                    <span className={styles.translateHeaderCountry}>
+                      {selectedLanguageItem.label} ({selectedLanguageItem.utcLabel})
+                    </span>
+                  </div>
+
+                  <div className={styles.translateHeaderMeta}>
+                    <span>{currentTime}</span>
+                  </div>
+                </div>
+
+                <div className={styles.languageList}>
+                  {translateReady ? (
+                    languageOptions.map((item) => {
+                      const active = selectedLanguage === item.value;
+
+                      return (
+                        <button
+                          key={item.value}
+                          type="button"
+                          className={`${styles.languageButton} ${
+                            active ? styles.languageButtonActive : ""
+                          }`}
+                          onClick={() => selectLanguage(item)}
+                        >
+                          <span className={styles.languageButtonMain}>
+                            <span className={styles.languageCountry}>
+                              {item.label} ({item.utcLabel})
+                            </span>
+                            {active ? <Check size={15} strokeWidth={2.4} /> : null}
+                          </span>
+                        </button>
+                      );
+                    })
+                  ) : (
+                    <div className={styles.languageLoading}>Loading...</div>
+                  )}
+                </div>
+
+                <div
+                  id="google_translate_element_desktop"
+                  className={styles.googleTranslateHost}
+                  aria-hidden="true"
+                />
+              </div>
+            </div>
+
+            <Link href="/registreren" className={styles.registerButton}>
+              Registreren
+            </Link>
+
+            <Link href="/inloggen" className={styles.loginButton}>
+              Inloggen
+            </Link>
+          </div>
+
+          <button
+            type="button"
+            className={styles.mobileToggle}
+            aria-label={mobileOpen ? "Menu sluiten" : "Menu openen"}
+            aria-expanded={mobileOpen}
+            onClick={() => setMobileOpen(true)}
+          >
+            <Menu size={22} strokeWidth={2} />
+          </button>
+        </div>
+
+        <div
+          className={`${styles.mobileOverlay} ${mobileOpen ? styles.mobileOverlayOpen : ""}`}
+          onClick={() => setMobileOpen(false)}
+        />
+
+        <aside
+          className={`${styles.mobileDrawer} ${mobileOpen ? styles.mobileDrawerOpen : ""}`}
+          aria-hidden={!mobileOpen}
+        >
+          <div className={styles.mobileDrawerHeader}>
+            <Link
+              href="/"
+              className={styles.mobileLogoLink}
+              aria-label="Hippique Auctions"
+              onClick={() => setMobileOpen(false)}
+            >
+              <Image
+                src="/img/logo/logo.png"
+                alt="Hippique Auctions"
+                width={240}
+                height={68}
+                className={styles.mobileLogo}
+              />
+            </Link>
+
+            <button
+              type="button"
+              className={styles.mobileClose}
+              aria-label="Menu sluiten"
+              onClick={() => setMobileOpen(false)}
+            >
+              <X size={22} strokeWidth={2} />
+            </button>
+          </div>
+
+          <div className={styles.mobileTranslateBlock}>
+            <div className={styles.mobileTranslateTitle}>Language & Timezone</div>
+
+            <div className={styles.mobileSelectedLocale}>
+              <strong>
+                {selectedLanguageItem.label} ({selectedLanguageItem.utcLabel})
+              </strong>
+              <span>{currentTime}</span>
+            </div>
+
+            <div className={styles.mobileLanguageList}>
+              {translateReady ? (
+                languageOptions.map((item) => {
+                  const active = selectedLanguage === item.value;
+
+                  return (
+                    <button
+                      key={item.value}
+                      type="button"
+                      className={`${styles.languageButton} ${
+                        active ? styles.languageButtonActive : ""
+                      }`}
+                      onClick={() => selectLanguage(item)}
+                    >
+                      <span className={styles.languageButtonMain}>
+                        <span className={styles.languageCountry}>
+                          {item.label} ({item.utcLabel})
+                        </span>
+                        {active ? <Check size={15} strokeWidth={2.4} /> : null}
+                      </span>
+                    </button>
+                  );
+                })
+              ) : (
+                <div className={styles.languageLoading}>Loading...</div>
+              )}
+            </div>
+
+            <div
+              id="google_translate_element_mobile"
+              className={styles.googleTranslateHost}
+              aria-hidden="true"
+            />
+          </div>
+
+          <nav className={styles.mobileNav} aria-label="Hoofdnavigatie mobiel">
+            {navItems.map((item) => {
+              const active = isActivePath(pathname, item.href);
+
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  className={`${styles.mobileNavLink} ${active ? styles.mobileActive : ""}`}
+                  onClick={() => setMobileOpen(false)}
+                >
+                  {item.label}
+                </Link>
+              );
+            })}
+          </nav>
+
+          <div className={styles.mobileActions}>
+            <Link
+              href="/registreren"
+              className={styles.registerButton}
+              onClick={() => setMobileOpen(false)}
+            >
+              Registreren
+            </Link>
+
+            <Link
+              href="/inloggen"
+              className={styles.loginButton}
+              onClick={() => setMobileOpen(false)}
+            >
+              Inloggen
+            </Link>
+          </div>
+        </aside>
+      </header>
+    </>
+  );
+}
