@@ -99,10 +99,18 @@
   gap: 12px;
 }
 
-.translateDropdown {
+.translateDropdown,
+.profileDropdown {
   position: relative;
   flex: 0 0 auto;
+}
+
+.translateDropdown {
   z-index: 30;
+}
+
+.profileDropdown {
+  z-index: 31;
 }
 
 .translateIconButton,
@@ -136,10 +144,13 @@
 .translateIconButton:focus-visible,
 .translateIconButtonOpen,
 .profileIconButton:hover,
-.profileIconButton:focus-visible {
+.profileIconButton:focus-visible,
+.profileIconButtonOpen {
   border-color: var(--hippique-secondary);
   color: var(--hippique-secondary);
+  background: rgba(197, 160, 89, 0.08);
   transform: translateY(-1px);
+  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.14);
 }
 
 .translateIconButton svg,
@@ -149,43 +160,123 @@
   stroke: currentColor;
 }
 
-.profileIconButton:hover,
-.profileIconButton:focus-visible {
-  background: rgba(197, 160, 89, 0.08);
-  box-shadow: 0 12px 26px rgba(0, 0, 0, 0.14);
-}
-
-.translateDropdownMenu {
+.translateDropdownMenu,
+.profileDropdownMenu {
   position: absolute;
   top: calc(100% + 10px);
   right: 0;
-  width: 360px;
-  padding: 10px;
+
   border: 1px solid rgba(245, 242, 237, 0.08);
   border-radius: 22px;
   background: #10233f;
   box-shadow: 0 14px 34px rgba(0, 0, 0, 0.28);
+
   opacity: 0;
   visibility: hidden;
   pointer-events: none;
   transform: translateY(8px);
-  z-index: 40;
+
   transition:
     opacity 0.22s ease,
     visibility 0.22s ease,
     transform 0.22s ease;
 }
 
-.translateDropdownMenuOpen {
+.translateDropdownMenu {
+  width: 360px;
+  padding: 10px;
+  z-index: 40;
+}
+
+.profileDropdownMenu {
+  width: 260px;
+  padding: 10px;
+  z-index: 45;
+}
+
+.translateDropdownMenuOpen,
+.profileDropdownMenuOpen {
   opacity: 1;
   visibility: visible;
   pointer-events: auto;
   transform: translateY(0);
 }
 
-.translateDropdownHeader {
+.translateDropdownHeader,
+.profileDropdownHeader {
   padding: 12px 14px 14px;
   border-bottom: 1px solid rgba(245, 242, 237, 0.08);
+}
+
+.profileDropdownHeader {
+  margin-bottom: 8px;
+
+  span {
+    display: block;
+    color: rgba(245, 242, 237, 0.58);
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.4;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    display: block;
+    margin-top: 4px;
+    color: var(--hippique-secondary);
+    font-size: 16px;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+}
+
+.profileDropdownItem {
+  width: 100%;
+  min-height: 46px;
+  padding: 0 14px;
+
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  border-radius: 14px;
+  color: var(--hippique-neutral);
+  text-decoration: none;
+
+  font-size: 14px;
+  font-weight: 700;
+  line-height: 1.3;
+
+  transition:
+    background 0.2s ease,
+    color 0.2s ease,
+    transform 0.2s ease;
+
+  svg {
+    width: 17px;
+    height: 17px;
+    flex: 0 0 17px;
+    stroke: currentColor;
+  }
+
+  &:hover,
+  &:focus-visible {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--hippique-secondary);
+    transform: translateY(-1px);
+  }
+}
+
+.profileDropdownLogout {
+  margin-top: 6px;
+  color: rgba(245, 242, 237, 0.72);
+
+  &:hover,
+  &:focus-visible {
+    color: #fca5a5;
+    background: rgba(239, 68, 68, 0.08);
+  }
 }
 
 .translateHeaderTop {
@@ -577,7 +668,8 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
-.mobileProfileButton {
+.mobileProfileButton,
+.mobileLogoutButton {
   width: 100%;
   min-height: 44px;
   padding: 0 18px;
@@ -588,9 +680,6 @@
   gap: 10px;
 
   border-radius: var(--radius-button);
-  border: 1px solid rgba(245, 242, 237, 0.18);
-  background: transparent;
-  color: var(--hippique-neutral);
   text-decoration: none;
 
   font-size: 15px;
@@ -607,6 +696,12 @@
     transform 0.25s ease;
 }
 
+.mobileProfileButton {
+  border: 1px solid rgba(245, 242, 237, 0.18);
+  background: transparent;
+  color: var(--hippique-neutral);
+}
+
 .mobileProfileButton:hover,
 .mobileProfileButton:focus-visible {
   border-color: var(--hippique-secondary);
@@ -614,7 +709,22 @@
   transform: translateY(-1px);
 }
 
-.mobileProfileButton svg {
+.mobileLogoutButton {
+  border: 1px solid rgba(239, 68, 68, 0.28);
+  background: rgba(239, 68, 68, 0.08);
+  color: #fca5a5;
+}
+
+.mobileLogoutButton:hover,
+.mobileLogoutButton:focus-visible {
+  border-color: rgba(239, 68, 68, 0.46);
+  background: rgba(239, 68, 68, 0.14);
+  color: #fecaca;
+  transform: translateY(-1px);
+}
+
+.mobileProfileButton svg,
+.mobileLogoutButton svg {
   width: 18px;
   height: 18px;
   stroke: currentColor;
@@ -653,6 +763,10 @@
 
   .translateDropdownMenu {
     width: 340px;
+  }
+
+  .profileDropdownMenu {
+    width: 250px;
   }
 }
 
@@ -715,7 +829,8 @@
 
   .mobileActions .registerButton,
   .mobileActions .loginButton,
-  .mobileActions .mobileProfileButton {
+  .mobileActions .mobileProfileButton,
+  .mobileActions .mobileLogoutButton {
     width: 100%;
     min-width: 0;
     height: 42px;

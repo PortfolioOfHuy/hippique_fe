@@ -5,7 +5,15 @@ import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
 import { usePathname } from "next/navigation";
-import { Check, Globe, Menu, UserRound, X } from "lucide-react";
+import {
+  Check,
+  Globe,
+  LogOut,
+  Menu,
+  PlusCircle,
+  UserRound,
+  X,
+} from "lucide-react";
 import styles from "./Header.module.scss";
 
 declare global {
@@ -220,6 +228,7 @@ function readGoogleLanguages(): LanguageItem[] {
   if (typeof window === "undefined") return [];
 
   const select = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+
   if (!select) return [];
 
   return Array.from(select.options)
@@ -280,6 +289,7 @@ export default function Header() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
   const [languages, setLanguages] = useState<LanguageItem[]>([]);
   const [translateReady, setTranslateReady] = useState(false);
   const [selectedLanguage, setSelectedLanguage] = useState("nl");
@@ -287,9 +297,10 @@ export default function Header() {
   const [currentTime, setCurrentTime] = useState("--:--");
 
   const langRef = useRef<HTMLDivElement | null>(null);
+  const profileRef = useRef<HTMLDivElement | null>(null);
   const pollRef = useRef<number | null>(null);
 
-  const languageOptions = useMemo<LanguageWithTimezone[]>((() => {
+  const languageOptions = useMemo<LanguageWithTimezone[]>(() => {
     return languages.map((item) => {
       const info = getTimezoneInfo(item.value);
 
@@ -300,7 +311,7 @@ export default function Header() {
         utcLabel: info.utcLabel,
       };
     });
-  }), [languages]);
+  }, [languages]);
 
   const selectedLanguageItem = useMemo(() => {
     return (
@@ -316,6 +327,7 @@ export default function Header() {
   useEffect(() => {
     setMobileOpen(false);
     setLangOpen(false);
+    setProfileOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -336,10 +348,14 @@ export default function Header() {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (!langRef.current) return;
+      const target = event.target as Node;
 
-      if (!langRef.current.contains(event.target as Node)) {
+      if (langRef.current && !langRef.current.contains(target)) {
         setLangOpen(false);
+      }
+
+      if (profileRef.current && !profileRef.current.contains(target)) {
+        setProfileOpen(false);
       }
     }
 
@@ -488,7 +504,10 @@ export default function Header() {
                 }`}
                 aria-label="Taal en tijdzone kiezen"
                 aria-expanded={langOpen}
-                onClick={() => setLangOpen((prev) => !prev)}
+                onClick={() => {
+                  setLangOpen((prev) => !prev);
+                  setProfileOpen(false);
+                }}
               >
                 <Globe size={18} strokeWidth={2} />
               </button>
@@ -535,7 +554,7 @@ export default function Header() {
                       );
                     })
                   ) : (
-                    <div className={styles.languageLoading}>Loading...</div>
+                    <div className={styles.languageLoading}>Laden...</div>
                   )}
                 </div>
 
@@ -547,14 +566,54 @@ export default function Header() {
               </div>
             </div>
 
-            <Link
-              href="/profiel"
-              className={styles.profileIconButton}
-              aria-label="Mijn profiel"
-              title="Mijn profiel"
-            >
-              <UserRound size={18} strokeWidth={2} />
-            </Link>
+            <div className={styles.profileDropdown} ref={profileRef}>
+              <button
+                type="button"
+                className={`${styles.profileIconButton} ${
+                  profileOpen ? styles.profileIconButtonOpen : ""
+                }`}
+                aria-label="Accountmenu openen"
+                aria-expanded={profileOpen}
+                onClick={() => {
+                  setProfileOpen((prev) => !prev);
+                  setLangOpen(false);
+                }}
+              >
+                <UserRound size={18} strokeWidth={2} />
+              </button>
+
+              <div
+                className={`${styles.profileDropdownMenu} ${
+                  profileOpen ? styles.profileDropdownMenuOpen : ""
+                }`}
+              >
+                <div className={styles.profileDropdownHeader}>
+                  <span>Welkom terug</span>
+                  <strong>Premium lid</strong>
+                </div>
+
+                <Link href="/profiel" className={styles.profileDropdownItem}>
+                  <UserRound size={17} strokeWidth={2.1} />
+                  <span>Mijn profiel</span>
+                </Link>
+
+                <Link
+                  href="/advertentie-plaatsen"
+                  className={styles.profileDropdownItem}
+                >
+                  <PlusCircle size={17} strokeWidth={2.1} />
+                  <span>Advertentie plaatsen</span>
+                </Link>
+
+                <Link
+                  href="/inloggen"
+                  className={`${styles.profileDropdownItem} ${styles.profileDropdownLogout}`}
+                >
+                  <LogOut size={17} strokeWidth={2.1} />
+                  <span>Uitloggen</span>
+                </Link>
+              </div>
+            </div>
 
             <Link href="/registreren" className={styles.registerButton}>
               Registreren
@@ -577,12 +636,16 @@ export default function Header() {
         </div>
 
         <div
-          className={`${styles.mobileOverlay} ${mobileOpen ? styles.mobileOverlayOpen : ""}`}
+          className={`${styles.mobileOverlay} ${
+            mobileOpen ? styles.mobileOverlayOpen : ""
+          }`}
           onClick={() => setMobileOpen(false)}
         />
 
         <aside
-          className={`${styles.mobileDrawer} ${mobileOpen ? styles.mobileDrawerOpen : ""}`}
+          className={`${styles.mobileDrawer} ${
+            mobileOpen ? styles.mobileDrawerOpen : ""
+          }`}
           aria-hidden={!mobileOpen}
         >
           <div className={styles.mobileDrawerHeader}>
@@ -612,7 +675,7 @@ export default function Header() {
           </div>
 
           <div className={styles.mobileTranslateBlock}>
-            <div className={styles.mobileTranslateTitle}>Language & Timezone</div>
+            <div className={styles.mobileTranslateTitle}>Taal & tijdzone</div>
 
             <div className={styles.mobileSelectedLocale}>
               <strong>
@@ -646,7 +709,7 @@ export default function Header() {
                   );
                 })
               ) : (
-                <div className={styles.languageLoading}>Loading...</div>
+                <div className={styles.languageLoading}>Laden...</div>
               )}
             </div>
 
@@ -665,7 +728,9 @@ export default function Header() {
                 <Link
                   key={item.href}
                   href={item.href}
-                  className={`${styles.mobileNavLink} ${active ? styles.mobileActive : ""}`}
+                  className={`${styles.mobileNavLink} ${
+                    active ? styles.mobileActive : ""
+                  }`}
                   onClick={() => setMobileOpen(false)}
                 >
                   {item.label}
@@ -685,6 +750,15 @@ export default function Header() {
             </Link>
 
             <Link
+              href="/advertentie-plaatsen"
+              className={styles.mobileProfileButton}
+              onClick={() => setMobileOpen(false)}
+            >
+              <PlusCircle size={18} strokeWidth={2} />
+              <span>Advertentie plaatsen</span>
+            </Link>
+
+            <Link
               href="/registreren"
               className={styles.registerButton}
               onClick={() => setMobileOpen(false)}
@@ -698,6 +772,15 @@ export default function Header() {
               onClick={() => setMobileOpen(false)}
             >
               Inloggen
+            </Link>
+
+            <Link
+              href="/inloggen"
+              className={styles.mobileLogoutButton}
+              onClick={() => setMobileOpen(false)}
+            >
+              <LogOut size={18} strokeWidth={2} />
+              <span>Uitloggen</span>
             </Link>
           </div>
         </aside>

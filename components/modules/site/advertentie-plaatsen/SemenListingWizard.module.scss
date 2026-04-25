@@ -1,0 +1,495 @@
+.wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+.sectionHeading {
+  margin-top: 10px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  span {
+    width: 40px;
+    height: 40px;
+    flex: 0 0 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background: #000000;
+    color: #ffffff;
+    font-size: 14px;
+    font-weight: 900;
+  }
+
+  h2 {
+    margin: 0;
+    font-size: clamp(26px, 2.4vw, 38px);
+    line-height: 1.1;
+  }
+}
+
+.card,
+.pricingCard {
+  padding: 28px;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 22px 60px rgba(10, 25, 47, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.addressHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 22px;
+}
+
+.linkButton {
+  min-height: 44px;
+  padding: 0 12px;
+  border-radius: var(--radius-button);
+  color: #8a6419;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  cursor: pointer;
+
+  &:hover {
+    background: rgba(197, 160, 89, 0.1);
+  }
+}
+
+.formGridTwo {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px 28px;
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+
+  label {
+    color: rgba(10, 25, 47, 0.62);
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    min-height: 58px;
+    padding: 14px 18px;
+    border-radius: var(--radius-sm);
+    border: 1px solid rgba(10, 25, 47, 0.08);
+    background: rgba(245, 242, 237, 0.68);
+    color: var(--hippique-primary);
+    outline: none;
+  }
+
+  textarea {
+    min-height: 128px;
+    resize: vertical;
+  }
+}
+
+.mediaGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 0.9fr);
+  gap: 24px;
+}
+
+.mainUpload,
+.uploadCard {
+  position: relative;
+  overflow: hidden;
+
+  input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+}
+
+.mainUpload {
+  min-height: 190px;
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  border: 2px dashed rgba(10, 25, 47, 0.22);
+  background: rgba(255, 255, 255, 0.7);
+  color: rgba(10, 25, 47, 0.7);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+
+  strong {
+    margin-top: 14px;
+    color: var(--hippique-primary);
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  span,
+  em {
+    max-width: 360px;
+    margin-top: 7px;
+    color: rgba(10, 25, 47, 0.58);
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    font-style: normal;
+  }
+
+  em {
+    color: #8a6419;
+    font-weight: 800;
+  }
+}
+
+.videoBox {
+  padding: 28px;
+  border-radius: var(--radius-lg);
+  background: rgba(245, 242, 237, 0.82);
+}
+
+.uploadGrid {
+  margin-top: 24px;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.uploadCard {
+  min-height: 128px;
+  padding: 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(10, 25, 47, 0.12);
+  background: rgba(255, 255, 255, 0.82);
+  color: rgba(10, 25, 47, 0.68);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  text-align: center;
+  gap: 8px;
+
+  strong {
+    color: var(--hippique-primary);
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.35;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+
+  span {
+    color: rgba(10, 25, 47, 0.5);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+}
+
+.pricingCard {
+  padding: 0;
+  overflow: hidden;
+}
+
+.pricingBlock,
+.summaryBlock {
+  padding: 28px;
+  border-bottom: 1px solid rgba(10, 25, 47, 0.08);
+
+  h3 {
+    margin-bottom: 22px;
+    color: #8a6419;
+    font-size: 15px;
+    font-weight: 900;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+}
+
+.toggleHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.toggle {
+  width: 54px;
+  height: 30px;
+  padding: 3px;
+  border-radius: var(--radius-pill);
+  background: rgba(10, 25, 47, 0.18);
+  cursor: pointer;
+
+  span {
+    width: 24px;
+    height: 24px;
+    display: block;
+    border-radius: 999px;
+    background: #ffffff;
+    transition: transform 0.22s ease;
+  }
+}
+
+.toggleActive {
+  background: var(--hippique-primary);
+
+  span {
+    transform: translateX(24px);
+  }
+}
+
+.cryptoBox {
+  margin-bottom: 22px;
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(245, 242, 237, 0.82);
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.warningBox {
+  margin-top: 22px;
+  padding: 18px 20px;
+  border-radius: var(--radius-sm);
+  border-left: 4px solid #8a6419;
+  background: #42180f;
+  color: #ffffff;
+
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  svg {
+    color: var(--hippique-secondary);
+    flex: 0 0 22px;
+  }
+
+  p {
+    color: #ffffff;
+    font-size: var(--fs-small);
+    line-height: 1.65;
+  }
+}
+
+.cryptoDisclaimer {
+  margin-top: 16px;
+  text-align: center;
+  color: rgba(10, 25, 47, 0.52);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+}
+
+.feeRows {
+  max-width: 540px;
+
+  div {
+    padding: 10px 0;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+
+    span {
+      color: rgba(10, 25, 47, 0.74);
+      font-size: var(--fs-body);
+    }
+
+    strong {
+      color: var(--hippique-primary);
+      font-size: var(--fs-body-lg);
+      font-weight: 900;
+    }
+  }
+
+  .totalRow {
+    margin-top: 8px;
+    padding-top: 18px;
+    border-top: 1px solid rgba(10, 25, 47, 0.12);
+
+    span {
+      color: var(--hippique-primary);
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+    }
+
+    strong {
+      font-size: 26px;
+    }
+  }
+}
+
+.infoBox {
+  margin-top: 28px;
+  padding: 18px 20px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(245, 242, 237, 0.72);
+
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+
+  svg {
+    color: #8a6419;
+    flex: 0 0 18px;
+  }
+
+  p {
+    color: rgba(10, 25, 47, 0.72);
+    font-size: var(--fs-small);
+    line-height: 1.65;
+  }
+}
+
+.stripeButton,
+.reviewButton {
+  min-height: 56px;
+  border-radius: var(--radius-button);
+  font-size: 14px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  cursor: pointer;
+}
+
+.stripeButton {
+  margin-top: 18px;
+  padding: 0 24px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #6256ff;
+  color: #ffffff;
+
+  &:hover {
+    filter: brightness(0.96);
+  }
+}
+
+.confirmation {
+  padding: 28px 0 0;
+  border-top: 1px solid rgba(10, 25, 47, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  label {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    color: rgba(10, 25, 47, 0.72);
+    font-size: var(--fs-body);
+    line-height: 1.6;
+  }
+
+  input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-top: 4px;
+    flex: 0 0 18px;
+  }
+}
+
+.reviewButton {
+  width: 100%;
+  margin-top: 14px;
+  background: var(--hippique-primary);
+  color: #ffffff;
+  box-shadow: 0 16px 34px rgba(10, 25, 47, 0.18);
+
+  &:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  &:not(:disabled):hover {
+    background: var(--hippique-secondary);
+    color: var(--hippique-primary);
+  }
+}
+
+@media (max-width: 991px) {
+  .card,
+  .pricingBlock,
+  .summaryBlock {
+    padding: 22px;
+  }
+
+  .addressHeader,
+  .formGridTwo,
+  .mediaGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .uploadGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .linkButton {
+    justify-self: flex-start;
+  }
+}
+
+@media (max-width: 640px) {
+  .sectionHeading {
+    align-items: flex-start;
+
+    span {
+      width: 36px;
+      height: 36px;
+      flex-basis: 36px;
+    }
+  }
+
+  .card,
+  .pricingCard {
+    border-radius: var(--radius-lg);
+  }
+
+  .uploadGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .mainUpload {
+    min-height: 170px;
+  }
+
+  .toggleHeader {
+    align-items: flex-start;
+  }
+
+  .stripeButton {
+    width: 100%;
+    justify-content: center;
+  }
+}
