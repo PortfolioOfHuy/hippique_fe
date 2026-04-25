@@ -1,0 +1,353 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.heading {
+  max-width: 760px;
+
+  h2 {
+    margin: 0;
+    color: var(--hippique-primary);
+    font-size: clamp(38px, 3.4vw, 54px);
+    font-weight: 900;
+    line-height: 1.06;
+    letter-spacing: -0.04em;
+  }
+
+  p {
+    margin-top: 12px;
+    color: rgba(10, 25, 47, 0.62);
+    font-size: var(--fs-body-lg);
+    line-height: 1.65;
+  }
+}
+
+.kicker {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: var(--hippique-secondary);
+  font-size: var(--fs-caption);
+  font-weight: 900;
+  line-height: 1.4;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.tableCard {
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  box-shadow:
+    0 22px 60px rgba(10, 25, 47, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.tableTitle {
+  padding: 30px 34px;
+  border-bottom: 1px solid rgba(10, 25, 47, 0.06);
+
+  h3 {
+    margin: 0;
+    color: var(--hippique-primary);
+    font-size: clamp(25px, 2vw, 34px);
+    font-weight: 850;
+    line-height: 1.15;
+    letter-spacing: -0.03em;
+  }
+}
+
+.tableWrap {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  min-width: 860px;
+  border-collapse: collapse;
+  table-layout: fixed;
+
+  th,
+  td {
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    padding: 22px 34px;
+    background: rgba(10, 25, 47, 0.035);
+    color: rgba(10, 25, 47, 0.42);
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.4;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+  }
+
+  td {
+    padding: 24px 34px;
+    border-top: 1px solid rgba(10, 25, 47, 0.055);
+    color: var(--hippique-primary);
+    font-size: var(--fs-small);
+    line-height: 1.55;
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 23%;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 27%;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 17%;
+  }
+
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 19%;
+  }
+
+  th:nth-child(5),
+  td:nth-child(5) {
+    width: 14%;
+    text-align: right;
+  }
+}
+
+.auctionName {
+  display: block;
+  max-width: 190px;
+  color: var(--hippique-primary);
+  font-size: 17px;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.lotCell {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lotImage,
+.lotPlaceholder {
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: rgba(10, 25, 47, 0.06);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+}
+
+.lotImage {
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+}
+
+.lotPlaceholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: rgba(10, 25, 47, 0.38);
+  font-size: 18px;
+  font-weight: 900;
+}
+
+.lotName {
+  display: block;
+  color: var(--hippique-primary);
+  font-size: 17px;
+  font-weight: 850;
+  line-height: 1.45;
+}
+
+.status {
+  min-height: 30px;
+  padding: 0 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border-radius: var(--radius-pill);
+  font-size: 11px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+
+  i {
+    width: 7px;
+    height: 7px;
+    border-radius: var(--radius-pill);
+    background: currentColor;
+  }
+}
+
+.status_active {
+  color: #8a6419;
+  background: rgba(197, 160, 89, 0.12);
+}
+
+.status_won {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+.status_outbid {
+  color: #b91c1c;
+  background: rgba(239, 68, 68, 0.08);
+}
+
+.status_lost {
+  color: rgba(10, 25, 47, 0.52);
+  background: rgba(10, 25, 47, 0.055);
+}
+
+.price {
+  display: inline-block;
+  color: var(--hippique-primary);
+  font-size: 19px;
+  font-weight: 900;
+  line-height: 1.35;
+  white-space: nowrap;
+}
+
+.dateTime {
+  display: inline-block;
+  color: rgba(10, 25, 47, 0.5);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+@media (max-width: 991px) {
+  .section {
+    gap: 24px;
+  }
+
+  .tableTitle {
+    padding: 24px;
+  }
+
+  .table {
+    min-width: 760px;
+
+    th,
+    td {
+      padding: 20px 24px;
+    }
+  }
+}
+
+@media (max-width: 767px) {
+  .heading {
+    h2 {
+      font-size: clamp(32px, 9vw, 42px);
+    }
+
+    p {
+      font-size: var(--fs-body);
+    }
+  }
+
+  .tableCard {
+    border-radius: var(--radius-lg);
+  }
+
+  .tableWrap {
+    overflow: visible;
+  }
+
+  .table {
+    min-width: 0;
+
+    thead {
+      display: none;
+    }
+
+    tbody,
+    tr,
+    td {
+      display: block;
+      width: 100%;
+    }
+
+    tr {
+      padding: 20px;
+      border-top: 1px solid rgba(10, 25, 47, 0.07);
+    }
+
+    tr:first-child {
+      border-top: 0;
+    }
+
+    td {
+      padding: 0;
+      border: 0;
+      text-align: left !important;
+    }
+
+    td + td {
+      margin-top: 16px;
+    }
+
+    td::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(10, 25, 47, 0.42);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+  }
+
+  .auctionName {
+    max-width: none;
+  }
+
+  .lotCell {
+    align-items: flex-start;
+  }
+
+  .price {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 575px) {
+  .tableTitle {
+    padding: 22px 20px;
+  }
+
+  .table {
+    tr {
+      padding: 18px;
+    }
+  }
+
+  .lotImage,
+  .lotPlaceholder {
+    width: 48px;
+    height: 48px;
+    flex-basis: 48px;
+  }
+
+  .lotName,
+  .auctionName {
+    font-size: 16px;
+  }
+}

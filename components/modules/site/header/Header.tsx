@@ -5,7 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
 import { usePathname } from "next/navigation";
-import { Check, Globe, Menu, X } from "lucide-react";
+import { Check, Globe, Menu, UserRound, X } from "lucide-react";
 import styles from "./Header.module.scss";
 
 declare global {
@@ -289,7 +289,7 @@ export default function Header() {
   const langRef = useRef<HTMLDivElement | null>(null);
   const pollRef = useRef<number | null>(null);
 
-  const languageOptions = useMemo<LanguageWithTimezone[]>(() => {
+  const languageOptions = useMemo<LanguageWithTimezone[]>((() => {
     return languages.map((item) => {
       const info = getTimezoneInfo(item.value);
 
@@ -300,7 +300,7 @@ export default function Header() {
         utcLabel: info.utcLabel,
       };
     });
-  }, [languages]);
+  }), [languages]);
 
   const selectedLanguageItem = useMemo(() => {
     return (
@@ -328,6 +328,7 @@ export default function Header() {
 
   useEffect(() => {
     document.body.style.overflow = mobileOpen ? "hidden" : "";
+
     return () => {
       document.body.style.overflow = "";
     };
@@ -336,13 +337,17 @@ export default function Header() {
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (!langRef.current) return;
+
       if (!langRef.current.contains(event.target as Node)) {
         setLangOpen(false);
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
   }, []);
 
   useEffect(() => {
@@ -353,7 +358,10 @@ export default function Header() {
     updateTime();
 
     const timer = window.setInterval(updateTime, 30000);
-    return () => window.clearInterval(timer);
+
+    return () => {
+      window.clearInterval(timer);
+    };
   }, [selectedTimezone]);
 
   useEffect(() => {
@@ -361,7 +369,9 @@ export default function Header() {
       removeGoogleTranslateArtifacts();
     }, 1000);
 
-    return () => window.clearInterval(cleanupTimer);
+    return () => {
+      window.clearInterval(cleanupTimer);
+    };
   }, []);
 
   useEffect(() => {
@@ -476,7 +486,7 @@ export default function Header() {
                 className={`${styles.translateIconButton} ${
                   langOpen ? styles.translateIconButtonOpen : ""
                 }`}
-                aria-label="Choose language and timezone"
+                aria-label="Taal en tijdzone kiezen"
                 aria-expanded={langOpen}
                 onClick={() => setLangOpen((prev) => !prev)}
               >
@@ -518,6 +528,7 @@ export default function Header() {
                             <span className={styles.languageCountry}>
                               {item.label} ({item.utcLabel})
                             </span>
+
                             {active ? <Check size={15} strokeWidth={2.4} /> : null}
                           </span>
                         </button>
@@ -535,6 +546,15 @@ export default function Header() {
                 />
               </div>
             </div>
+
+            <Link
+              href="/profiel"
+              className={styles.profileIconButton}
+              aria-label="Mijn profiel"
+              title="Mijn profiel"
+            >
+              <UserRound size={18} strokeWidth={2} />
+            </Link>
 
             <Link href="/registreren" className={styles.registerButton}>
               Registreren
@@ -619,6 +639,7 @@ export default function Header() {
                         <span className={styles.languageCountry}>
                           {item.label} ({item.utcLabel})
                         </span>
+
                         {active ? <Check size={15} strokeWidth={2.4} /> : null}
                       </span>
                     </button>
@@ -654,6 +675,15 @@ export default function Header() {
           </nav>
 
           <div className={styles.mobileActions}>
+            <Link
+              href="/profiel"
+              className={styles.mobileProfileButton}
+              onClick={() => setMobileOpen(false)}
+            >
+              <UserRound size={18} strokeWidth={2} />
+              <span>Mijn profiel</span>
+            </Link>
+
             <Link
               href="/registreren"
               className={styles.registerButton}

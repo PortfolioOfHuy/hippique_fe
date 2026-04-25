@@ -1,0 +1,564 @@
+.section {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.heading {
+  max-width: 780px;
+
+  h2 {
+    margin: 0;
+    color: var(--hippique-primary);
+    font-size: clamp(36px, 3.4vw, 54px);
+    font-weight: 900;
+    line-height: 1.06;
+    letter-spacing: -0.04em;
+  }
+
+  p {
+    margin-top: 12px;
+    color: rgba(10, 25, 47, 0.62);
+    font-size: var(--fs-body-lg);
+    line-height: 1.65;
+  }
+}
+
+.summaryGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.summaryCard {
+  position: relative;
+  min-width: 0;
+  padding: 26px 24px;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 18px 48px rgba(10, 25, 47, 0.05),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 4px;
+    border-radius: var(--radius-card) 0 0 var(--radius-card);
+    background: rgba(10, 25, 47, 0.12);
+  }
+}
+
+.summaryCardGold {
+  &::before {
+    background: var(--hippique-secondary);
+  }
+
+  .summaryValue {
+    color: #8a6419;
+  }
+}
+
+.summaryCardMuted {
+  .summaryValue {
+    color: rgba(10, 25, 47, 0.45);
+  }
+}
+
+.summaryLabel {
+  display: block;
+  color: rgba(10, 25, 47, 0.52);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.4;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.summaryValue {
+  display: block;
+  margin-top: 16px;
+  color: var(--hippique-primary);
+  font-size: clamp(24px, 2vw, 32px);
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -0.03em;
+}
+
+.bottomGrid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(0, 0.95fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.panel {
+  min-width: 0;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 22px 60px rgba(10, 25, 47, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+}
+
+.panelHeader {
+  min-width: 0;
+  padding: 22px 24px;
+  border-bottom: 1px solid rgba(10, 25, 47, 0.06);
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.panelHeaderMain {
+  min-width: 0;
+  flex: 1;
+
+  h3 {
+    margin: 0;
+    color: var(--hippique-primary);
+    font-size: clamp(22px, 1.7vw, 32px);
+    font-weight: 850;
+    line-height: 1.12;
+    letter-spacing: -0.04em;
+
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+.panelMeta {
+  flex: 0 0 auto;
+  color: rgba(10, 25, 47, 0.42);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.requestButton {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 42px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border-radius: var(--radius-button);
+  border: 1px solid var(--hippique-secondary);
+  background: var(--hippique-secondary);
+  color: var(--hippique-primary);
+  cursor: pointer;
+
+  transition:
+    transform 0.22s ease,
+    background 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease,
+    box-shadow 0.22s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    background: var(--hippique-tertiary);
+    border-color: var(--hippique-tertiary);
+    color: #ffffff;
+  }
+
+  svg {
+    width: 16px;
+    height: 16px;
+    stroke: currentColor;
+  }
+}
+
+.historyTableWrap,
+.refundTableWrap {
+  width: 100%;
+  overflow: hidden;
+}
+
+.historyTable,
+.refundTable {
+  width: 100%;
+  table-layout: fixed;
+  border-collapse: collapse;
+
+  th,
+  td {
+    text-align: left;
+    vertical-align: middle;
+  }
+
+  th {
+    padding: 16px 24px;
+    background: rgba(10, 25, 47, 0.035);
+    color: rgba(10, 25, 47, 0.46);
+    font-size: 11px;
+    font-weight: 900;
+    line-height: 1.45;
+    letter-spacing: 0.13em;
+    text-transform: uppercase;
+  }
+
+  td {
+    padding: 22px 24px;
+    border-top: 1px solid rgba(10, 25, 47, 0.055);
+  }
+}
+
+.historyTable {
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 17%;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 31%;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 22%;
+  }
+
+  th:nth-child(4),
+  td:nth-child(4) {
+    width: 30%;
+  }
+}
+
+.refundTable {
+  th,
+  td {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+
+  th:nth-child(1),
+  td:nth-child(1) {
+    width: 34%;
+  }
+
+  th:nth-child(2),
+  td:nth-child(2) {
+    width: 35%;
+  }
+
+  th:nth-child(3),
+  td:nth-child(3) {
+    width: 31%;
+  }
+}
+
+.dateCell {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+
+  small {
+    color: rgba(10, 25, 47, 0.42);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+    word-break: break-word;
+  }
+}
+
+.dateMain {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+
+  span {
+    color: var(--hippique-primary);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.2;
+    text-transform: capitalize;
+  }
+
+  strong {
+    color: var(--hippique-primary);
+    font-size: 19px;
+    font-weight: 900;
+    line-height: 1.15;
+  }
+}
+
+.purposeCell {
+  color: rgba(10, 25, 47, 0.78);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.amountCell {
+  color: var(--hippique-primary);
+  font-size: 17px;
+  font-weight: 900;
+  line-height: 1.4;
+  white-space: nowrap;
+}
+
+.statusBadge,
+.statusDotBadge {
+  min-height: 30px;
+  max-width: 100%;
+  padding: 0 10px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+
+  border-radius: var(--radius-pill);
+  font-size: 9px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.statusDotBadge {
+  i {
+    width: 7px;
+    height: 7px;
+    flex: 0 0 7px;
+    border-radius: 999px;
+    background: currentColor;
+  }
+}
+
+.statusDeposit_refundbaar {
+  color: #8a6419;
+  background: rgba(197, 160, 89, 0.18);
+}
+
+.statusDeposit_toegepast {
+  color: #15803d;
+  background: rgba(34, 197, 94, 0.14);
+}
+
+.statusDeposit_terugbetaald {
+  color: rgba(10, 25, 47, 0.5);
+  background: rgba(10, 25, 47, 0.08);
+}
+
+.requestDateCell {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+
+  strong {
+    color: var(--hippique-primary);
+    font-size: 16px;
+    font-weight: 850;
+    line-height: 1.45;
+    word-break: break-word;
+  }
+
+  small {
+    color: rgba(10, 25, 47, 0.42);
+    font-size: 11px;
+    font-weight: 700;
+    line-height: 1.5;
+  }
+}
+
+.linkedDepositCell {
+  color: rgba(10, 25, 47, 0.78);
+  font-size: 15px;
+  font-weight: 500;
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.statusRefund_behandeling {
+  color: #8a6419;
+}
+
+.statusRefund_goedgekeurd {
+  color: #16a34a;
+}
+
+@media (max-width: 1320px) {
+  .bottomGrid {
+    grid-template-columns: minmax(0, 1.2fr) minmax(0, 0.9fr);
+    gap: 20px;
+  }
+
+  .historyTable,
+  .refundTable {
+    th,
+    td {
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+  }
+
+  .statusBadge,
+  .statusDotBadge {
+    padding: 0 8px;
+    font-size: 8.5px;
+  }
+
+  .requestDateCell {
+    strong {
+      font-size: 15px;
+    }
+  }
+
+  .linkedDepositCell {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 1199px) {
+  .summaryGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bottomGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .historyTable,
+  .refundTable {
+    th,
+    td {
+      padding-left: 24px;
+      padding-right: 24px;
+    }
+  }
+
+  .statusBadge,
+  .statusDotBadge {
+    padding: 0 10px;
+    font-size: 10px;
+  }
+
+  .requestDateCell {
+    strong {
+      font-size: 17px;
+    }
+  }
+
+  .linkedDepositCell {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 767px) {
+  .heading {
+    h2 {
+      font-size: clamp(32px, 8vw, 42px);
+    }
+
+    p {
+      font-size: var(--fs-body);
+    }
+  }
+
+  .summaryGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .summaryCard {
+    padding: 22px 20px;
+    border-radius: var(--radius-lg);
+
+    &::before {
+      border-radius: var(--radius-lg) 0 0 var(--radius-lg);
+    }
+  }
+
+  .panel {
+    border-radius: var(--radius-lg);
+  }
+
+  .panelHeader {
+    padding: 20px;
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .panelHeaderMain {
+    h3 {
+      font-size: clamp(24px, 7vw, 32px);
+    }
+  }
+
+  .requestButton {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+  }
+
+  .historyTable,
+  .refundTable {
+    thead {
+      display: none;
+    }
+
+    tbody,
+    tr,
+    td {
+      display: block;
+      width: 100%;
+    }
+
+    tr {
+      padding: 18px 20px;
+      border-top: 1px solid rgba(10, 25, 47, 0.06);
+    }
+
+    tr:first-child {
+      border-top: 0;
+    }
+
+    td {
+      padding: 0;
+      border: 0;
+      text-align: left;
+    }
+
+    td + td {
+      margin-top: 16px;
+    }
+
+    td::before {
+      content: attr(data-label);
+      display: block;
+      margin-bottom: 8px;
+      color: rgba(10, 25, 47, 0.42);
+      font-size: 11px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+    }
+  }
+}
+
+@media (max-width: 575px) {
+  .section {
+    gap: 24px;
+  }
+
+  .summaryValue {
+    font-size: 30px;
+  }
+}
