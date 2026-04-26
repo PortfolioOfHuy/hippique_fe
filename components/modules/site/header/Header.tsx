@@ -11,6 +11,7 @@ import {
   LogOut,
   Menu,
   PlusCircle,
+  RotateCcw,
   UserRound,
   X,
 } from "lucide-react";
@@ -631,6 +632,11 @@ export default function Header() {
                   <span>Advertentie plaatsen</span>
                 </Link>
 
+                <Link href="/opnieuw-verkopen" className={styles.profileDropdownItem}>
+                  <RotateCcw size={17} strokeWidth={2.1} />
+                  <span>Opnieuw verkopen</span>
+                </Link>
+
                 <Link
                   href="/inloggen"
                   className={`${styles.profileDropdownItem} ${styles.profileDropdownLogout}`}
@@ -779,6 +785,15 @@ export default function Header() {
             >
               <PlusCircle size={18} strokeWidth={2} />
               <span>Advertentie plaatsen</span>
+            </Link>
+
+            <Link
+              href="/opnieuw-verkopen"
+              className={styles.mobileProfileButton}
+              onClick={() => setMobileOpen(false)}
+            >
+              <RotateCcw size={18} strokeWidth={2} />
+              <span>Opnieuw verkopen</span>
             </Link>
 
             <Link
