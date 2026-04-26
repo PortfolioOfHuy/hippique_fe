@@ -21,68 +21,88 @@ const horses: HorseItem[] = [
   {
     id: 1,
     title: "Lothario Z",
-    subtitle: "Zangersheide / 10 Years",
-    bid: "€112,000",
-    badge: "Ending",
-    endsAt: "2026-04-23T00:15:42",
+    subtitle: "Zangersheide / 10 jaar",
+    bid: "€112.000",
+    badge: "Bijna afgelopen",
+    endsAt: "2026-07-23T00:15:42",
     image: "/img/home/ending-soon/horse-1.webp",
     imageAlt: "Lothario Z",
-    href: "/horses/lothario-z",
+    href: "/paarden/lothario-z",
   },
   {
     id: 2,
     title: "Diamond Jewel",
-    subtitle: "Oldenburg / 5 Years",
-    bid: "€89,500",
-    badge: "Ending",
-    endsAt: "2026-04-23T00:42:11",
+    subtitle: "Oldenburg / 5 jaar",
+    bid: "€89.500",
+    badge: "Bijna afgelopen",
+    endsAt: "2026-07-23T00:42:11",
     image: "/img/home/ending-soon/horse-2.webp",
     imageAlt: "Diamond Jewel",
-    href: "/horses/diamond-jewel",
+    href: "/paarden/diamond-jewel",
   },
   {
     id: 3,
     title: "Quantum Leap",
-    subtitle: "Hanoverian / 7 Years",
-    bid: "€204,000",
-    badge: "Ending",
-    endsAt: "2026-04-23T01:05:59",
+    subtitle: "Hannoveraan / 7 jaar",
+    bid: "€204.000",
+    badge: "Bijna afgelopen",
+    endsAt: "2026-07-23T01:05:59",
     image: "/img/home/ending-soon/horse-3.webp",
     imageAlt: "Quantum Leap",
-    href: "/horses/quantum-leap",
+    href: "/paarden/quantum-leap",
   },
 ];
 
 function formatCountdown(targetDate: string, now: number) {
-  const distance = new Date(targetDate).getTime() - now;
+  const targetTime = new Date(targetDate).getTime();
+  const distance = targetTime - now;
 
-  if (Number.isNaN(distance) || distance <= 0) {
+  if (Number.isNaN(targetTime) || distance <= 0) {
     return "00:00:00";
   }
 
   const totalSeconds = Math.floor(distance / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+  const days = Math.floor(totalSeconds / (60 * 60 * 24));
+  const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+  const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
   const seconds = totalSeconds % 60;
 
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-    2,
-    "0",
-  )}:${String(seconds).padStart(2, "0")}`;
+  const timeText = `${String(hours).padStart(2, "0")}:${String(
+    minutes,
+  ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  if (days > 0) {
+    return `${String(days).padStart(2, "0")}d ${timeText}`;
+  }
+
+  return timeText;
 }
 
 function useCountdown(targetDate: string) {
-  const [now, setNow] = useState(Date.now());
+  const [mounted, setMounted] = useState(false);
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
+    setMounted(true);
+    setNow(Date.now());
+
     const timer = window.setInterval(() => {
       setNow(Date.now());
     }, 1000);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+    };
   }, []);
 
-  return useMemo(() => formatCountdown(targetDate, now), [targetDate, now]);
+  return useMemo(() => {
+    if (!mounted || now === 0) {
+      return "--:--:--";
+    }
+
+    return formatCountdown(targetDate, now);
+  }, [mounted, targetDate, now]);
 }
 
 function HorseCard({ horse }: { horse: HorseItem }) {
@@ -103,8 +123,10 @@ function HorseCard({ horse }: { horse: HorseItem }) {
           <span className={styles.badge}>{horse.badge}</span>
 
           <div className={styles.closingBox}>
-            <span className={styles.closingLabel}>Ends In</span>
-            <strong className={styles.closingTime}>{countdown}</strong>
+            <span className={styles.closingLabel}>Eindigt over</span>
+            <strong className={styles.closingTime} suppressHydrationWarning>
+              {countdown}
+            </strong>
           </div>
         </div>
       </Link>
@@ -120,12 +142,12 @@ function HorseCard({ horse }: { horse: HorseItem }) {
 
         <div className={styles.bottomRow}>
           <div className={styles.priceBlock}>
-            <span className={styles.priceLabel}>Current Bid</span>
+            <span className={styles.priceLabel}>Huidig bod</span>
             <strong className={styles.priceValue}>{horse.bid}</strong>
           </div>
 
           <Link href={horse.href} className={styles.bidButton}>
-            Place Bid
+            Bieden
           </Link>
         </div>
       </div>
@@ -139,14 +161,14 @@ export default function EndingSoonSection() {
       <div className={styles.inner}>
         <div className={styles.headingRow}>
           <div className={styles.heading}>
-            <h2 className={styles.title}>Ending Soon</h2>
+            <h2 className={styles.title}>Binnenkort afgelopen</h2>
             <p className={styles.subtitle}>
-              Don&apos;t miss out on these final opportunities.
+              Mis deze laatste kansen niet.
             </p>
           </div>
 
-          <Link href="/auctions/ending-soon" className={styles.viewAll}>
-            View All Closing Soon
+          <Link href="/veilingen" className={styles.viewAll}>
+            Bekijk alle kavels die bijna sluiten
           </Link>
         </div>
 

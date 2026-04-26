@@ -149,14 +149,42 @@ const timezoneMap: Record<string, { timezone: string; utcLabel: string }> = {
   sq: { timezone: "Europe/Tirane", utcLabel: "UTC +1" },
 };
 
-const defaultTimezoneInfo = {
-  timezone: "Europe/Amsterdam",
-  utcLabel: "UTC +1",
-};
-
 function isActivePath(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
+}
+
+function getTimezoneInfo(lang: string) {
+  return timezoneMap[lang];
+}
+
+function getLanguageDisplayName(lang: string, fallbackLabel: string) {
+  return languageNameMap[lang] || fallbackLabel;
+}
+
+function getSavedLanguage() {
+  if (typeof window === "undefined") return "";
+  return window.localStorage.getItem("site-language") || "";
+}
+
+function getSavedTimezone() {
+  if (typeof window === "undefined") return "";
+  return window.localStorage.getItem("site-timezone") || "";
+}
+
+function formatCurrentTime(timezone: string) {
+  if (!timezone) return "";
+
+  try {
+    return new Intl.DateTimeFormat("en-GB", {
+      timeZone: timezone,
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(new Date());
+  } catch {
+    return "";
+  }
 }
 
 function initGoogleTranslate() {
@@ -227,7 +255,9 @@ function removeGoogleTranslateArtifacts() {
 function readGoogleLanguages(): LanguageItem[] {
   if (typeof window === "undefined") return [];
 
-  const select = document.querySelector(".goog-te-combo") as HTMLSelectElement | null;
+  const select = document.querySelector(
+    ".goog-te-combo",
+  ) as HTMLSelectElement | null;
 
   if (!select) return [];
 
@@ -240,6 +270,8 @@ function readGoogleLanguages(): LanguageItem[] {
 }
 
 function triggerGoogleTranslate(lang: string) {
+  if (!lang) return false;
+
   const selects = document.querySelectorAll(".goog-te-combo");
 
   if (!selects.length) return false;
@@ -253,37 +285,6 @@ function triggerGoogleTranslate(lang: string) {
   return true;
 }
 
-function getSavedLanguage() {
-  if (typeof window === "undefined") return "nl";
-  return window.localStorage.getItem("site-language") || "nl";
-}
-
-function getSavedTimezone() {
-  if (typeof window === "undefined") return "Europe/Amsterdam";
-  return window.localStorage.getItem("site-timezone") || "Europe/Amsterdam";
-}
-
-function formatCurrentTime(timezone: string) {
-  try {
-    return new Intl.DateTimeFormat("en-GB", {
-      timeZone: timezone,
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    }).format(new Date());
-  } catch {
-    return "--:--";
-  }
-}
-
-function getTimezoneInfo(lang: string) {
-  return timezoneMap[lang] || defaultTimezoneInfo;
-}
-
-function getLanguageDisplayName(lang: string, fallbackLabel: string) {
-  return languageNameMap[lang] || fallbackLabel;
-}
-
 export default function Header() {
   const pathname = usePathname();
 
@@ -292,11 +293,12 @@ export default function Header() {
   const [profileOpen, setProfileOpen] = useState(false);
   const [languages, setLanguages] = useState<LanguageItem[]>([]);
   const [translateReady, setTranslateReady] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("nl");
-  const [selectedTimezone, setSelectedTimezone] = useState("Europe/Amsterdam");
-  const [currentTime, setCurrentTime] = useState("--:--");
+  const [selectedLanguage, setSelectedLanguage] = useState("");
+  const [selectedTimezone, setSelectedTimezone] = useState("");
+  const [currentTime, setCurrentTime] = useState("");
 
   const langRef = useRef<HTMLDivElement | null>(null);
+  const mobileLangRef = useRef<HTMLDivElement | null>(null);
   const profileRef = useRef<HTMLDivElement | null>(null);
   const pollRef = useRef<number | null>(null);
 
@@ -307,20 +309,17 @@ export default function Header() {
       return {
         value: item.value,
         label: getLanguageDisplayName(item.value, item.label),
-        timezone: info.timezone,
-        utcLabel: info.utcLabel,
+        timezone: info?.timezone || "",
+        utcLabel: info?.utcLabel || "",
       };
     });
   }, [languages]);
 
   const selectedLanguageItem = useMemo(() => {
+    if (!selectedLanguage) return null;
+
     return (
-      languageOptions.find((item) => item.value === selectedLanguage) ?? {
-        value: "nl",
-        label: "Dutch",
-        timezone: "Europe/Amsterdam",
-        utcLabel: "UTC +1",
-      }
+      languageOptions.find((item) => item.value === selectedLanguage) ?? null
     );
   }, [languageOptions, selectedLanguage]);
 
@@ -334,8 +333,12 @@ export default function Header() {
     const savedLanguage = getSavedLanguage();
     const savedTimezone = getSavedTimezone();
 
-    setSelectedLanguage(savedLanguage);
-    setSelectedTimezone(savedTimezone);
+    if (savedLanguage) {
+      const info = getTimezoneInfo(savedLanguage);
+
+      setSelectedLanguage(savedLanguage);
+      setSelectedTimezone(savedTimezone || info?.timezone || "");
+    }
   }, []);
 
   useEffect(() => {
@@ -350,7 +353,10 @@ export default function Header() {
     function handleClickOutside(event: MouseEvent) {
       const target = event.target as Node;
 
-      if (langRef.current && !langRef.current.contains(target)) {
+      const clickedDesktopLang = langRef.current?.contains(target);
+      const clickedMobileLang = mobileLangRef.current?.contains(target);
+
+      if (!clickedDesktopLang && !clickedMobileLang) {
         setLangOpen(false);
       }
 
@@ -409,11 +415,17 @@ export default function Header() {
           setTranslateReady(true);
 
           const savedLanguage = getSavedLanguage();
-          const info = getTimezoneInfo(savedLanguage);
 
-          setSelectedLanguage(savedLanguage);
-          setSelectedTimezone(info.timezone);
-          triggerGoogleTranslate(savedLanguage);
+          if (savedLanguage) {
+            const info = getTimezoneInfo(savedLanguage);
+
+            setSelectedLanguage(savedLanguage);
+            setSelectedTimezone(info?.timezone || getSavedTimezone());
+
+            if (savedLanguage !== "nl") {
+              triggerGoogleTranslate(savedLanguage);
+            }
+          }
 
           window.setTimeout(() => {
             removeGoogleTranslateArtifacts();
@@ -456,6 +468,60 @@ export default function Header() {
     window.setTimeout(() => {
       removeGoogleTranslateArtifacts();
     }, 150);
+  }
+
+  function renderTranslateHeader() {
+    return (
+      <div className={styles.translateDropdownHeader}>
+        <div className={styles.translateHeaderTop}>
+          <span className={styles.translateHeaderCountry}>
+            {selectedLanguageItem
+              ? `${selectedLanguageItem.label}${
+                  selectedLanguageItem.utcLabel
+                    ? ` (${selectedLanguageItem.utcLabel})`
+                    : ""
+                }`
+              : "Select language"}
+          </span>
+        </div>
+
+        {currentTime ? (
+          <div className={styles.translateHeaderMeta}>
+            <span>{currentTime}</span>
+          </div>
+        ) : null}
+      </div>
+    );
+  }
+
+  function renderLanguageList() {
+    if (!translateReady) {
+      return <div className={styles.languageLoading}>Laden...</div>;
+    }
+
+    return languageOptions.map((item) => {
+      const active = selectedLanguage === item.value;
+
+      return (
+        <button
+          key={item.value}
+          type="button"
+          className={`${styles.languageButton} ${
+            active ? styles.languageButtonActive : ""
+          }`}
+          onClick={() => selectLanguage(item)}
+        >
+          <span className={styles.languageButtonMain}>
+            <span className={styles.languageCountry}>
+              {item.label}
+              {item.utcLabel ? ` (${item.utcLabel})` : ""}
+            </span>
+
+            {active ? <Check size={15} strokeWidth={2.4} /> : null}
+          </span>
+        </button>
+      );
+    });
   }
 
   return (
@@ -517,46 +583,9 @@ export default function Header() {
                   langOpen ? styles.translateDropdownMenuOpen : ""
                 }`}
               >
-                <div className={styles.translateDropdownHeader}>
-                  <div className={styles.translateHeaderTop}>
-                    <span className={styles.translateHeaderCountry}>
-                      {selectedLanguageItem.label} ({selectedLanguageItem.utcLabel})
-                    </span>
-                  </div>
+                {renderTranslateHeader()}
 
-                  <div className={styles.translateHeaderMeta}>
-                    <span>{currentTime}</span>
-                  </div>
-                </div>
-
-                <div className={styles.languageList}>
-                  {translateReady ? (
-                    languageOptions.map((item) => {
-                      const active = selectedLanguage === item.value;
-
-                      return (
-                        <button
-                          key={item.value}
-                          type="button"
-                          className={`${styles.languageButton} ${
-                            active ? styles.languageButtonActive : ""
-                          }`}
-                          onClick={() => selectLanguage(item)}
-                        >
-                          <span className={styles.languageButtonMain}>
-                            <span className={styles.languageCountry}>
-                              {item.label} ({item.utcLabel})
-                            </span>
-
-                            {active ? <Check size={15} strokeWidth={2.4} /> : null}
-                          </span>
-                        </button>
-                      );
-                    })
-                  ) : (
-                    <div className={styles.languageLoading}>Laden...</div>
-                  )}
-                </div>
+                <div className={styles.languageList}>{renderLanguageList()}</div>
 
                 <div
                   id="google_translate_element_desktop"
@@ -597,10 +626,7 @@ export default function Header() {
                   <span>Mijn profiel</span>
                 </Link>
 
-                <Link
-                  href="/advertentie-plaatsen"
-                  className={styles.profileDropdownItem}
-                >
+                <Link href="/advertentie-plaatsen" className={styles.profileDropdownItem}>
                   <PlusCircle size={17} strokeWidth={2.1} />
                   <span>Advertentie plaatsen</span>
                 </Link>
@@ -624,15 +650,58 @@ export default function Header() {
             </Link>
           </div>
 
-          <button
-            type="button"
-            className={styles.mobileToggle}
-            aria-label={mobileOpen ? "Menu sluiten" : "Menu openen"}
-            aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen(true)}
+          <div
+            className={`${styles.mobileHeaderActions} ${
+              mobileOpen ? styles.mobileHeaderActionsHidden : ""
+            }`}
           >
-            <Menu size={22} strokeWidth={2} />
-          </button>
+            <div className={styles.mobileTranslateDropdown} ref={mobileLangRef}>
+              <button
+                type="button"
+                className={`${styles.mobileTranslateButton} ${
+                  langOpen ? styles.mobileTranslateButtonOpen : ""
+                }`}
+                aria-label="Taal en tijdzone kiezen"
+                aria-expanded={langOpen}
+                onClick={() => {
+                  setLangOpen((prev) => !prev);
+                  setProfileOpen(false);
+                  setMobileOpen(false);
+                }}
+              >
+                <Globe size={19} strokeWidth={2} />
+              </button>
+
+              <div
+                className={`${styles.mobileTranslateMenu} ${
+                  langOpen ? styles.mobileTranslateMenuOpen : ""
+                }`}
+              >
+                {renderTranslateHeader()}
+
+                <div className={styles.languageList}>{renderLanguageList()}</div>
+
+                <div
+                  id="google_translate_element_mobile"
+                  className={styles.googleTranslateHost}
+                  aria-hidden="true"
+                />
+              </div>
+            </div>
+
+            <button
+              type="button"
+              className={styles.mobileToggle}
+              aria-label={mobileOpen ? "Menu sluiten" : "Menu openen"}
+              aria-expanded={mobileOpen}
+              onClick={() => {
+                setMobileOpen(true);
+                setLangOpen(false);
+              }}
+            >
+              <Menu size={22} strokeWidth={2} />
+            </button>
+          </div>
         </div>
 
         <div
@@ -672,52 +741,6 @@ export default function Header() {
             >
               <X size={22} strokeWidth={2} />
             </button>
-          </div>
-
-          <div className={styles.mobileTranslateBlock}>
-            <div className={styles.mobileTranslateTitle}>Taal & tijdzone</div>
-
-            <div className={styles.mobileSelectedLocale}>
-              <strong>
-                {selectedLanguageItem.label} ({selectedLanguageItem.utcLabel})
-              </strong>
-              <span>{currentTime}</span>
-            </div>
-
-            <div className={styles.mobileLanguageList}>
-              {translateReady ? (
-                languageOptions.map((item) => {
-                  const active = selectedLanguage === item.value;
-
-                  return (
-                    <button
-                      key={item.value}
-                      type="button"
-                      className={`${styles.languageButton} ${
-                        active ? styles.languageButtonActive : ""
-                      }`}
-                      onClick={() => selectLanguage(item)}
-                    >
-                      <span className={styles.languageButtonMain}>
-                        <span className={styles.languageCountry}>
-                          {item.label} ({item.utcLabel})
-                        </span>
-
-                        {active ? <Check size={15} strokeWidth={2.4} /> : null}
-                      </span>
-                    </button>
-                  );
-                })
-              ) : (
-                <div className={styles.languageLoading}>Laden...</div>
-              )}
-            </div>
-
-            <div
-              id="google_translate_element_mobile"
-              className={styles.googleTranslateHost}
-              aria-hidden="true"
-            />
           </div>
 
           <nav className={styles.mobileNav} aria-label="Hoofdnavigatie mobiel">

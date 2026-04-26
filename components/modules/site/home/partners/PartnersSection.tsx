@@ -47,14 +47,14 @@ export default function PartnersSection() {
     <section className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.heading}>
-          <h2 className={styles.title}>Our Partners</h2>
+          <h2 className={styles.title}>Onze partners</h2>
           <p className={styles.subtitle}>
-            Collaborating with the world&apos;s leading brands in equestrian
-            excellence.
+            Wij werken samen met toonaangevende merken binnen de internationale
+            paardensport.
           </p>
         </div>
 
-        <div className={styles.slider} aria-label="Our partners">
+        <div className={styles.slider} aria-label="Onze partners">
           <div className={styles.track}>
             {duplicatedPartners.map((partner, index) => (
               <div

@@ -24,7 +24,7 @@ const horses: HorseItem[] = [
     subtitle: "Hannoveraan • Grand Prix Dressuur",
     bid: "€2.850.000",
     badge: "Topselectie",
-    endsAt: "2026-04-23T14:22:00",
+    endsAt: "2026-05-23T14:22:00",
     image: "/img/home/elite/horse-1.webp",
     imageAlt: "Imperial Majesty",
     href: "/elite/imperial-majesty",
@@ -35,7 +35,7 @@ const horses: HorseItem[] = [
     subtitle: "KWPN • Internationale springer",
     bid: "€1.675.000",
     badge: "Elite",
-    endsAt: "2026-04-22T08:45:00",
+    endsAt: "2026-05-22T08:45:00",
     image: "/img/home/elite/horse-2.webp",
     imageAlt: "Silver Sovereign",
     href: "/elite/silver-sovereign",
@@ -46,7 +46,7 @@ const horses: HorseItem[] = [
     subtitle: "Selle Français • Elite hengst",
     bid: "€1.520.000",
     badge: "Topselectie",
-    endsAt: "2026-04-24T02:10:00",
+    endsAt: "2026-05-24T02:10:00",
     image: "/img/home/elite/horse-3.webp",
     imageAlt: "Royal Vanguard",
     href: "/elite/royal-vanguard",
@@ -54,35 +54,53 @@ const horses: HorseItem[] = [
 ];
 
 function formatCountdown(targetDate: string, now: number) {
-  const distance = new Date(targetDate).getTime() - now;
+  const targetTime = new Date(targetDate).getTime();
+  const distance = targetTime - now;
 
-  if (Number.isNaN(distance) || distance <= 0) {
+  if (Number.isNaN(targetTime) || distance <= 0) {
     return "Gesloten";
   }
 
-  const totalMinutes = Math.floor(distance / 1000 / 60);
-  const days = Math.floor(totalMinutes / (60 * 24));
-  const hours = Math.floor((totalMinutes % (60 * 24)) / 60);
-  const minutes = totalMinutes % 60;
+  const totalSeconds = Math.floor(distance / 1000);
+
+  const days = Math.floor(totalSeconds / (60 * 60 * 24));
+  const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+  const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+  const seconds = totalSeconds % 60;
 
   return `${String(days).padStart(2, "0")}d ${String(hours).padStart(
     2,
     "0",
-  )}u ${String(minutes).padStart(2, "0")}m`;
+  )}u ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(
+    2,
+    "0",
+  )}s`;
 }
 
 function useCountdown(targetDate: string) {
-  const [now, setNow] = useState(Date.now());
+  const [mounted, setMounted] = useState(false);
+  const [now, setNow] = useState(0);
 
   useEffect(() => {
+    setMounted(true);
+    setNow(Date.now());
+
     const timer = window.setInterval(() => {
       setNow(Date.now());
-    }, 60000);
+    }, 1000);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+    };
   }, []);
 
-  return useMemo(() => formatCountdown(targetDate, now), [targetDate, now]);
+  return useMemo(() => {
+    if (!mounted || now === 0) {
+      return "--d --u --m --s";
+    }
+
+    return formatCountdown(targetDate, now);
+  }, [mounted, targetDate, now]);
 }
 
 function HorseCard({ horse }: { horse: HorseItem }) {
@@ -97,13 +115,16 @@ function HorseCard({ horse }: { horse: HorseItem }) {
             alt={horse.imageAlt}
             fill
             className={styles.image}
+            sizes="(max-width: 991px) 100vw, 33vw"
           />
 
           <span className={styles.badge}>{horse.badge}</span>
 
           <div className={styles.closingBox}>
             <span className={styles.closingLabel}>Sluit over</span>
-            <strong className={styles.closingTime}>{countdown}</strong>
+            <strong className={styles.closingTime} suppressHydrationWarning>
+              {countdown}
+            </strong>
           </div>
         </div>
       </Link>

@@ -20,59 +20,68 @@ type HorseItem = {
 const horses: HorseItem[] = [
   {
     id: 1,
-    title: "Starlight Gazer",
-    subtitle: "Holsteiner / 4 Years",
-    bid: "€45,000",
-    badge: "New",
-    endsAt: "2026-04-26T00:00:00",
-    image: "/img/home/newly-listed/horse-1.webp",
-    imageAlt: "Starlight Gazer",
-    href: "/horses/starlight-gazer",
+    title: "Silver Lining",
+    subtitle: "Dutch Warmblood / 6 jaar",
+    bid: "€185.000",
+    badge: "Nieuw",
+    endsAt: "2026-05-23T04:12:33",
+    image: "/img/home/featured-horses/horse-1.webp",
+    imageAlt: "Silver Lining",
+    href: "/paarden/silver-lining",
   },
   {
     id: 2,
-    title: "Arctic Storm",
-    subtitle: "Oldenburg / 7 Years",
-    bid: "€72,000",
-    badge: "New",
-    endsAt: "2026-04-25T20:15:20",
-    image: "/img/home/newly-listed/horse-2.webp",
-    imageAlt: "Arctic Storm",
-    href: "/horses/arctic-storm",
+    title: "Valentino Z",
+    subtitle: "Zangersheide / 8 jaar",
+    bid: "€320.000",
+    badge: "Nieuw",
+    endsAt: "2026-05-23T02:45:10",
+    image: "/img/home/featured-horses/horse-2.webp",
+    imageAlt: "Valentino Z",
+    href: "/paarden/valentino-z",
   },
   {
     id: 3,
-    title: "Bella Notte",
-    subtitle: "Italian Sport Horse / 6 Years",
-    bid: "€55,000",
-    badge: "New",
-    endsAt: "2026-04-25T22:45:12",
-    image: "/img/home/newly-listed/horse-3.webp",
-    imageAlt: "Bella Notte",
-    href: "/horses/bella-notte",
+    title: "Midnight Express",
+    subtitle: "Hannoveraan / 5 jaar",
+    bid: "€95.000",
+    badge: "Nieuw",
+    endsAt: "2026-05-23T12:05:59",
+    image: "/img/home/featured-horses/horse-3.webp",
+    imageAlt: "Midnight Express",
+    href: "/paarden/midnight-express",
   },
 ];
 
-function formatCountdown(targetDate: string, now: number | null) {
-  if (now === null) {
-    return "--:--:--";
+function formatCountdown(targetDate: string, now: number) {
+  const targetTime = new Date(targetDate).getTime();
+
+  if (Number.isNaN(targetTime)) {
+    return "00:00:00";
   }
 
-  const distance = new Date(targetDate).getTime() - now;
+  const distance = targetTime - now;
 
-  if (Number.isNaN(distance) || distance <= 0) {
+  if (distance <= 0) {
     return "00:00:00";
   }
 
   const totalSeconds = Math.floor(distance / 1000);
-  const hours = Math.floor(totalSeconds / 3600);
-  const minutes = Math.floor((totalSeconds % 3600) / 60);
+
+  const days = Math.floor(totalSeconds / (60 * 60 * 24));
+  const hours = Math.floor((totalSeconds % (60 * 60 * 24)) / (60 * 60));
+  const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
   const seconds = totalSeconds % 60;
 
-  return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-    2,
-    "0",
-  )}:${String(seconds).padStart(2, "0")}`;
+  const timeText = `${String(hours).padStart(2, "0")}:${String(
+    minutes,
+  ).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+
+  if (days > 0) {
+    return `${String(days).padStart(2, "0")}d ${timeText}`;
+  }
+
+  return timeText;
 }
 
 function useCountdown(targetDate: string) {
@@ -85,10 +94,18 @@ function useCountdown(targetDate: string) {
       setNow(Date.now());
     }, 1000);
 
-    return () => window.clearInterval(timer);
+    return () => {
+      window.clearInterval(timer);
+    };
   }, []);
 
-  return useMemo(() => formatCountdown(targetDate, now), [targetDate, now]);
+  return useMemo(() => {
+    if (now === null) {
+      return "--:--:--";
+    }
+
+    return formatCountdown(targetDate, now);
+  }, [targetDate, now]);
 }
 
 function HorseCard({ horse }: { horse: HorseItem }) {
@@ -109,8 +126,10 @@ function HorseCard({ horse }: { horse: HorseItem }) {
           <span className={styles.badge}>{horse.badge}</span>
 
           <div className={styles.closingBox}>
-            <span className={styles.closingLabel}>Ends In</span>
-            <strong className={styles.closingTime}>{countdown}</strong>
+            <span className={styles.closingLabel}>Eindigt over</span>
+            <strong className={styles.closingTime} suppressHydrationWarning>
+              {countdown}
+            </strong>
           </div>
         </div>
       </Link>
@@ -126,12 +145,12 @@ function HorseCard({ horse }: { horse: HorseItem }) {
 
         <div className={styles.bottomRow}>
           <div className={styles.priceBlock}>
-            <span className={styles.priceLabel}>Current Bid</span>
+            <span className={styles.priceLabel}>Huidig bod</span>
             <strong className={styles.priceValue}>{horse.bid}</strong>
           </div>
 
           <Link href={horse.href} className={styles.bidButton}>
-            Place Bid
+            Bieden
           </Link>
         </div>
       </div>
@@ -144,9 +163,9 @@ export default function NewlyListedSection() {
     <section className={styles.section}>
       <div className={styles.inner}>
         <div className={styles.heading}>
-          <h2 className={styles.title}>Newly Listed in the Last 24 Hours</h2>
+          <h2 className={styles.title}>Nieuw aangeboden</h2>
           <p className={styles.subtitle}>
-            The latest additions to our exclusive collections.
+            Ontdek de nieuwste paarden die recent aan de veiling zijn toegevoegd.
           </p>
         </div>
 

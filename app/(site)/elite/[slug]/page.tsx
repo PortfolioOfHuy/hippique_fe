@@ -1,14 +1,12 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
+import { ChevronDown, Heart, Play, Share2 } from "lucide-react";
 import {
-  CalendarDays,
-  ChevronDown,
-  Heart,
-  Play,
-  Share2,
-} from "lucide-react";
-import { getHorseBySlug } from "@/components/modules/site/home/data/horses";
+  getEliteHorses,
+  getHorseBySlug,
+} from "@/components/modules/site/home/data/horses";
+import AuctionCountdown from "./AuctionCountdown";
 import styles from "./EliteDetailPage.module.scss";
 
 type PageProps = {
@@ -19,9 +17,22 @@ export default async function EliteDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const horse = getHorseBySlug(slug);
 
+  const auctionEndsAt = "2026-08-23T19:59:00";
+
   if (!horse || horse.category !== "elite") {
     notFound();
   }
+
+  const eliteHorses = getEliteHorses();
+  const currentIndex = eliteHorses.findIndex((item) => item.slug === slug);
+
+  const nextHorse =
+    currentIndex >= 0 && eliteHorses.length > 0
+      ? eliteHorses[(currentIndex + 1) % eliteHorses.length]
+      : null;
+
+  const nextHorseHref = nextHorse ? `/elite/${nextHorse.slug}` : "/elite";
+  const lotNumber = currentIndex >= 0 ? currentIndex + 1 : 1;
 
   return (
     <main className={styles.page}>
@@ -37,10 +48,10 @@ export default async function EliteDetailPage({ params }: PageProps) {
               <h1 className={styles.collectionTitle}>
                 The Heritage Sport Horse Collection
               </h1>
+
               <p className={styles.collectionSubtitle}>
-                Exclusief geselecteerde elitepaarden uit vooraanstaande
-                Europese en Noord-Amerikaanse bloedlijnen. Live bieden is nu
-                actief.
+                Exclusief geselecteerde elitepaarden uit vooraanstaande Europese
+                en Noord-Amerikaanse bloedlijnen. Live bieden is nu actief.
               </p>
             </div>
           </div>
@@ -48,7 +59,9 @@ export default async function EliteDetailPage({ params }: PageProps) {
           <div className={styles.auctionBarRight}>
             <div className={styles.statBox}>
               <span className={styles.statLabel}>Veiling eindigt over</span>
-              <strong className={styles.statValue}>02 : 14 : 56</strong>
+              <strong className={styles.statValue} suppressHydrationWarning>
+                <AuctionCountdown endsAt={auctionEndsAt} />
+              </strong>
             </div>
 
             <div className={styles.statBox}>
@@ -61,18 +74,22 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
       <div className={styles.inner}>
         <div className={styles.topNav}>
-          <Link href="/elite" className={styles.backLink}>
+          <Link href="/elite" scroll className={styles.backLink}>
             ← Terug naar collectie
           </Link>
 
           <div className={styles.topNavRight}>
-            <span className={styles.lotBadge}>Lot #04</span>
-            <span className={styles.periodText}>
-              Biedperiode · 17/03/26 - 23/03/26 | 19:59
+            <span className={styles.lotBadge}>
+              Lot #{String(lotNumber).padStart(2, "0")}
             </span>
-            <button type="button" className={styles.nextLotButton}>
+
+            <span className={styles.periodText}>
+              Biedperiode · 17/03/26 - 23/08/26 | 19:59
+            </span>
+
+            <Link href={nextHorseHref} scroll className={styles.nextLotButton}>
               Volgende lot →
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -81,6 +98,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
             <div className={styles.titleRow}>
               <div className={styles.titleContent}>
                 <h2 className={styles.horseTitle}>{horse.title}</h2>
+
                 <p className={styles.horseSubtitle}>
                   Een wereldklasse springprospect met uitzonderlijke afstamming
                   en elite bloedlijn.
@@ -88,10 +106,19 @@ export default async function EliteDetailPage({ params }: PageProps) {
               </div>
 
               <div className={styles.titleActions}>
-                <button type="button" className={styles.iconButton} aria-label="Favoriet">
+                <button
+                  type="button"
+                  className={styles.iconButton}
+                  aria-label="Favoriet"
+                >
                   <Heart size={18} strokeWidth={1.8} />
                 </button>
-                <button type="button" className={styles.iconButton} aria-label="Delen">
+
+                <button
+                  type="button"
+                  className={styles.iconButton}
+                  aria-label="Delen"
+                >
                   <Share2 size={18} strokeWidth={1.8} />
                 </button>
               </div>
@@ -193,9 +220,11 @@ export default async function EliteDetailPage({ params }: PageProps) {
                 <button type="button" className={styles.quickBidButton}>
                   + € 500
                 </button>
+
                 <button type="button" className={styles.quickBidButton}>
                   + € 1.000
                 </button>
+
                 <button type="button" className={styles.quickBidButton}>
                   + € 5.000
                 </button>
@@ -230,6 +259,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
                     <strong>Bieder #712</strong>
                     <span>2 min geleden</span>
                   </div>
+
                   <strong>€ 64.500</strong>
                 </div>
 
@@ -238,6 +268,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
                     <strong>Bieder #104</strong>
                     <span>5 min geleden</span>
                   </div>
+
                   <strong>€ 63.000</strong>
                 </div>
 
@@ -246,6 +277,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
                     <strong>Bieder #889</strong>
                     <span>12 min geleden</span>
                   </div>
+
                   <strong>€ 62.500</strong>
                 </div>
               </div>
@@ -259,11 +291,12 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
         <section className={styles.sectionBlock}>
           <h3 className={styles.sectionTitle}>Notitie van de curator</h3>
+
           <p className={styles.sectionText}>
             {horse.title} is een modern sportpaard met uitzonderlijke
             bloedlijnen. Hij toont een ritmische, gronddekkende galop en een
-            zorgvuldige techniek over de hindernissen. Momenteel succesvol in
-            de rubrieken voor jonge paarden met constante foutloze rondes.
+            zorgvuldige techniek over de hindernissen. Momenteel succesvol in de
+            rubrieken voor jonge paarden met constante foutloze rondes.
             Veterinair rapport en röntgenopnames zijn beschikbaar in de
             beveiligde documentatie.
           </p>
@@ -278,7 +311,11 @@ export default async function EliteDetailPage({ params }: PageProps) {
                 sizes="100vw"
               />
 
-              <button type="button" className={styles.playButton} aria-label="Video afspelen">
+              <button
+                type="button"
+                className={styles.playButton}
+                aria-label="Video afspelen"
+              >
                 <Play size={26} fill="currentColor" />
               </button>
 
@@ -296,15 +333,17 @@ export default async function EliteDetailPage({ params }: PageProps) {
           <div className={styles.twoColumnText}>
             <div className={styles.textCard}>
               <h4>Vaderlijn</h4>
+
               <p>
                 De vaderlijn staat bekend om modern springvermogen, elasticiteit
-                en scherpte op de hindernis. Deze afstamming levert al jarenlang
-                paarden voor internationaal topniveau.
+                en scherpte op de hindernis. Deze afstamming levert al
+                jarenlang paarden voor internationaal topniveau.
               </p>
             </div>
 
             <div className={styles.textCard}>
               <h4>Moederlijn</h4>
+
               <p>
                 De moederlijn is prestatiegericht gefokt met focus op balans,
                 voorzichtigheid en instelling. Hierdoor ontstaat een complete en
@@ -314,6 +353,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
             <div className={styles.textCard}>
               <h4>Prestatiehoogtepunten</h4>
+
               <p>
                 {horse.title} heeft vroeg in zijn ontwikkeling veel kwaliteit
                 laten zien. De combinatie van kracht, reactievermogen en
@@ -323,6 +363,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
             <div className={styles.textCard}>
               <h4>Foknotities</h4>
+
               <p>
                 Dankzij zijn moderne model, sterke bovenlijn en
                 prestatie-afstamming is dit paard niet alleen interessant voor
@@ -369,7 +410,9 @@ export default async function EliteDetailPage({ params }: PageProps) {
               </div>
 
               <div className={styles.pedigreeColumn}>
-                <div className={styles.pedigreeMiniCard}>Diamant de Semilly</div>
+                <div className={styles.pedigreeMiniCard}>
+                  Diamant de Semilly
+                </div>
                 <div className={styles.pedigreeMiniCard}>Carthina Z</div>
                 <div className={styles.pedigreeMiniCard}>Nabab de Reve</div>
                 <div className={styles.pedigreeMiniCard}>Ulara</div>

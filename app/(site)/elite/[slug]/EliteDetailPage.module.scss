@@ -158,15 +158,25 @@
 }
 
 .nextLotButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0;
   border: 0;
   background: transparent;
+  color: var(--admin-text-muted);
+  text-decoration: none;
   cursor: pointer;
-  transition: color 0.25s ease;
+  transition:
+    color 0.25s ease,
+    transform 0.25s ease;
 }
 
 .nextLotButton:hover,
 .nextLotButton:focus-visible {
   color: var(--hippique-secondary);
+  transform: translateX(2px);
 }
 
 .heroGrid {
@@ -849,6 +859,16 @@
   .inner,
   .auctionInner {
     width: calc(100% - 24px);
+  }
+
+  .topNavRight {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .nextLotButton {
+    min-height: 28px;
   }
 
   .sideImages,
