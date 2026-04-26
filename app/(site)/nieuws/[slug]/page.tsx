@@ -12,21 +12,17 @@ import {
 import {
   getNewsBySlug,
   getRelatedNews,
-  newsItems,
 } from "@/components/modules/site/news/news-data";
 import styles from "./NewsDetailPage.module.scss";
+
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
 
 type NewsDetailPageProps = {
   params: Promise<{
     slug: string;
   }>;
 };
-
-export function generateStaticParams() {
-  return newsItems.map((item) => ({
-    slug: item.slug,
-  }));
-}
 
 export async function generateMetadata({ params }: NewsDetailPageProps) {
   const { slug } = await params;
