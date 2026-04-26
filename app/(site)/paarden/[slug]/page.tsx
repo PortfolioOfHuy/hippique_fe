@@ -7,6 +7,7 @@ import {
   horses as allHorses,
 } from "@/components/modules/site/home/data/horses";
 import AuctionCountdown from "./AuctionCountdown";
+import AuctionBidPanel from "./AuctionBidPanel";
 import styles from "./HorseDetailPage.module.scss";
 
 type PageProps = {
@@ -193,56 +194,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
           </div>
 
           <aside className={styles.sidebar}>
-            <div className={styles.bidCard}>
-              <div className={styles.bidHeader}>
-                <div>
-                  <span className={styles.bidLabel}>Huidig hoogste bod</span>
-                  <strong className={styles.bidValue}>{horse.bid}</strong>
-                </div>
-
-                <span className={styles.bidStatus}>Bieden actief</span>
-              </div>
-
-              <div className={styles.minimumBid}>
-                <span>Volgend minimumbod</span>
-                <strong>€ 65.500</strong>
-              </div>
-
-              <div className={styles.bidInputWrap}>
-                <input
-                  type="text"
-                  placeholder="Voer biedbedrag in"
-                  className={styles.bidInput}
-                />
-              </div>
-
-              <div className={styles.quickBidRow}>
-                <button type="button" className={styles.quickBidButton}>
-                  + € 500
-                </button>
-
-                <button type="button" className={styles.quickBidButton}>
-                  + € 1.000
-                </button>
-
-                <button type="button" className={styles.quickBidButton}>
-                  + € 5.000
-                </button>
-              </div>
-
-              <button type="button" className={styles.primaryBidButton}>
-                Plaats bod nu
-              </button>
-
-              <button type="button" className={styles.secondaryBidButton}>
-                Boek try-out
-              </button>
-
-              <p className={styles.bidNote}>
-                *Door te bieden ga je akkoord met de veilingvoorwaarden. Alle
-                biedingen zijn exclusief btw en verzendkosten.
-              </p>
-            </div>
+            <AuctionBidPanel horse={horse} />
 
             <div className={styles.activityCard}>
               <div className={styles.activityTopNote}>

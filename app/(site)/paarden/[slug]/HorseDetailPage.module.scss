@@ -808,6 +808,446 @@
   line-height: 1.6;
 }
 
+/* ===== Currency selector ===== */
+
+.currencyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  border-radius: var(--radius-card);
+  background: rgba(10, 25, 47, 0.03);
+
+  span {
+    color: var(--admin-text-muted);
+    font-size: var(--fs-caption);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+.currencySelect {
+  min-width: 120px;
+
+  :global(.ant-select-selector) {
+    min-height: 38px !important;
+    border-radius: var(--radius-button) !important;
+    border-color: rgba(10, 25, 47, 0.12) !important;
+    box-shadow: none !important;
+  }
+
+  :global(.ant-select-selection-item) {
+    color: var(--hippique-primary);
+    font-size: var(--fs-small);
+    font-weight: 800;
+  }
+}
+
+.currencyDropdown {
+  :global(.ant-select-item-option-selected) {
+    background: rgba(197, 160, 89, 0.12) !important;
+  }
+
+  :global(.ant-select-item-option-content) {
+    font-weight: 700;
+  }
+}
+
+/* ===== Auction popup ===== */
+
+.auctionPopupModal {
+  :global(.ant-modal-content) {
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background: #ffffff;
+    box-shadow: 0 24px 70px rgba(10, 25, 47, 0.24);
+  }
+
+  :global(.ant-modal-body) {
+    padding: 0;
+  }
+}
+
+.auctionPopupContent {
+  position: relative;
+  padding: 22px 30px 26px;
+  text-align: center;
+  color: var(--hippique-primary);
+}
+
+.popupCloseButton {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: 0;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  color: var(--admin-text-muted);
+  cursor: pointer;
+  transition:
+    background 0.22s ease,
+    color 0.22s ease;
+}
+
+.popupCloseButton:hover,
+.popupCloseButton:focus-visible {
+  background: rgba(10, 25, 47, 0.06);
+  color: var(--hippique-primary);
+}
+
+.popupBadgeDanger,
+.popupBadgeWarning,
+.popupBadgeGold {
+  position: absolute;
+  top: 20px;
+  left: 22px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.popupBadgeDanger {
+  background: rgba(239, 68, 68, 0.08);
+  color: var(--admin-danger);
+}
+
+.popupBadgeWarning,
+.popupBadgeGold {
+  background: rgba(197, 160, 89, 0.1);
+  color: var(--hippique-tertiary);
+}
+
+.popupBadgeDanger span,
+.popupBadgeWarning span {
+  width: 7px;
+  height: 7px;
+  border-radius: var(--radius-pill);
+}
+
+.popupBadgeDanger span {
+  background: var(--admin-danger);
+}
+
+.popupBadgeWarning span {
+  background: var(--hippique-secondary);
+}
+
+.popupIconDanger,
+.popupIconWarning,
+.popupIconSuccess {
+  width: 72px;
+  height: 72px;
+  margin: 14px auto 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+}
+
+.popupIconDanger {
+  color: var(--admin-danger);
+  background: rgba(239, 68, 68, 0.08);
+  box-shadow: 0 0 0 6px rgba(239, 68, 68, 0.05);
+}
+
+.popupIconWarning {
+  color: var(--hippique-tertiary);
+  background: rgba(197, 160, 89, 0.08);
+  box-shadow: 0 0 0 6px rgba(197, 160, 89, 0.05);
+}
+
+.popupIconSuccess {
+  color: var(--admin-success);
+  background: rgba(34, 197, 94, 0.1);
+  box-shadow: 0 0 0 8px rgba(34, 197, 94, 0.06);
+}
+
+.popupTitle {
+  max-width: 310px;
+  margin: 0 auto;
+  color: var(--hippique-primary);
+  font-size: var(--fs-h3);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.popupDescription {
+  max-width: 320px;
+  margin: 10px auto 18px;
+  color: var(--admin-text-soft);
+  font-size: var(--fs-small);
+  line-height: 1.55;
+
+  strong {
+    color: var(--hippique-primary);
+    font-weight: 800;
+  }
+}
+
+.popupHorseCard {
+  display: grid;
+  grid-template-columns: 78px minmax(0, 1fr);
+  gap: 14px;
+  align-items: center;
+  padding: 10px;
+  border: 1px solid rgba(10, 25, 47, 0.1);
+  border-radius: var(--radius-md);
+  text-align: left;
+  background: #ffffff;
+
+  strong {
+    display: block;
+    color: var(--hippique-primary);
+    font-size: var(--fs-body);
+    font-weight: 800;
+    line-height: 1.25;
+  }
+
+  span {
+    display: block;
+    margin-top: 4px;
+    color: var(--admin-text-soft);
+    font-size: var(--fs-caption);
+    line-height: 1.35;
+  }
+}
+
+.popupHorseImage {
+  position: relative;
+  width: 78px;
+  height: 64px;
+  overflow: hidden;
+  border-radius: var(--radius-sm);
+  background: rgba(10, 25, 47, 0.08);
+}
+
+.popupImage {
+  object-fit: cover;
+}
+
+.popupHorseMeta {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.liveDot {
+  position: relative;
+  padding-left: 11px;
+  color: var(--admin-danger) !important;
+  font-weight: 800 !important;
+}
+
+.liveDot::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 6px;
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: var(--admin-danger);
+  transform: translateY(-50%);
+}
+
+.goldText {
+  color: var(--hippique-tertiary) !important;
+  font-weight: 700 !important;
+}
+
+.popupPriceGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  border-radius: var(--radius-md);
+  background: #ffffff;
+
+  div {
+    padding: 13px 12px;
+  }
+
+  div + div {
+    border-left: 1px solid rgba(10, 25, 47, 0.08);
+  }
+
+  span {
+    display: block;
+    margin-bottom: 5px;
+    color: var(--admin-text-muted);
+    font-size: var(--fs-caption);
+    line-height: 1.2;
+  }
+
+  strong {
+    display: block;
+    color: var(--hippique-primary);
+    font-size: var(--fs-body-lg);
+    font-weight: 800;
+    line-height: 1.2;
+  }
+}
+
+.popupPriceDanger {
+  color: var(--admin-danger) !important;
+}
+
+.popupPriceSuccess {
+  color: var(--admin-success) !important;
+}
+
+.popupCountdownBox {
+  display: grid;
+  grid-template-columns: auto auto;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  margin-top: 12px;
+  padding: 14px;
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  border-radius: var(--radius-md);
+  background: rgba(197, 160, 89, 0.06);
+  color: var(--hippique-tertiary);
+
+  strong {
+    color: var(--hippique-tertiary);
+    font-size: var(--fs-h3);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.04em;
+  }
+
+  span {
+    grid-column: 1 / -1;
+    color: var(--admin-text-soft);
+    font-size: var(--fs-caption);
+  }
+}
+
+.popupNotifyRow,
+.popupNotifyRowCenter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.popupNotifyRow {
+  justify-content: flex-start;
+}
+
+.popupNotifyRowCenter {
+  justify-content: center;
+}
+
+.popupNotifySuccess,
+.popupNotifyInfo {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-caption);
+  font-weight: 700;
+  line-height: 1;
+}
+
+.popupNotifySuccess {
+  background: rgba(34, 197, 94, 0.1);
+  color: #2f7d45;
+}
+
+.popupNotifyInfo {
+  background: rgba(59, 130, 246, 0.1);
+  color: #2563eb;
+}
+
+.popupFullNotice {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  min-height: 34px;
+  margin-top: 12px;
+  border-radius: var(--radius-sm);
+  background: rgba(34, 197, 94, 0.1);
+  color: #2f7d45;
+  font-size: var(--fs-caption);
+  font-weight: 700;
+}
+
+.popupPrimaryButton,
+.popupSecondaryButton {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 12px;
+  border-radius: var(--radius-button);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  text-decoration: none;
+  font-size: var(--fs-body);
+  font-weight: 800;
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background 0.25s ease,
+    color 0.25s ease,
+    border-color 0.25s ease,
+    transform 0.25s ease;
+}
+
+.popupPrimaryButton {
+  border: 1px solid var(--hippique-secondary);
+  background: var(--hippique-primary);
+  color: var(--hippique-secondary);
+  box-shadow: inset 0 0 0 1px rgba(197, 160, 89, 0.42);
+}
+
+.popupPrimaryButton:hover,
+.popupPrimaryButton:focus-visible {
+  background: var(--hippique-tertiary);
+  color: #ffffff;
+  transform: translateY(-1px);
+}
+
+.popupSecondaryButton {
+  border: 1px solid rgba(10, 25, 47, 0.42);
+  background: #ffffff;
+  color: var(--hippique-primary);
+}
+
+.popupSecondaryButton:hover,
+.popupSecondaryButton:focus-visible {
+  border-color: var(--hippique-secondary);
+  color: var(--hippique-secondary);
+  transform: translateY(-1px);
+}
+
 @media (max-width: 1199px) {
   .inner,
   .auctionBar :global(.inner),
@@ -907,5 +1347,45 @@
 
   .statBox {
     min-width: 0;
+  }
+
+  .auctionPopupContent {
+    padding: 22px 18px 22px;
+  }
+
+  .popupBadgeDanger,
+  .popupBadgeWarning,
+  .popupBadgeGold {
+    position: static;
+    width: fit-content;
+    margin-bottom: 10px;
+  }
+
+  .popupCloseButton {
+    top: 14px;
+    right: 14px;
+  }
+
+  .popupIconDanger,
+  .popupIconWarning,
+  .popupIconSuccess {
+    margin-top: 6px;
+  }
+
+  .popupHorseCard {
+    grid-template-columns: 70px minmax(0, 1fr);
+  }
+
+  .popupHorseImage {
+    width: 70px;
+    height: 58px;
+  }
+
+  .popupNotifyRow {
+    flex-wrap: wrap;
+  }
+
+  .popupTitle {
+    font-size: var(--fs-h4);
   }
 }
