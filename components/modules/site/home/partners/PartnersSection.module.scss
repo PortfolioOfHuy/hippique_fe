@@ -1,6 +1,6 @@
 .section {
-  background: #f6f2eb;
-  padding: 72px 0 88px;
+  background: var(--hippique-neutral);
+  padding: 10px 0 88px;
   overflow: hidden;
 }
 
@@ -17,24 +17,24 @@
 
 .title {
   margin: 0;
-  color: #071a3a;
-  font-size: clamp(40px, 4vw, 64px);
+  color: var(--hippique-primary);
+  font-size: var(--fs-h1);
   font-weight: 800;
-  line-height: 1.02;
+  line-height: 1.04;
   letter-spacing: -0.03em;
 }
 
 .subtitle {
   margin: 12px 0 0;
-  color: #2f2f2f;
-  font-size: clamp(18px, 1.6vw, 22px);
-  line-height: 1.45;
+  color: var(--admin-text-soft);
+  font-size: var(--fs-body-lg);
+  line-height: 1.55;
 }
 
 .slider {
   position: relative;
-  overflow: hidden;
   width: 100%;
+  overflow: hidden;
 }
 
 .track {
@@ -56,9 +56,19 @@
   align-items: center;
   justify-content: center;
   background: #ffffff;
-  border: 1px solid rgba(7, 26, 58, 0.06);
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(7, 26, 58, 0.04);
+  border: 1px solid rgba(10, 25, 47, 0.06);
+  border-radius: var(--radius-card);
+  box-shadow: 0 6px 18px rgba(10, 25, 47, 0.04);
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.card:hover {
+  border-color: rgba(197, 160, 89, 0.28);
+  box-shadow: 0 10px 24px rgba(10, 25, 47, 0.08);
+  transform: translateY(-2px);
 }
 
 .logoWrap {
@@ -121,12 +131,8 @@
     margin-bottom: 30px;
   }
 
-  .title {
-    font-size: clamp(30px, 9vw, 44px);
-  }
-
   .subtitle {
-    font-size: 16px;
+    line-height: 1.55;
   }
 
   .track {
@@ -139,7 +145,7 @@
     min-width: 150px;
     height: 80px;
     padding: 14px;
-    border-radius: 10px;
+    border-radius: var(--radius-md);
   }
 
   .logoWrap {
