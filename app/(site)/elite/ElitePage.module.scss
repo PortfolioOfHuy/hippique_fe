@@ -1,5 +1,5 @@
 .page {
-  background: #f6f2eb;
+  background: var(--hippique-neutral);
   padding: 64px 0 88px;
 }
 
@@ -16,17 +16,18 @@
 .eyebrow {
   display: inline-block;
   margin-bottom: 12px;
-  color: #cda349;
-  font-size: 13px;
+  color: var(--hippique-secondary);
+  font-size: var(--fs-caption);
   font-weight: 800;
+  line-height: 1.2;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .title {
   margin: 0;
-  color: #071a3a;
-  font-size: clamp(38px, 4vw, 60px);
+  color: var(--hippique-primary);
+  font-size: var(--fs-h1);
   font-weight: 800;
   line-height: 1.04;
   letter-spacing: -0.03em;
@@ -34,8 +35,8 @@
 
 .subtitle {
   margin: 14px 0 0;
-  color: #5b6472;
-  font-size: 18px;
+  color: var(--admin-text-soft);
+  font-size: var(--fs-body-lg);
   line-height: 1.6;
 }
 
@@ -46,11 +47,21 @@
 }
 
 .card {
-  background: #fff;
-  border: 1px solid rgba(7, 26, 58, 0.08);
-  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  border-radius: var(--radius-card);
   overflow: hidden;
-  box-shadow: 0 12px 28px rgba(7, 26, 58, 0.06);
+  box-shadow: 0 12px 28px rgba(10, 25, 47, 0.06);
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    border-color 0.25s ease;
+}
+
+.card:hover {
+  border-color: rgba(197, 160, 89, 0.28);
+  box-shadow: 0 16px 34px rgba(10, 25, 47, 0.12);
+  transform: translateY(-4px);
 }
 
 .imageLink {
@@ -62,7 +73,7 @@
   position: relative;
   aspect-ratio: 1 / 0.76;
   overflow: hidden;
-  background: #e5e7eb;
+  background: rgba(10, 25, 47, 0.08);
 }
 
 .image {
@@ -79,13 +90,15 @@
   top: 16px;
   left: 16px;
   padding: 8px 14px;
-  border-radius: 999px;
-  background: #cda349;
-  color: #fff;
-  font-size: 11px;
+  border-radius: var(--radius-pill);
+  background: var(--hippique-secondary);
+  color: #ffffff;
+  font-size: var(--fs-caption);
   font-weight: 800;
+  line-height: 1;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  box-shadow: 0 6px 18px rgba(10, 25, 47, 0.14);
 }
 
 .cardBody {
@@ -94,20 +107,28 @@
 
 .cardTitle {
   margin: 0;
-  font-size: 28px;
+  color: var(--hippique-primary);
+  font-size: var(--fs-h3);
+  font-weight: 800;
   line-height: 1.1;
   letter-spacing: -0.03em;
 }
 
 .cardTitle a {
-  color: #071a3a;
+  color: inherit;
   text-decoration: none;
+  transition: color 0.25s ease;
+}
+
+.cardTitle a:hover,
+.cardTitle a:focus-visible {
+  color: var(--hippique-secondary);
 }
 
 .cardSubtitle {
   margin: 10px 0 0;
-  color: #5b6472;
-  font-size: 15px;
+  color: var(--admin-text-soft);
+  font-size: var(--fs-small);
   line-height: 1.5;
 }
 
@@ -116,8 +137,9 @@
   flex-wrap: wrap;
   gap: 10px 18px;
   margin-top: 16px;
-  color: #6b7280;
-  font-size: 13px;
+  color: var(--admin-text-muted);
+  font-size: var(--fs-caption);
+  line-height: 1.5;
 }
 
 .bottomRow {
@@ -131,17 +153,18 @@
 .priceLabel {
   display: block;
   margin-bottom: 8px;
-  color: #cda349;
-  font-size: 10px;
+  color: var(--hippique-secondary);
+  font-size: var(--fs-caption);
   font-weight: 800;
+  line-height: 1;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
 .priceValue {
   display: block;
-  color: #071a3a;
-  font-size: 30px;
+  color: var(--hippique-primary);
+  font-size: var(--fs-h3);
   font-weight: 800;
   line-height: 1;
   letter-spacing: -0.03em;
@@ -154,12 +177,27 @@
   min-width: 144px;
   height: 46px;
   padding: 0 20px;
-  border-radius: 12px;
-  background: #cda349;
-  color: #fff;
+  border: 1px solid var(--hippique-secondary);
+  border-radius: var(--radius-button);
+  background: var(--hippique-secondary);
+  color: #ffffff;
   text-decoration: none;
-  font-size: 14px;
+  font-size: var(--fs-small);
   font-weight: 700;
+  line-height: 1;
+  transition:
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease,
+    transform 0.25s ease;
+}
+
+.button:hover,
+.button:focus-visible {
+  background: var(--hippique-tertiary);
+  border-color: var(--hippique-tertiary);
+  box-shadow: 0 12px 24px rgba(142, 111, 62, 0.22);
+  transform: translateY(-2px);
 }
 
 @media (max-width: 991px) {
@@ -189,15 +227,31 @@
     padding: 48px 0 60px;
   }
 
+  .hero {
+    margin-bottom: 32px;
+  }
+
+  .subtitle {
+    margin-top: 12px;
+    line-height: 1.55;
+  }
+
   .cardBody {
     padding: 18px 16px 20px;
   }
 
-  .cardTitle {
-    font-size: 24px;
+  .meta {
+    gap: 8px 14px;
+    margin-top: 14px;
   }
 
-  .priceValue {
-    font-size: 28px;
+  .bottomRow {
+    gap: 16px;
+    margin-top: 18px;
+  }
+
+  .button {
+    height: 44px;
+    border-radius: var(--radius-button);
   }
 }

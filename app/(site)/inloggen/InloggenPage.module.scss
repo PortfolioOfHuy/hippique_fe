@@ -32,7 +32,7 @@
   h1 {
     margin: 0;
     color: var(--hippique-primary);
-    font-size: clamp(36px, 3.2vw, 46px);
+    font-size: var(--fs-h2);
     font-weight: 900;
     line-height: 1.05;
     letter-spacing: -0.04em;
@@ -41,7 +41,7 @@
   p {
     max-width: 340px;
     margin: 12px auto 0;
-    color: rgba(10, 25, 47, 0.66);
+    color: var(--admin-text-soft);
     font-size: var(--fs-body);
     line-height: 1.7;
   }
@@ -70,7 +70,7 @@
   gap: 10px;
 
   label {
-    color: rgba(10, 25, 47, 0.86);
+    color: var(--hippique-primary);
     font-size: var(--fs-caption);
     font-weight: 850;
     line-height: 1.4;
@@ -84,7 +84,7 @@
     padding: 0 18px;
     border-radius: var(--radius-input);
     border: 1px solid rgba(10, 25, 47, 0.1);
-    background: rgba(10, 25, 47, 0.07);
+    background: rgba(10, 25, 47, 0.05);
     color: var(--hippique-primary);
     font-size: var(--fs-small);
     font-weight: 500;
@@ -94,7 +94,7 @@
       box-shadow 0.2s ease;
 
     &::placeholder {
-      color: rgba(10, 25, 47, 0.45);
+      color: var(--admin-text-muted);
     }
 
     &:focus {
@@ -114,13 +114,14 @@
 
 .forgotLink {
   color: var(--hippique-primary);
-  font-size: 13px;
+  font-size: var(--fs-caption);
   font-weight: 750;
   line-height: 1.4;
   white-space: nowrap;
   transition: color 0.2s ease;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     color: var(--hippique-secondary);
   }
 }
@@ -129,7 +130,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  color: rgba(10, 25, 47, 0.72);
+  color: var(--admin-text-soft);
   font-size: var(--fs-small);
   line-height: 1.5;
   cursor: pointer;
@@ -140,7 +141,7 @@
     height: 18px;
     flex: 0 0 18px;
     appearance: none;
-    border-radius: 5px;
+    border-radius: var(--radius-xs);
     border: 1px solid rgba(10, 25, 47, 0.24);
     background: #ffffff;
     cursor: pointer;
@@ -193,8 +194,9 @@
     box-shadow 0.2s ease,
     background 0.2s ease;
 
-  &:hover {
-    background: #102440;
+  &:hover,
+  &:focus-visible {
+    background: var(--hippique-tertiary);
     transform: translateY(-2px);
     box-shadow: 0 20px 42px rgba(10, 25, 47, 0.22);
   }
@@ -221,7 +223,7 @@
 
   p {
     margin-bottom: 16px;
-    color: rgba(10, 25, 47, 0.64);
+    color: var(--admin-text-soft);
     font-size: var(--fs-small);
     line-height: 1.6;
   }
@@ -239,6 +241,7 @@
   background: transparent;
   font-size: var(--fs-caption);
   font-weight: 900;
+  line-height: 1;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   transition:
@@ -247,7 +250,8 @@
     background 0.2s ease,
     transform 0.2s ease;
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
     color: #ffffff;
     border-color: var(--hippique-secondary);
     background: var(--hippique-secondary);
@@ -270,7 +274,7 @@
     margin-bottom: 28px;
 
     h1 {
-      font-size: clamp(31px, 9vw, 39px);
+      line-height: 1.08;
     }
   }
 

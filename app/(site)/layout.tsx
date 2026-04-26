@@ -3,6 +3,7 @@ import { mainFont } from "./font";
 import styles from "./layout.module.scss";
 import Header from "@/components/modules/site/header/Header";
 import Footer from "@/components/modules/site/footer/Footer";
+import ScrollToTop from "@/components/common/ScrollToTop";
 
 export default function RootLayout({
   children,
@@ -12,6 +13,7 @@ export default function RootLayout({
   return (
     <div className={`${mainFont.variable} ${styles.container}`}>
       <Header />
+      <ScrollToTop />
       <main>{children}</main>
       <Footer />
     </div>
