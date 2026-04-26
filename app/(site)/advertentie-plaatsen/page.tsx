@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { Suspense, useMemo, useState } from "react";
 import Link from "next/link";
 import styles from "./AdvertentiePlaatsenPage.module.scss";
 import ListingTypeTabs, {
@@ -26,36 +26,36 @@ const listingDescriptions: Record<ListingType, string> = {
     "Gebruik dit type voor partners, commerciële samenwerkingen of marketplace-gerelateerde plaatsingen.",
 };
 
+function ListingFormRenderer({ activeType }: { activeType: ListingType }) {
+  if (
+    activeType === "paard" ||
+    activeType === "jonge-paarden" ||
+    activeType === "elite-paarden"
+  ) {
+    return <HorseListingWizard type={activeType} />;
+  }
+
+  if (activeType === "embryo") {
+    return <EmbryoListingWizard />;
+  }
+
+  if (activeType === "sperma") {
+    return <SemenListingWizard />;
+  }
+
+  if (activeType === "partner") {
+    return <PartnerListingWizard />;
+  }
+
+  return null;
+}
+
 export default function AdvertentiePlaatsenPage() {
   const [activeType, setActiveType] = useState<ListingType>("paard");
 
   const activeDescription = useMemo(() => {
     return listingDescriptions[activeType];
   }, [activeType]);
-
-  function renderListingForm() {
-    if (
-      activeType === "paard" ||
-      activeType === "jonge-paarden" ||
-      activeType === "elite-paarden"
-    ) {
-      return <HorseListingWizard type={activeType} />;
-    }
-
-    if (activeType === "embryo") {
-      return <EmbryoListingWizard />;
-    }
-
-    if (activeType === "sperma") {
-      return <SemenListingWizard />;
-    }
-
-    if (activeType === "partner") {
-      return <PartnerListingWizard />;
-    }
-
-    return null;
-  }
 
   return (
     <main className={styles.page}>
@@ -80,15 +80,19 @@ export default function AdvertentiePlaatsenPage() {
         </div>
       </section>
 
-      <section className={styles.typesSection}>
-        <ListingTypeTabs
-          activeType={activeType}
-          onChange={setActiveType}
-          description={activeDescription}
-        />
-      </section>
+      <Suspense fallback={null}>
+        <section className={styles.typesSection}>
+          <ListingTypeTabs
+            activeType={activeType}
+            onChange={setActiveType}
+            description={activeDescription}
+          />
+        </section>
 
-      <section className={styles.contentSection}>{renderListingForm()}</section>
+        <section className={styles.contentSection}>
+          <ListingFormRenderer activeType={activeType} />
+        </section>
+      </Suspense>
     </main>
   );
 }
