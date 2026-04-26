@@ -1,4 +1,4 @@
-import React from "react";
+import React, { Suspense } from "react";
 import { mainFont } from "./font";
 import styles from "./layout.module.scss";
 import Header from "@/components/modules/site/header/Header";
@@ -12,10 +12,21 @@ export default function RootLayout({
 }>) {
   return (
     <div className={`${mainFont.variable} ${styles.container}`}>
-      <Header />
-      <ScrollToTop />
-      <main>{children}</main>
-      <Footer />
+      <Suspense fallback={null}>
+        <Header />
+      </Suspense>
+
+      <Suspense fallback={null}>
+        <ScrollToTop />
+      </Suspense>
+
+      <main>
+        <Suspense fallback={null}>{children}</Suspense>
+      </main>
+
+      <Suspense fallback={null}>
+        <Footer />
+      </Suspense>
     </div>
   );
 }
