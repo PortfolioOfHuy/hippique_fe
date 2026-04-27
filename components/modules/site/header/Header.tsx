@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import Script from "next/script";
 import { usePathname } from "next/navigation";
@@ -34,6 +33,14 @@ type LanguageWithTimezone = {
   label: string;
   timezone: string;
   utcLabel: string;
+};
+
+type HeaderLinkProps = {
+  href: string;
+  className?: string;
+  children: React.ReactNode;
+  ariaLabel?: string;
+  onClick?: () => void;
 };
 
 const BASE_LANGUAGE = "nl";
@@ -154,6 +161,25 @@ const timezoneMap: Record<string, { timezone: string; utcLabel: string }> = {
   sq: { timezone: "Europe/Tirane", utcLabel: "UTC +1" },
 };
 
+function HeaderLink({
+  href,
+  className,
+  children,
+  ariaLabel,
+  onClick,
+}: HeaderLinkProps) {
+  return (
+    <a
+      href={href}
+      className={className}
+      aria-label={ariaLabel}
+      onClick={onClick}
+    >
+      {children}
+    </a>
+  );
+}
+
 function isActivePath(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
   return pathname === href || pathname.startsWith(`${href}/`);
@@ -174,6 +200,7 @@ function getSavedLanguage() {
 
 function getSavedTimezone() {
   if (typeof window === "undefined") return timezoneMap[BASE_LANGUAGE].timezone;
+
   return (
     window.localStorage.getItem(STORAGE_TIMEZONE_KEY) ||
     timezoneMap[BASE_LANGUAGE].timezone
@@ -196,12 +223,15 @@ function formatCurrentTime(timezone: string) {
 }
 
 function setGoogleTranslateCookie(lang: string) {
-  if (typeof document === "undefined") return;
+  if (typeof document === "undefined" || typeof window === "undefined") return;
 
   const value = lang === BASE_LANGUAGE ? "" : `/${BASE_LANGUAGE}/${lang}`;
   const expires = lang === BASE_LANGUAGE ? "Thu, 01 Jan 1970 00:00:00 GMT" : "";
 
-  document.cookie = `googtrans=${value};path=/;${expires ? `expires=${expires};` : ""}`;
+  document.cookie = `googtrans=${value};path=/;${
+    expires ? `expires=${expires};` : ""
+  }`;
+
   document.cookie = `googtrans=${value};path=/;domain=${window.location.hostname};${
     expires ? `expires=${expires};` : ""
   }`;
@@ -292,7 +322,9 @@ function readGoogleLanguages(): LanguageItem[] {
     }))
     .filter((item) => item.value && item.label);
 
-  const hasBaseLanguage = googleItems.some((item) => item.value === BASE_LANGUAGE);
+  const hasBaseLanguage = googleItems.some(
+    (item) => item.value === BASE_LANGUAGE,
+  );
 
   return hasBaseLanguage ? googleItems : [baseItem, ...googleItems];
 }
@@ -495,12 +527,10 @@ export default function Header() {
     setProfileOpen(false);
     setMobileOpen(false);
 
-    if (typeof window !== "undefined") {
-      window.localStorage.setItem(STORAGE_LANGUAGE_KEY, item.value);
-      window.localStorage.setItem(STORAGE_TIMEZONE_KEY, item.timezone);
+    window.localStorage.setItem(STORAGE_LANGUAGE_KEY, item.value);
+    window.localStorage.setItem(STORAGE_TIMEZONE_KEY, item.timezone);
 
-      setGoogleTranslateCookie(item.value);
-    }
+    setGoogleTranslateCookie(item.value);
 
     if (item.value !== BASE_LANGUAGE && translateReady) {
       triggerGoogleTranslate(item.value);
@@ -526,7 +556,7 @@ export default function Header() {
                     ? ` (${selectedLanguageItem.utcLabel})`
                     : ""
                 }`
-              : "Select language"}
+              : "Selecteer taal"}
           </span>
         </div>
 
@@ -579,7 +609,11 @@ export default function Header() {
 
       <header className={`${styles.header} notranslate`} translate="no">
         <div className={styles.inner}>
-          <Link href="/" className={styles.logoLink} aria-label="Hippique Auctions">
+          <HeaderLink
+            href="/"
+            className={styles.logoLink}
+            ariaLabel="Hippique Auctions"
+          >
             <Image
               src="/img/logo/logo.png"
               alt="Hippique Auctions"
@@ -588,20 +622,20 @@ export default function Header() {
               priority
               className={styles.logo}
             />
-          </Link>
+          </HeaderLink>
 
           <nav className={styles.desktopNav} aria-label="Hoofdnavigatie">
             {navItems.map((item) => {
               const active = isActivePath(pathname, item.href);
 
               return (
-                <Link
+                <HeaderLink
                   key={item.href}
                   href={item.href}
                   className={`${styles.navLink} ${active ? styles.active : ""}`}
                 >
                   <span>{item.label}</span>
-                </Link>
+                </HeaderLink>
               );
             })}
           </nav>
@@ -666,41 +700,44 @@ export default function Header() {
                   <strong>Premium lid</strong>
                 </div>
 
-                <Link href="/profiel" className={styles.profileDropdownItem}>
+                <HeaderLink href="/profiel" className={styles.profileDropdownItem}>
                   <UserRound size={17} strokeWidth={2.1} />
                   <span>Mijn profiel</span>
-                </Link>
+                </HeaderLink>
 
-                <Link
+                <HeaderLink
                   href="/advertentie-plaatsen"
                   className={styles.profileDropdownItem}
                 >
                   <PlusCircle size={17} strokeWidth={2.1} />
                   <span>Advertentie plaatsen</span>
-                </Link>
+                </HeaderLink>
 
-                <Link href="/opnieuw-verkopen" className={styles.profileDropdownItem}>
+                <HeaderLink
+                  href="/opnieuw-verkopen"
+                  className={styles.profileDropdownItem}
+                >
                   <RotateCcw size={17} strokeWidth={2.1} />
                   <span>Opnieuw verkopen</span>
-                </Link>
+                </HeaderLink>
 
-                <Link
+                <HeaderLink
                   href="/inloggen"
                   className={`${styles.profileDropdownItem} ${styles.profileDropdownLogout}`}
                 >
                   <LogOut size={17} strokeWidth={2.1} />
                   <span>Uitloggen</span>
-                </Link>
+                </HeaderLink>
               </div>
             </div>
 
-            <Link href="/registreren" className={styles.registerButton}>
+            <HeaderLink href="/registreren" className={styles.registerButton}>
               Registreren
-            </Link>
+            </HeaderLink>
 
-            <Link href="/inloggen" className={styles.loginButton}>
+            <HeaderLink href="/inloggen" className={styles.loginButton}>
               Inloggen
-            </Link>
+            </HeaderLink>
           </div>
 
           <div
@@ -771,10 +808,10 @@ export default function Header() {
           aria-hidden={!mobileOpen}
         >
           <div className={styles.mobileDrawerHeader}>
-            <Link
+            <HeaderLink
               href="/"
               className={styles.mobileLogoLink}
-              aria-label="Hippique Auctions"
+              ariaLabel="Hippique Auctions"
               onClick={() => setMobileOpen(false)}
             >
               <Image
@@ -784,7 +821,7 @@ export default function Header() {
                 height={68}
                 className={styles.mobileLogo}
               />
-            </Link>
+            </HeaderLink>
 
             <button
               type="button"
@@ -801,7 +838,7 @@ export default function Header() {
               const active = isActivePath(pathname, item.href);
 
               return (
-                <Link
+                <HeaderLink
                   key={item.href}
                   href={item.href}
                   className={`${styles.mobileNavLink} ${
@@ -810,63 +847,63 @@ export default function Header() {
                   onClick={() => setMobileOpen(false)}
                 >
                   {item.label}
-                </Link>
+                </HeaderLink>
               );
             })}
           </nav>
 
           <div className={styles.mobileActions}>
-            <Link
+            <HeaderLink
               href="/profiel"
               className={styles.mobileProfileButton}
               onClick={() => setMobileOpen(false)}
             >
               <UserRound size={18} strokeWidth={2} />
               <span>Mijn profiel</span>
-            </Link>
+            </HeaderLink>
 
-            <Link
+            <HeaderLink
               href="/advertentie-plaatsen"
               className={styles.mobileProfileButton}
               onClick={() => setMobileOpen(false)}
             >
               <PlusCircle size={18} strokeWidth={2} />
               <span>Advertentie plaatsen</span>
-            </Link>
+            </HeaderLink>
 
-            <Link
+            <HeaderLink
               href="/opnieuw-verkopen"
               className={styles.mobileProfileButton}
               onClick={() => setMobileOpen(false)}
             >
               <RotateCcw size={18} strokeWidth={2} />
               <span>Opnieuw verkopen</span>
-            </Link>
+            </HeaderLink>
 
-            <Link
+            <HeaderLink
               href="/registreren"
               className={styles.registerButton}
               onClick={() => setMobileOpen(false)}
             >
               Registreren
-            </Link>
+            </HeaderLink>
 
-            <Link
+            <HeaderLink
               href="/inloggen"
               className={styles.loginButton}
               onClick={() => setMobileOpen(false)}
             >
               Inloggen
-            </Link>
+            </HeaderLink>
 
-            <Link
+            <HeaderLink
               href="/inloggen"
               className={styles.mobileLogoutButton}
               onClick={() => setMobileOpen(false)}
             >
               <LogOut size={18} strokeWidth={2} />
               <span>Uitloggen</span>
-            </Link>
+            </HeaderLink>
           </div>
         </aside>
       </header>

@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { Heart, MapPin, CalendarDays } from "lucide-react";
 import { horses } from "@/components/modules/site/home/data/horses";
 import styles from "./VeilingenPage.module.scss";
@@ -19,9 +18,9 @@ function getCardVariant(category: string) {
 }
 
 function getTagText(category: string) {
-  if (category === "ending-soon") return "Ending soon";
-  if (category === "newly-listed") return "Upcoming";
-  return "Live now";
+  if (category === "ending-soon") return "Eindigt binnenkort";
+  if (category === "newly-listed") return "Binnenkort";
+  return "Nu live";
 }
 
 function getTagClassName(category: string) {
@@ -31,9 +30,9 @@ function getTagClassName(category: string) {
 }
 
 function getPrimaryButtonText(category: string) {
-  if (category === "ending-soon") return "Bid now";
-  if (category === "newly-listed") return "View details";
-  return "Place bid";
+  if (category === "ending-soon") return "Bied nu";
+  if (category === "newly-listed") return "Bekijk details";
+  return "Plaats bod";
 }
 
 function getButtonClassName(category: string) {
@@ -43,34 +42,34 @@ function getButtonClassName(category: string) {
 }
 
 function getPriceLabel(category: string) {
-  if (category === "newly-listed") return "Starting price";
-  return "Current bid";
+  if (category === "newly-listed") return "Startprijs";
+  return "Huidig bod";
 }
 
 function getTimeLabel(category: string) {
-  if (category === "newly-listed") return "Starts in";
-  return "Ends in";
+  if (category === "newly-listed") return "Start over";
+  return "Eindigt over";
 }
 
 function getTimeValue(category: string) {
   if (category === "ending-soon") return "00:08:42";
-  if (category === "newly-listed") return "2d 08h";
+  if (category === "newly-listed") return "2d 08u";
   return "04:12:35";
 }
 
 function getLocation(category: string) {
-  if (category === "ending-soon") return "Wellington, USA";
-  if (category === "newly-listed") return "Starts Nov 12, 18:00 CET";
-  return "Deauville, France";
+  if (category === "ending-soon") return "Wellington, VS";
+  if (category === "newly-listed") return "Start op 12 nov., 18:00 CET";
+  return "Deauville, Frankrijk";
 }
 
 const topTabs = [
-  { label: "All", count: 124, active: true },
-  { label: "Live now", count: 8 },
-  { label: "Ending soon", count: 4 },
-  { label: "Upcoming", count: 12 },
-  { label: "Preview", count: 15 },
-  { label: "Past results", count: 85 },
+  { label: "Alles", count: 124, active: true },
+  { label: "Nu live", count: 8 },
+  { label: "Eindigt binnenkort", count: 4 },
+  { label: "Binnenkort", count: 12 },
+  { label: "Voorvertoning", count: 15 },
+  { label: "Eerdere resultaten", count: 85 },
 ];
 
 export default function VeilingenPage() {
@@ -85,7 +84,9 @@ export default function VeilingenPage() {
               <button
                 key={tab.label}
                 type="button"
-                className={`${styles.tabButton} ${tab.active ? styles.tabButtonActive : ""}`}
+                className={`${styles.tabButton} ${
+                  tab.active ? styles.tabButtonActive : ""
+                }`}
               >
                 <span>{tab.label}</span>
                 <small>{tab.count}</small>
@@ -97,17 +98,17 @@ export default function VeilingenPage() {
             <div className={styles.searchWrap}>
               <input
                 type="text"
-                placeholder="Search by name, sire..."
+                placeholder="Zoek op naam, vaderlijn..."
                 className={styles.searchInput}
               />
             </div>
 
             <div className={styles.sortWrap}>
               <select className={styles.sortSelect} defaultValue="ending-soon">
-                <option value="ending-soon">Ending soon</option>
-                <option value="live-now">Live now</option>
-                <option value="upcoming">Upcoming</option>
-                <option value="latest">Latest</option>
+                <option value="ending-soon">Eindigt binnenkort</option>
+                <option value="live-now">Nu live</option>
+                <option value="upcoming">Binnenkort</option>
+                <option value="latest">Nieuwste</option>
               </select>
             </div>
           </div>
@@ -115,22 +116,27 @@ export default function VeilingenPage() {
 
         <section className={styles.filtersBox}>
           <div className={styles.categoryRow}>
-            <button type="button" className={`${styles.categoryChip} ${styles.categoryChipActive}`}>
-              Horses
+            <button
+              type="button"
+              className={`${styles.categoryChip} ${styles.categoryChipActive}`}
+            >
+              Paarden
             </button>
+
             <button type="button" className={styles.categoryChip}>
               Embryo&apos;s
             </button>
+
             <button type="button" className={styles.categoryChip}>
-              Semen
+              Sperma
             </button>
           </div>
 
           <div className={styles.filtersGrid}>
             <div className={styles.filterItem}>
-              <span className={styles.filterLabel}>Breed</span>
+              <span className={styles.filterLabel}>Ras</span>
               <select className={styles.filterSelect} defaultValue="all-breeds">
-                <option value="all-breeds">All breeds</option>
+                <option value="all-breeds">Alle rassen</option>
                 <option value="kwpn">KWPN</option>
                 <option value="hannoveraan">Hannoveraan</option>
                 <option value="zangersheide">Zangersheide</option>
@@ -139,26 +145,32 @@ export default function VeilingenPage() {
 
             <div className={styles.filterItem}>
               <span className={styles.filterLabel}>Discipline</span>
-              <select className={styles.filterSelect} defaultValue="show-jumping">
-                <option value="show-jumping">Show Jumping</option>
-                <option value="dressage">Dressage</option>
+              <select
+                className={styles.filterSelect}
+                defaultValue="show-jumping"
+              >
+                <option value="show-jumping">Springen</option>
+                <option value="dressage">Dressuur</option>
                 <option value="allround">Allround</option>
               </select>
             </div>
 
             <div className={styles.filterItem}>
-              <span className={styles.filterLabel}>Age</span>
+              <span className={styles.filterLabel}>Leeftijd</span>
               <select className={styles.filterSelect} defaultValue="any-age">
-                <option value="any-age">Any age</option>
+                <option value="any-age">Elke leeftijd</option>
                 <option value="4-6">4 - 6 jaar</option>
                 <option value="7-10">7 - 10 jaar</option>
               </select>
             </div>
 
             <div className={styles.filterItem}>
-              <span className={styles.filterLabel}>Gender</span>
-              <select className={styles.filterSelect} defaultValue="all-genders">
-                <option value="all-genders">All genders</option>
+              <span className={styles.filterLabel}>Geslacht</span>
+              <select
+                className={styles.filterSelect}
+                defaultValue="all-genders"
+              >
+                <option value="all-genders">Alle geslachten</option>
                 <option value="mare">Merrie</option>
                 <option value="stallion">Hengst</option>
                 <option value="gelding">Ruin</option>
@@ -166,18 +178,18 @@ export default function VeilingenPage() {
             </div>
 
             <div className={styles.filterItem}>
-              <span className={styles.filterLabel}>Location</span>
+              <span className={styles.filterLabel}>Locatie</span>
               <select className={styles.filterSelect} defaultValue="global">
-                <option value="global">Global</option>
+                <option value="global">Wereldwijd</option>
                 <option value="netherlands">Nederland</option>
                 <option value="france">Frankrijk</option>
               </select>
             </div>
 
             <div className={styles.filterItem}>
-              <span className={styles.filterLabel}>Price range</span>
+              <span className={styles.filterLabel}>Prijsklasse</span>
               <select className={styles.filterSelect} defaultValue="any-price">
-                <option value="any-price">Any price</option>
+                <option value="any-price">Elke prijs</option>
                 <option value="0-50000">€0 - €50.000</option>
                 <option value="50000-250000">€50.000 - €250.000</option>
               </select>
@@ -187,17 +199,22 @@ export default function VeilingenPage() {
 
         <section className={styles.infoBar}>
           <div className={styles.infoLeft}>
-            <span className={styles.infoDotLive}>8 lots live now</span>
-            <span className={styles.infoDotEnding}>4 ending soon</span>
-            <span className={styles.infoText}>Next auction starts in 2 days</span>
+            <span className={styles.infoDotLive}>8 kavels nu live</span>
+            <span className={styles.infoDotEnding}>4 eindigen binnenkort</span>
+            <span className={styles.infoText}>
+              Volgende veiling start over 2 dagen
+            </span>
           </div>
 
-          <div className={styles.infoRight}>Global shipping assistance available</div>
+          <div className={styles.infoRight}>
+            Wereldwijde transportbegeleiding beschikbaar
+          </div>
         </section>
 
         <section className={styles.grid}>
           {auctionItems.map((horse) => {
             const variant = getCardVariant(horse.category);
+            const href = getHorseHref(horse.category, horse.slug);
 
             return (
               <article
@@ -210,7 +227,7 @@ export default function VeilingenPage() {
                       : styles.cardLive
                 }`}
               >
-                <Link href={getHorseHref(horse.category, horse.slug)} className={styles.imageLink}>
+                <a href={href} className={styles.imageLink}>
                   <div className={styles.imageWrap}>
                     <Image
                       src={horse.image}
@@ -220,39 +237,56 @@ export default function VeilingenPage() {
                       sizes="(max-width: 991px) 100vw, (max-width: 1279px) 50vw, 33vw"
                     />
 
-                    <span className={`${styles.tag} ${getTagClassName(horse.category)}`}>
+                    <span
+                      className={`${styles.tag} ${getTagClassName(
+                        horse.category,
+                      )}`}
+                    >
                       {getTagText(horse.category)}
                     </span>
                   </div>
-                </Link>
+                </a>
 
                 <div className={styles.cardBody}>
                   <div className={styles.cardHeader}>
                     <div className={styles.titleWrap}>
                       <h2 className={styles.cardTitle}>
-                        <Link href={getHorseHref(horse.category, horse.slug)}>
-                          {horse.title}
-                        </Link>
+                        <a href={href}>{horse.title}</a>
                       </h2>
+
                       <p className={styles.cardSubtitle}>{horse.subtitle}</p>
                     </div>
 
-                    <button type="button" className={styles.favoriteButton} aria-label="Favoriet">
+                    <button
+                      type="button"
+                      className={styles.favoriteButton}
+                      aria-label="Toevoegen aan favorieten"
+                    >
                       <Heart size={18} strokeWidth={1.8} />
                     </button>
                   </div>
 
                   <div className={styles.metrics}>
                     <div className={styles.metricItem}>
-                      <span className={styles.metricLabel}>{getPriceLabel(horse.category)}</span>
-                      <strong className={styles.metricValue}>{horse.bid}</strong>
+                      <span className={styles.metricLabel}>
+                        {getPriceLabel(horse.category)}
+                      </span>
+
+                      <strong className={styles.metricValue}>
+                        {horse.bid}
+                      </strong>
                     </div>
 
                     <div className={styles.metricItem}>
-                      <span className={styles.metricLabel}>{getTimeLabel(horse.category)}</span>
+                      <span className={styles.metricLabel}>
+                        {getTimeLabel(horse.category)}
+                      </span>
+
                       <strong
                         className={`${styles.metricValue} ${
-                          horse.category === "ending-soon" ? styles.metricValueEnding : ""
+                          horse.category === "ending-soon"
+                            ? styles.metricValueEnding
+                            : ""
                         }`}
                       >
                         {getTimeValue(horse.category)}
@@ -274,12 +308,14 @@ export default function VeilingenPage() {
                     )}
                   </div>
 
-                  <Link
-                    href={getHorseHref(horse.category, horse.slug)}
-                    className={`${styles.cardButton} ${getButtonClassName(horse.category)}`}
+                  <a
+                    href={href}
+                    className={`${styles.cardButton} ${getButtonClassName(
+                      horse.category,
+                    )}`}
                   >
                     {getPrimaryButtonText(horse.category)}
-                  </Link>
+                  </a>
                 </div>
               </article>
             );

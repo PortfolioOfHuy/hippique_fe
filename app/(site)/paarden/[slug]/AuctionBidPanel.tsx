@@ -2,7 +2,6 @@
 
 import { useMemo, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import { Modal, Select } from "antd";
 import {
   AlertTriangle,
@@ -135,14 +134,14 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
         <div className={styles.auctionPopupContent}>
           <div className={styles.popupBadgeDanger}>
             <span />
-            Live auction alert
+            Live veilingmelding
           </div>
 
           <button
             type="button"
             className={styles.popupCloseButton}
             onClick={() => setPopupOpen(false)}
-            aria-label="Close popup"
+            aria-label="Popup sluiten"
           >
             <X size={18} strokeWidth={1.8} />
           </button>
@@ -151,10 +150,10 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
             <AlertTriangle size={30} strokeWidth={1.9} />
           </div>
 
-          <h3 className={styles.popupTitle}>You have been outbid</h3>
+          <h3 className={styles.popupTitle}>Je bent overboden</h3>
 
           <p className={styles.popupDescription}>
-            Another bidder has placed a higher bid on{" "}
+            Een andere bieder heeft een hoger bod geplaatst op{" "}
             <strong>{horse.title}</strong>.
           </p>
 
@@ -171,25 +170,25 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
 
             <div>
               <strong>{horse.title}</strong>
-              <span>Lot 12 · Arabian Stallion · Grey · 5 yrs</span>
+              <span>Kavel 12 · Arabische hengst · Schimmel · 5 jaar</span>
 
               <div className={styles.popupHorseMeta}>
                 <span className={styles.liveDot}>Live</span>
-                <span>Ends in 02:14:32</span>
+                <span>Eindigt over 02:14:32</span>
               </div>
             </div>
           </div>
 
           <div className={styles.popupPriceGrid}>
             <div>
-              <span>Current bid</span>
+              <span>Huidig bod</span>
               <strong className={styles.popupPriceDanger}>
                 {formattedCurrentBid}
               </strong>
             </div>
 
             <div>
-              <span>Your last bid</span>
+              <span>Je laatste bod</span>
               <strong>{formattedLastBid}</strong>
             </div>
           </div>
@@ -197,12 +196,12 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
           <div className={styles.popupNotifyRow}>
             <span className={styles.popupNotifySuccess}>
               <Mail size={14} strokeWidth={1.8} />
-              Email sent
+              E-mail verzonden
             </span>
 
             <span className={styles.popupNotifyInfo}>
               <Bell size={14} strokeWidth={1.8} />
-              Platform notification
+              Platformmelding
             </span>
           </div>
 
@@ -212,16 +211,16 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
             onClick={() => setPopupOpen(false)}
           >
             <Gavel size={18} strokeWidth={1.9} />
-            Place a new bid
+            Plaats een nieuw bod
           </button>
 
-          <Link
+          <a
             href={`/elite/${horse.slug}`}
             className={styles.popupSecondaryButton}
             onClick={() => setPopupOpen(false)}
           >
-            View auction
-          </Link>
+            Bekijk veiling
+          </a>
         </div>
       );
     }
@@ -231,14 +230,14 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
         <div className={styles.auctionPopupContent}>
           <div className={styles.popupBadgeWarning}>
             <span />
-            Live auction alert
+            Live veilingmelding
           </div>
 
           <button
             type="button"
             className={styles.popupCloseButton}
             onClick={() => setPopupOpen(false)}
-            aria-label="Close popup"
+            aria-label="Popup sluiten"
           >
             <X size={18} strokeWidth={1.8} />
           </button>
@@ -247,11 +246,11 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
             <Clock3 size={32} strokeWidth={1.9} />
           </div>
 
-          <h3 className={styles.popupTitle}>Auction ending soon</h3>
+          <h3 className={styles.popupTitle}>Veiling eindigt binnenkort</h3>
 
           <p className={styles.popupDescription}>
-            The auction for <strong>{horse.title}</strong> ends in{" "}
-            <strong>15 minutes</strong>.
+            De veiling voor <strong>{horse.title}</strong> eindigt over{" "}
+            <strong>15 minuten</strong>.
           </p>
 
           <div className={styles.popupHorseCard}>
@@ -267,11 +266,11 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
 
             <div>
               <strong>{horse.title}</strong>
-              <span>Lot 15 · Dutch Warmblood · Grey · 7 yrs</span>
+              <span>Kavel 15 · Nederlands Warmbloed · Schimmel · 7 jaar</span>
 
               <div className={styles.popupHorseMeta}>
                 <span className={styles.liveDot}>LIVE</span>
-                <span>Ends in 00:14:59</span>
+                <span>Eindigt over 00:14:59</span>
               </div>
             </div>
           </div>
@@ -279,17 +278,19 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
           <div className={styles.popupCountdownBox}>
             <Clock3 size={26} strokeWidth={1.8} />
             <strong>00:14:59</strong>
-            <span>remaining</span>
+            <span>resterend</span>
           </div>
 
           <div className={styles.popupPriceGrid}>
             <div>
-              <span>Current bid</span>
-              <strong>{formatCurrency(8750 * selectedCurrency.rate, currency)}</strong>
+              <span>Huidig bod</span>
+              <strong>
+                {formatCurrency(8750 * selectedCurrency.rate, currency)}
+              </strong>
             </div>
 
             <div>
-              <span>Your max bid</span>
+              <span>Je maximumbod</span>
               <strong>{formattedMaxBid}</strong>
             </div>
           </div>
@@ -297,12 +298,12 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
           <div className={styles.popupNotifyRow}>
             <span className={styles.popupNotifySuccess}>
               <Mail size={14} strokeWidth={1.8} />
-              Email sent
+              E-mail verzonden
             </span>
 
             <span className={styles.popupNotifyInfo}>
               <Bell size={14} strokeWidth={1.8} />
-              Platform notification
+              Platformmelding
             </span>
           </div>
 
@@ -312,7 +313,7 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
             onClick={() => setPopupOpen(false)}
           >
             <Gavel size={18} strokeWidth={1.9} />
-            Go to auction
+            Ga naar veiling
           </button>
 
           <button
@@ -320,7 +321,7 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
             className={styles.popupSecondaryButton}
             onClick={() => setPopupOpen(false)}
           >
-            Increase max bid
+            Verhoog maximumbod
           </button>
         </div>
       );
@@ -330,14 +331,14 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
       <div className={styles.auctionPopupContent}>
         <div className={styles.popupBadgeGold}>
           <Trophy size={13} strokeWidth={1.9} />
-          Auction won
+          Veiling gewonnen
         </div>
 
         <button
           type="button"
           className={styles.popupCloseButton}
           onClick={() => setPopupOpen(false)}
-          aria-label="Close popup"
+          aria-label="Popup sluiten"
         >
           <X size={18} strokeWidth={1.8} />
         </button>
@@ -346,10 +347,12 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
           <Check size={34} strokeWidth={2.2} />
         </div>
 
-        <h3 className={styles.popupTitle}>Congratulations, you won the auction</h3>
+        <h3 className={styles.popupTitle}>
+          Gefeliciteerd, je hebt de veiling gewonnen
+        </h3>
 
         <p className={styles.popupDescription}>
-          You are the winning bidder for <strong>{horse.title}</strong>.
+          Je bent de winnende bieder voor <strong>{horse.title}</strong>.
         </p>
 
         <div className={styles.popupHorseCard}>
@@ -365,37 +368,39 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
 
           <div>
             <strong>{horse.title}</strong>
-            <span>Lot 27 · Friesian · Black · 6 yrs</span>
+            <span>Kavel 27 · Fries · Zwart · 6 jaar</span>
 
             <div className={styles.popupHorseMeta}>
-              <span className={styles.goldText}>Auction ended on 02:14:32</span>
+              <span className={styles.goldText}>
+                Veiling geëindigd om 02:14:32
+              </span>
             </div>
           </div>
         </div>
 
         <div className={styles.popupPriceGrid}>
           <div>
-            <span>Winning bid</span>
+            <span>Winnend bod</span>
             <strong className={styles.popupPriceSuccess}>
               {formattedWinningBid}
             </strong>
           </div>
 
           <div>
-            <span>Auction status</span>
-            <strong className={styles.popupPriceSuccess}>Closed</strong>
+            <span>Veilingstatus</span>
+            <strong className={styles.popupPriceSuccess}>Gesloten</strong>
           </div>
         </div>
 
         <div className={styles.popupFullNotice}>
           <Mail size={15} strokeWidth={1.8} />
-          Confirmation sent by email
+          Bevestiging per e-mail verzonden
         </div>
 
         <div className={styles.popupNotifyRowCenter}>
           <span className={styles.popupNotifyInfo}>
             <Bell size={14} strokeWidth={1.8} />
-            Platform notification
+            Platformmelding
           </span>
         </div>
 
@@ -405,16 +410,16 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
           onClick={() => setPopupOpen(false)}
         >
           <Trophy size={18} strokeWidth={1.9} />
-          View next steps
+          Bekijk volgende stappen
         </button>
 
-        <Link
+        <a
           href={`/elite/${horse.slug}`}
           className={styles.popupSecondaryButton}
           onClick={() => setPopupOpen(false)}
         >
-          View auction details
-        </Link>
+          Bekijk veilingdetails
+        </a>
       </div>
     );
   }
@@ -434,20 +439,20 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
         <div className={styles.currencyRow}>
           <span>Valuta weergeven</span>
 
-<Select
-  value={currency}
-  onChange={(value: CurrencyCode) => setCurrency(value)}
-  options={currencyOptions.map((item) => ({
-    value: item.value,
-    label: `${item.label} ${item.symbol}`,
-  }))}
-  className={styles.currencySelect}
-  classNames={{
-    popup: {
-      root: styles.currencyDropdown,
-    },
-  }}
-/>
+          <Select
+            value={currency}
+            onChange={(value: CurrencyCode) => setCurrency(value)}
+            options={currencyOptions.map((item) => ({
+              value: item.value,
+              label: `${item.label} ${item.symbol}`,
+            }))}
+            className={styles.currencySelect}
+            classNames={{
+              popup: {
+                root: styles.currencyDropdown,
+              },
+            }}
+          />
         </div>
 
         <div className={styles.minimumBid}>

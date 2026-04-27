@@ -1,4 +1,3 @@
-import Link from "next/link";
 import Image from "next/image";
 import styles from "./Footer.module.scss";
 
@@ -20,7 +19,7 @@ export default function Footer() {
     <footer className={styles.footer}>
       <div className={styles.inner}>
         <div className={styles.brandCol}>
-          <Link href="/" className={styles.logoLink} aria-label="Hippique Auctions">
+          <a href="/" className={styles.logoLink} aria-label="Hippique Auctions">
             <Image
               src="/img/logo/footer.png"
               alt="Hippique Auctions"
@@ -28,7 +27,7 @@ export default function Footer() {
               height={180}
               className={styles.logo}
             />
-          </Link>
+          </a>
 
           <p className={styles.description}>
             De toonaangevende bestemming voor sportpaardenveilingen van
@@ -42,9 +41,9 @@ export default function Footer() {
           <ul className={styles.linkList}>
             {navigationLinks.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className={styles.link}>
+                <a href={item.href} className={styles.link}>
                   {item.label}
-                </Link>
+                </a>
               </li>
             ))}
           </ul>
@@ -56,9 +55,9 @@ export default function Footer() {
           <ul className={styles.linkList}>
             {legalLinks.map((item) => (
               <li key={item.href}>
-                <Link href={item.href} className={styles.link}>
+                <a href={item.href} className={styles.link}>
                   {item.label}
-                </Link>
+                </a>
               </li>
             ))}
           </ul>

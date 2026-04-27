@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import styles from "./NewlyListedSection.module.scss";
 
 type HorseItem = {
@@ -113,7 +112,7 @@ function HorseCard({ horse }: { horse: HorseItem }) {
 
   return (
     <article className={styles.card}>
-      <Link href={horse.href} className={styles.imageLink}>
+      <a href={horse.href} className={styles.imageLink}>
         <div className={styles.imageWrap}>
           <Image
             src={horse.image}
@@ -132,12 +131,12 @@ function HorseCard({ horse }: { horse: HorseItem }) {
             </strong>
           </div>
         </div>
-      </Link>
+      </a>
 
       <div className={styles.cardBody}>
         <div className={styles.topContent}>
           <h3 className={styles.cardTitle}>
-            <Link href={horse.href}>{horse.title}</Link>
+            <a href={horse.href}>{horse.title}</a>
           </h3>
 
           <p className={styles.cardSubtitle}>{horse.subtitle}</p>
@@ -149,9 +148,9 @@ function HorseCard({ horse }: { horse: HorseItem }) {
             <strong className={styles.priceValue}>{horse.bid}</strong>
           </div>
 
-          <Link href={horse.href} className={styles.bidButton}>
+          <a href={horse.href} className={styles.bidButton}>
             Bied mee
-          </Link>
+          </a>
         </div>
       </div>
     </article>

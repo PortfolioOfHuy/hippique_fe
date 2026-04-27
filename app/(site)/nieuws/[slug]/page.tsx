@@ -1,6 +1,5 @@
 import { connection } from "next/server";
 import Image from "next/image";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import {
   ArrowLeft,
@@ -55,10 +54,10 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
   return (
     <main className={styles.page}>
       <article className={styles.article}>
-        <Link href="/nieuws" className={styles.backLink}>
+        <a href="/nieuws" className={styles.backLink}>
           <ArrowLeft size={17} strokeWidth={2.2} />
           <span>Terug naar nieuws</span>
-        </Link>
+        </a>
 
         <header className={styles.hero}>
           <span className={styles.category}>{news.category}</span>
@@ -113,18 +112,16 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
             ))}
 
             <div className={styles.noteBox}>
-              <h2>Wilt u deelnemen aan een veiling?</h2>
+              <h2>Wil je deelnemen aan een veiling?</h2>
 
               <p>
-                Maak een account aan, bekijk de beschikbare kavels of plaats uw
+                Maak een account aan, bekijk de beschikbare kavels of plaats je
                 eigen advertentie via het verkopersportaal.
               </p>
 
               <div className={styles.noteActions}>
-                <Link href="/registreren">Registreren</Link>
-                <Link href="/advertentie-plaatsen">
-                  Advertentie plaatsen
-                </Link>
+                <a href="/registreren">Registreren</a>
+                <a href="/advertentie-plaatsen">Advertentie plaatsen</a>
               </div>
             </div>
           </div>
@@ -140,7 +137,7 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
         <div className={styles.relatedGrid}>
           {relatedNews.map((item) => (
             <article key={item.id} className={styles.relatedCard}>
-              <Link
+              <a
                 href={`/nieuws/${item.slug}`}
                 className={styles.relatedImage}
               >
@@ -150,22 +147,22 @@ export default async function NewsDetailPage({ params }: NewsDetailPageProps) {
                   width={420}
                   height={280}
                 />
-              </Link>
+              </a>
 
               <div className={styles.relatedContent}>
                 <span>{item.category}</span>
 
                 <h3>
-                  <Link href={`/nieuws/${item.slug}`}>{item.title}</Link>
+                  <a href={`/nieuws/${item.slug}`}>{item.title}</a>
                 </h3>
 
-                <Link
+                <a
                   href={`/nieuws/${item.slug}`}
                   className={styles.relatedLink}
                 >
                   Lees artikel
                   <ArrowRight size={16} strokeWidth={2.2} />
-                </Link>
+                </a>
               </div>
             </article>
           ))}

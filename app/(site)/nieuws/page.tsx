@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { ArrowRight, CalendarDays, Clock3 } from "lucide-react";
 import { newsItems } from "@/components/modules/site/news/news-data";
 import styles from "./NewsPage.module.scss";
@@ -24,7 +23,7 @@ export default function NewsPage() {
 
       <section className={styles.featuredSection}>
         <article className={styles.featuredCard}>
-          <Link
+          <a
             href={`/nieuws/${featuredNews.slug}`}
             className={styles.featuredImage}
             aria-label={featuredNews.title}
@@ -36,15 +35,15 @@ export default function NewsPage() {
               height={520}
               priority
             />
-          </Link>
+          </a>
 
           <div className={styles.featuredContent}>
             <span className={styles.category}>{featuredNews.category}</span>
 
             <h2>
-              <Link href={`/nieuws/${featuredNews.slug}`}>
+              <a href={`/nieuws/${featuredNews.slug}`}>
                 {featuredNews.title}
-              </Link>
+              </a>
             </h2>
 
             <p>{featuredNews.summary}</p>
@@ -61,10 +60,13 @@ export default function NewsPage() {
               </span>
             </div>
 
-            <Link href={`/nieuws/${featuredNews.slug}`} className={styles.readMore}>
+            <a
+              href={`/nieuws/${featuredNews.slug}`}
+              className={styles.readMore}
+            >
               <span>Lees meer</span>
               <ArrowRight size={17} strokeWidth={2.2} />
-            </Link>
+            </a>
           </div>
         </article>
       </section>
@@ -72,13 +74,13 @@ export default function NewsPage() {
       <section className={styles.newsSection}>
         <div className={styles.sectionHeader}>
           <span className={styles.kicker}>Alle artikelen</span>
-          <h2>Nieuws overzicht</h2>
+          <h2>Nieuwsoverzicht</h2>
         </div>
 
         <div className={styles.newsGrid}>
           {otherNews.map((item) => (
             <article key={item.id} className={styles.newsCard}>
-              <Link
+              <a
                 href={`/nieuws/${item.slug}`}
                 className={styles.cardImage}
                 aria-label={item.title}
@@ -89,13 +91,13 @@ export default function NewsPage() {
                   width={520}
                   height={360}
                 />
-              </Link>
+              </a>
 
               <div className={styles.cardContent}>
                 <span className={styles.category}>{item.category}</span>
 
                 <h3>
-                  <Link href={`/nieuws/${item.slug}`}>{item.title}</Link>
+                  <a href={`/nieuws/${item.slug}`}>{item.title}</a>
                 </h3>
 
                 <p>{item.summary}</p>
@@ -106,13 +108,13 @@ export default function NewsPage() {
                     <span>{item.readTime}</span>
                   </div>
 
-                  <Link
+                  <a
                     href={`/nieuws/${item.slug}`}
                     className={styles.cardArrow}
                     aria-label={`Lees meer over ${item.title}`}
                   >
                     <ArrowRight size={18} strokeWidth={2.2} />
-                  </Link>
+                  </a>
                 </div>
               </div>
             </article>

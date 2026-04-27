@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { BadgeCheck, ShieldCheck } from "lucide-react";
 import {
   logoutItem,
@@ -58,10 +57,10 @@ export default function ProfileSidebar({
           );
         })}
 
-        <Link href="/inloggen" className={styles.logoutButton}>
+        <a href="/inloggen" className={styles.logoutButton}>
           <LogoutIcon size={18} strokeWidth={2.1} />
           <span>{logoutItem.label}</span>
-        </Link>
+        </a>
       </nav>
     </aside>
   );

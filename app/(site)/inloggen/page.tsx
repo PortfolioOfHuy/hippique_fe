@@ -1,15 +1,12 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import styles from "./InloggenPage.module.scss";
 
 export default function InloggenPage() {
-  const router = useRouter();
-
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    router.push("/");
+
+    window.location.href = "/";
   }
 
   return (
@@ -40,9 +37,9 @@ export default function InloggenPage() {
             <div className={styles.labelRow}>
               <label htmlFor="password">Wachtwoord</label>
 
-              <Link href="/" className={styles.forgotLink}>
+              <a href="/" className={styles.forgotLink}>
                 Wachtwoord vergeten?
-              </Link>
+              </a>
             </div>
 
             <input
@@ -69,9 +66,9 @@ export default function InloggenPage() {
         <div className={styles.register}>
           <p>Nog geen account bij het veilinghuis?</p>
 
-          <Link href="/registreren" className={styles.registerButton}>
+          <a href="/registreren" className={styles.registerButton}>
             Registreren om te bieden
-          </Link>
+          </a>
         </div>
       </section>
     </main>

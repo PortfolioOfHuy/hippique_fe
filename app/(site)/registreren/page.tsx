@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 import styles from "./RegistrerenPage.module.scss";
 
@@ -36,8 +34,6 @@ function maskPhone(phone: string) {
 }
 
 export default function RegistrerenPage() {
-  const router = useRouter();
-
   const [form, setForm] = useState<FormState>({
     fullName: "",
     email: "",
@@ -119,7 +115,9 @@ export default function RegistrerenPage() {
     setEmailVerified(false);
     setForm((prev) => ({ ...prev, emailOtp: "" }));
     setEmailMessage(
-      `OTP is verzonden naar ${maskEmail(form.email.trim())}. Dit is een demo-flow zonder backend.`,
+      `OTP is verzonden naar ${maskEmail(
+        form.email.trim(),
+      )}. Dit is een demoflow zonder backend.`,
     );
   }
 
@@ -136,7 +134,9 @@ export default function RegistrerenPage() {
     setPhoneVerified(false);
     setForm((prev) => ({ ...prev, phoneOtp: "" }));
     setPhoneMessage(
-      `OTP is verzonden naar ${maskPhone(form.phone.trim())}. Dit is een demo-flow zonder backend.`,
+      `OTP is verzonden naar ${maskPhone(
+        form.phone.trim(),
+      )}. Dit is een demoflow zonder backend.`,
     );
   }
 
@@ -191,7 +191,7 @@ export default function RegistrerenPage() {
     );
 
     window.setTimeout(() => {
-      router.push("/inloggen");
+      window.location.href = "/inloggen";
     }, 1200);
   }
 
@@ -199,7 +199,7 @@ export default function RegistrerenPage() {
     <main className={styles.page}>
       <section className={styles.card} aria-labelledby="register-title">
         <div className={styles.heading}>
-          <span className={styles.kicker}>Hippique Auction House</span>
+          <span className={styles.kicker}>Hippique Veilinghuis</span>
           <h1 id="register-title">Registreren</h1>
           <p>
             Maak een account aan om te bieden. Verifieer je e-mailadres en
@@ -208,11 +208,11 @@ export default function RegistrerenPage() {
         </div>
 
         <div className={styles.demoNotice}>
-          <div className={styles.demoBadge}>Demo modus</div>
+          <div className={styles.demoBadge}>Demomodus</div>
           <p>
             Er is nog geen backend gekoppeld. Daarom tonen we na het verzenden
-            van een OTP ook een <strong>demo-code</strong> in de interface,
-            zodat klanten de volledige verificatieflow toch kunnen zien.
+            van een OTP ook een <strong>democode</strong> in de interface, zodat
+            klanten de volledige verificatieflow toch kunnen zien.
           </p>
         </div>
 
@@ -286,7 +286,7 @@ export default function RegistrerenPage() {
                 </div>
 
                 <div className={styles.demoCodeBox}>
-                  <span>Demo code</span>
+                  <span>Democode</span>
                   <strong>{emailSentCode}</strong>
                 </div>
               </div>
@@ -363,7 +363,7 @@ export default function RegistrerenPage() {
                 </div>
 
                 <div className={styles.demoCodeBox}>
-                  <span>Demo code</span>
+                  <span>Democode</span>
                   <strong>{phoneSentCode}</strong>
                 </div>
               </div>
@@ -418,7 +418,7 @@ export default function RegistrerenPage() {
 
         <div className={styles.footer}>
           <p>Heb je al een account?</p>
-          <Link href="/inloggen">Ga naar inloggen</Link>
+          <a href="/inloggen">Ga naar inloggen</a>
         </div>
       </section>
     </main>

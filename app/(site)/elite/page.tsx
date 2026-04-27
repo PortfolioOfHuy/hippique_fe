@@ -1,5 +1,4 @@
 import Image from "next/image";
-import Link from "next/link";
 import { getEliteHorses } from "@/components/modules/site/home/data/horses";
 import styles from "./ElitePage.module.scss";
 
@@ -26,7 +25,7 @@ export default function ElitePage() {
 
             return (
               <article key={horse.id} className={styles.card}>
-                <Link href={href} scroll className={styles.imageLink}>
+                <a href={href} className={styles.imageLink}>
                   <div className={styles.imageWrap}>
                     <Image
                       src={horse.image}
@@ -38,13 +37,11 @@ export default function ElitePage() {
 
                     <span className={styles.badge}>{horse.badge}</span>
                   </div>
-                </Link>
+                </a>
 
                 <div className={styles.cardBody}>
                   <h2 className={styles.cardTitle}>
-                    <Link href={href} scroll>
-                      {horse.title}
-                    </Link>
+                    <a href={href}>{horse.title}</a>
                   </h2>
 
                   <p className={styles.cardSubtitle}>{horse.subtitle}</p>
@@ -60,9 +57,9 @@ export default function ElitePage() {
                       <strong className={styles.priceValue}>{horse.bid}</strong>
                     </div>
 
-                    <Link href={href} scroll className={styles.button}>
+                    <a href={href} className={styles.button}>
                       Details bekijken
-                    </Link>
+                    </a>
                   </div>
                 </div>
               </article>

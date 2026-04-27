@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
-import Link from "next/link";
 import styles from "./EndingSoonSection.module.scss";
 
 type HorseItem = {
@@ -110,7 +109,7 @@ function HorseCard({ horse }: { horse: HorseItem }) {
 
   return (
     <article className={styles.card}>
-      <Link href={horse.href} className={styles.imageLink}>
+      <a href={horse.href} className={styles.imageLink}>
         <div className={styles.imageWrap}>
           <Image
             src={horse.image}
@@ -129,12 +128,12 @@ function HorseCard({ horse }: { horse: HorseItem }) {
             </strong>
           </div>
         </div>
-      </Link>
+      </a>
 
       <div className={styles.cardBody}>
         <div className={styles.topContent}>
           <h3 className={styles.cardTitle}>
-            <Link href={horse.href}>{horse.title}</Link>
+            <a href={horse.href}>{horse.title}</a>
           </h3>
 
           <p className={styles.cardSubtitle}>{horse.subtitle}</p>
@@ -146,9 +145,9 @@ function HorseCard({ horse }: { horse: HorseItem }) {
             <strong className={styles.priceValue}>{horse.bid}</strong>
           </div>
 
-          <Link href={horse.href} className={styles.bidButton}>
+          <a href={horse.href} className={styles.bidButton}>
             Bied mee
-          </Link>
+          </a>
         </div>
       </div>
     </article>
@@ -162,14 +161,12 @@ export default function EndingSoonSection() {
         <div className={styles.headingRow}>
           <div className={styles.heading}>
             <h2 className={styles.title}>Binnenkort afgelopen</h2>
-            <p className={styles.subtitle}>
-              Mis deze laatste kansen niet.
-            </p>
+            <p className={styles.subtitle}>Mis deze laatste kansen niet.</p>
           </div>
 
-          <Link href="/veilingen" className={styles.viewAll}>
+          <a href="/veilingen" className={styles.viewAll}>
             Bekijk alle kavels die bijna sluiten
-          </Link>
+          </a>
         </div>
 
         <div className={styles.grid}>

@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { Search, ChevronDown } from "lucide-react";
 import styles from "./HeroSection.module.scss";
 
@@ -36,13 +35,13 @@ export default function HeroSection() {
           </p>
 
           <div className={styles.actions}>
-            <Link href="/veilingen" className={styles.primaryButton}>
+            <a href="/veilingen" className={styles.primaryButton}>
               Bekijk veilingen
-            </Link>
+            </a>
 
-            <Link href="/registreren" className={styles.secondaryButton}>
+            <a href="/registreren" className={styles.secondaryButton}>
               Registreer nu
-            </Link>
+            </a>
           </div>
         </div>
 

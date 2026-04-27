@@ -1,6 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
-import { CalendarDays, Clock, Eye, Gavel, ShieldCheck } from "lucide-react";
+import { Eye, Gavel, ShieldCheck } from "lucide-react";
 import type { ProfileTabKey } from "./profile-data";
 import styles from "./AuctionTabsPanel.module.scss";
 
@@ -280,15 +279,15 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
               </div>
 
               <div className={styles.cardActions}>
-                <Link href={item.href} className={styles.primaryAction}>
+                <a href={item.href} className={styles.primaryAction}>
                   <Gavel size={16} strokeWidth={2.2} />
                   <span>Bieden bekijken</span>
-                </Link>
+                </a>
 
-                <Link href={item.href} className={styles.secondaryAction}>
+                <a href={item.href} className={styles.secondaryAction}>
                   <Eye size={16} strokeWidth={2.2} />
                   <span>Details</span>
-                </Link>
+                </a>
               </div>
             </div>
           </article>

@@ -1,7 +1,6 @@
 "use client";
 
 import { Suspense, useMemo, useState } from "react";
-import Link from "next/link";
 import styles from "./AdvertentiePlaatsenPage.module.scss";
 import ListingTypeTabs, {
   type ListingType,
@@ -60,7 +59,7 @@ export default function AdvertentiePlaatsenPage() {
   return (
     <main className={styles.page}>
       <section className={styles.hero}>
-        <span className={styles.kicker}>Verkoperportaal</span>
+        <span className={styles.kicker}>Verkopersportaal</span>
 
         <h1>Advertentie plaatsen</h1>
 
@@ -75,7 +74,7 @@ export default function AdvertentiePlaatsenPage() {
 
           <p>
             Wil je bestaande advertenties beheren?{" "}
-            <Link href="/verkopersdashboard">Ga naar verkopersdashboard.</Link>
+            <a href="/verkopersdashboard">Ga naar het verkopersdashboard.</a>
           </p>
         </div>
       </section>

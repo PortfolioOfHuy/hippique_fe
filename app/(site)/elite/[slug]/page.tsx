@@ -1,6 +1,5 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import Link from "next/link";
 import { ChevronDown, Heart, Play, Share2 } from "lucide-react";
 import {
   getEliteHorses,
@@ -42,12 +41,12 @@ export default async function EliteDetailPage({ params }: PageProps) {
           <div className={styles.auctionBarLeft}>
             <div className={styles.auctionMeta}>
               <span className={styles.liveBadge}>Live veiling</span>
-              <span className={styles.eventCode}>Event ID: EC-2026-AUG</span>
+              <span className={styles.eventCode}>Event-ID: EC-2026-AUG</span>
             </div>
 
             <div>
               <h1 className={styles.collectionTitle}>
-                The Heritage Sport Horse Collection
+                De Heritage Sportpaarden Collectie
               </h1>
 
               <p className={styles.collectionSubtitle}>
@@ -75,22 +74,22 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
       <div className={styles.inner}>
         <div className={styles.topNav}>
-          <Link href="/elite" scroll className={styles.backLink}>
+          <a href="/elite" className={styles.backLink}>
             ← Terug naar collectie
-          </Link>
+          </a>
 
           <div className={styles.topNavRight}>
             <span className={styles.lotBadge}>
-              Lot #{String(lotNumber).padStart(2, "0")}
+              Kavel #{String(lotNumber).padStart(2, "0")}
             </span>
 
             <span className={styles.periodText}>
-              Biedperiode · 17/03/26 - 23/08/26 | 19:59
+              Biedperiode · 17-03-2026 - 23-08-2026 | 19:59
             </span>
 
-            <Link href={nextHorseHref} scroll className={styles.nextLotButton}>
-              Volgende lot →
-            </Link>
+            <a href={nextHorseHref} className={styles.nextLotButton}>
+              Volgende kavel →
+            </a>
           </div>
         </div>
 
@@ -101,8 +100,8 @@ export default async function EliteDetailPage({ params }: PageProps) {
                 <h2 className={styles.horseTitle}>{horse.title}</h2>
 
                 <p className={styles.horseSubtitle}>
-                  Een wereldklasse springprospect met uitzonderlijke afstamming
-                  en elite bloedlijn.
+                  Een springprospect van wereldklasse met uitzonderlijke
+                  afstamming en een elitebloedlijn.
                 </p>
               </div>
 
@@ -110,7 +109,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
                 <button
                   type="button"
                   className={styles.iconButton}
-                  aria-label="Favoriet"
+                  aria-label="Toevoegen aan favorieten"
                 >
                   <Heart size={18} strokeWidth={1.8} />
                 </button>
@@ -178,7 +177,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
               <div className={styles.specItem}>
                 <span className={styles.specLabel}>Kleur</span>
-                <strong className={styles.specValue}>Bright Bay</strong>
+                <strong className={styles.specValue}>Bruin</strong>
               </div>
 
               <div className={styles.specItem}>
@@ -247,10 +246,10 @@ export default async function EliteDetailPage({ params }: PageProps) {
           <p className={styles.sectionText}>
             {horse.title} is een modern sportpaard met uitzonderlijke
             bloedlijnen. Hij toont een ritmische, gronddekkende galop en een
-            zorgvuldige techniek over de hindernissen. Momenteel succesvol in de
-            rubrieken voor jonge paarden met constante foutloze rondes.
-            Veterinair rapport en röntgenopnames zijn beschikbaar in de
-            beveiligde documentatie.
+            zorgvuldige techniek over de hindernissen. Momenteel presteert hij
+            succesvol in rubrieken voor jonge paarden met constante foutloze
+            rondes. Het veterinaire rapport en de röntgenopnames zijn
+            beschikbaar in de beveiligde documentatie.
           </p>
 
           <div className={styles.videoCard}>
@@ -271,7 +270,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
                 <Play size={26} fill="currentColor" />
               </button>
 
-              <span className={styles.videoLabel}>4K performance reel</span>
+              <span className={styles.videoLabel}>4K prestatievideo</span>
             </div>
           </div>
         </section>
@@ -279,7 +278,9 @@ export default async function EliteDetailPage({ params }: PageProps) {
         <section className={styles.sectionBlock}>
           <div className={styles.decorTitleWrap}>
             <span className={styles.decorLine} />
-            <h3 className={styles.sectionTitleLarge}>Bloedlijn & prestaties</h3>
+            <h3 className={styles.sectionTitleLarge}>
+              Bloedlijn & prestaties
+            </h3>
           </div>
 
           <div className={styles.twoColumnText}>
@@ -288,8 +289,8 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
               <p>
                 De vaderlijn staat bekend om modern springvermogen, elasticiteit
-                en scherpte op de hindernis. Deze afstamming levert al
-                jarenlang paarden voor internationaal topniveau.
+                en scherpte op de hindernis. Deze afstamming levert al jarenlang
+                paarden voor internationaal topniveau.
               </p>
             </div>
 
@@ -326,7 +327,9 @@ export default async function EliteDetailPage({ params }: PageProps) {
         </section>
 
         <section className={styles.sectionBlock}>
-          <h3 className={styles.sectionTitleLarge}>Documentatie & rapporten</h3>
+          <h3 className={styles.sectionTitleLarge}>
+            Documentatie & rapporten
+          </h3>
 
           <div className={styles.accordionList}>
             <button type="button" className={styles.accordionItem}>
@@ -344,7 +347,9 @@ export default async function EliteDetailPage({ params }: PageProps) {
         <section className={styles.sectionBlock}>
           <div className={styles.decorTitleWrap}>
             <span className={styles.decorLine} />
-            <h3 className={styles.sectionTitleLarge}>Pedigree & afstamming</h3>
+            <h3 className={styles.sectionTitleLarge}>
+              Pedigree & afstamming
+            </h3>
           </div>
 
           <div className={styles.pedigreePanel}>
