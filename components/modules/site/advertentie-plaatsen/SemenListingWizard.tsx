@@ -152,66 +152,7 @@ export default function SemenListingWizard() {
 
   return (
     <div className={styles.wrapper}>
-      <SectionHeading number="02" title="Verkoperinformatie" />
-
-      <section className={styles.card}>
-        <div className={styles.addressHeader}>
-          <div className={styles.field}>
-            <label htmlFor="savedAddress">Opgeslagen adres</label>
-            <select
-              id="savedAddress"
-              value={form.savedAddress}
-              onChange={(e) => updateField("savedAddress", e.target.value)}
-            >
-              <option>Main Stable - 123 Equestrian Lane...</option>
-              <option>Private Stable - Amsterdam</option>
-              <option>Breeding Center - Brussel</option>
-            </select>
-          </div>
-
-          <button type="button" className={styles.linkButton}>
-            Nieuw adres toevoegen
-          </button>
-        </div>
-
-        <div className={styles.formGridTwo}>
-          <TextField
-            label="Volledige naam / primaire contactpersoon"
-            value={form.fullName}
-            onChange={(value) => updateField("fullName", value)}
-          />
-
-          <TextField
-            label="E-mailadres"
-            value={form.email}
-            type="email"
-            onChange={(value) => updateField("email", value)}
-          />
-
-          <TextField
-            label="Telefoonnummer"
-            value={form.phone}
-            onChange={(value) => updateField("phone", value)}
-          />
-
-          <TextField
-            label="Bedrijf / stalnaam"
-            value={form.companyName}
-            onChange={(value) => updateField("companyName", value)}
-          />
-
-          <div className={`${styles.field} ${styles.fullWidth}`}>
-            <label htmlFor="fullAddress">Volledig adres</label>
-            <input
-              id="fullAddress"
-              value={form.fullAddress}
-              onChange={(e) => updateField("fullAddress", e.target.value)}
-            />
-          </div>
-        </div>
-      </section>
-
-      <SectionHeading number="03" title="Advertentie-informatie" />
+      <SectionHeading number="01" title="Advertentie-informatie" />
 
       <section className={styles.card}>
         <div className={styles.formGridTwo}>
@@ -316,7 +257,7 @@ export default function SemenListingWizard() {
         </div>
       </section>
 
-      <SectionHeading number="04" title="Media & documenten" />
+      <SectionHeading number="02" title="Media & documenten" />
 
       <section className={styles.card}>
         <div className={styles.mediaGrid}>
@@ -365,7 +306,7 @@ export default function SemenListingWizard() {
         </div>
       </section>
 
-      <SectionHeading number="05" title="Prijs & betalingsopties" />
+      <SectionHeading number="03" title="Prijs & betalingsopties" />
 
       <section className={styles.pricingCard}>
         <div className={styles.pricingBlock}>

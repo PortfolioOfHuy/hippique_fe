@@ -227,6 +227,19 @@ export default function HorseListingWizard({
     form.startingBid,
   ]);
 
+  const previewTitle = form.horseName.trim() || "Royal Champion Z";
+  const previewBreed = form.breed.trim() || "KWPN";
+  const previewBirthYear = form.birthYear.trim() || "2018";
+  const previewHeight = form.height.trim() || "16.2";
+  const previewColor = form.color.trim() || "Bruin";
+  const previewLocation = form.location.trim() || "Wellington, FL";
+  const previewDiscipline = form.discipline.trim() || "Dressuur";
+  const previewBid = form.startingBid.trim()
+    ? `${form.currency} ${form.startingBid}`
+    : `${form.currency} 50.000`;
+  const previewMainImage = coverPreview || galleryPreviews[0] || null;
+  const previewGalleryImages = galleryPreviews.length > 0 ? galleryPreviews : [];
+
   return (
     <div className={styles.wrapper}>
       <div className={styles.topMeta}>
@@ -254,7 +267,7 @@ export default function HorseListingWizard({
           onClick={() => setStep(2)}
         >
           <span className={styles.progressLine} />
-          <small>Controle</small>
+          <small>Voorbeeld</small>
         </button>
 
         <button
@@ -273,7 +286,7 @@ export default function HorseListingWizard({
         <h2>{content.title}</h2>
         <p>
           {step === 1 && content.stepOneLabel}
-          {step === 2 && "Stap 2: controle van je vermelding"}
+          {step === 2 && "Stap 2: voorbeeld van je veilingpagina"}
           {step === 3 && "Stap 3: betaling en afronding"}
         </p>
       </div>
@@ -467,7 +480,10 @@ export default function HorseListingWizard({
 
                 <div className={styles.galleryGrid}>
                   {galleryPreviews.map((preview, index) => (
-                    <div key={`${preview}-${index}`} className={styles.galleryTile}>
+                    <div
+                      key={`${preview}-${index}`}
+                      className={styles.galleryTile}
+                    >
                       <img src={preview} alt={`Galerij ${index + 1}`} />
                     </div>
                   ))}
@@ -601,135 +617,331 @@ export default function HorseListingWizard({
       ) : null}
 
       {step === 2 ? (
-        <section className={styles.reviewSection}>
-          <div className={styles.reviewHeader}>
-            <div>
-              <h3>Controleoverzicht</h3>
-              <p>
-                Bekijk alle ingevulde informatie voordat je doorgaat naar
-                betaling.
-              </p>
+        <section className={styles.previewPage}>
+          <div className={styles.previewAuctionBar}>
+            <div className={styles.previewAuctionLeft}>
+              <div className={styles.previewAuctionMeta}>
+                <span className={styles.previewLiveBadge}>Preview</span>
+                <span className={styles.previewEventCode}>
+                  Event-ID: DRAFT-AUCTION
+                </span>
+              </div>
+
+              <div>
+                <h3 className={styles.previewCollectionTitle}>
+                  De Heritage Sportpaarden Collectie
+                </h3>
+
+                <p className={styles.previewCollectionSubtitle}>
+                  Dit is een voorbeeld van hoe je advertentie eruitziet op de
+                  veilingdetailpagina.
+                </p>
+              </div>
             </div>
 
-            <div className={styles.completionBadge}>
-              <CheckCircle2 size={18} strokeWidth={2} />
-              <span>{completion}% compleet</span>
+            <div className={styles.previewAuctionRight}>
+              <div className={styles.previewStatBox}>
+                <span>Veiling eindigt over</span>
+                <strong>14d 08u 22m</strong>
+              </div>
+
+              <div className={styles.previewStatBox}>
+                <span>Compleet</span>
+                <strong>{completion}%</strong>
+              </div>
             </div>
           </div>
 
-          <div className={styles.reviewGrid}>
-            <div className={styles.reviewCard}>
-              <h4>Basisinformatie</h4>
-              <ul>
-                <li>
-                  <span>Type vermelding</span>
-                  <strong>{content.typeLabel}</strong>
-                </li>
-                <li>
-                  <span>Naam / titel</span>
-                  <strong>{form.horseName || "-"}</strong>
-                </li>
-                <li>
-                  <span>Ras</span>
-                  <strong>{form.breed || "-"}</strong>
-                </li>
-                <li>
+          <div className={styles.previewTopNav}>
+            <span>← Terug naar collectie</span>
+
+            <div className={styles.previewTopNavRight}>
+              <span>Kavel #01</span>
+              <span>Biedperiode · Draft preview</span>
+              <span>Volgende kavel →</span>
+            </div>
+          </div>
+
+          <div className={styles.previewHeroGrid}>
+            <div className={styles.previewMainColumn}>
+              <div className={styles.previewTitleRow}>
+                <div>
+                  <h3 className={styles.previewHorseTitle}>{previewTitle}</h3>
+
+                  <p className={styles.previewHorseSubtitle}>
+                    Een eersteklas sportpaard met een uitzonderlijke bloedlijn
+                    en veilingwaardige presentatie.
+                  </p>
+                </div>
+
+                <div className={styles.previewTitleActions}>
+                  <button type="button" aria-label="Favoriet">
+                    ♥
+                  </button>
+
+                  <button type="button" aria-label="Delen">
+                    ↗
+                  </button>
+                </div>
+              </div>
+
+              <div className={styles.previewGallery}>
+                <div className={styles.previewMainImageWrap}>
+                  {previewMainImage ? (
+                    <img
+                      src={previewMainImage}
+                      alt={previewTitle}
+                      className={styles.previewImage}
+                    />
+                  ) : (
+                    <div className={styles.previewImagePlaceholder}>
+                      <strong>Omslagfoto preview</strong>
+                      <span>Upload een omslagfoto in stap 1</span>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.previewSideImages}>
+                  {[0, 1].map((index) => {
+                    const image = previewGalleryImages[index];
+
+                    return (
+                      <div key={index} className={styles.previewSideImageWrap}>
+                        {image ? (
+                          <img
+                            src={image}
+                            alt={`${previewTitle} galerij ${index + 1}`}
+                            className={styles.previewImage}
+                          />
+                        ) : (
+                          <div className={styles.previewSmallPlaceholder}>
+                            Galerie
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              <div className={styles.previewSpecPanel}>
+                <div>
                   <span>Geboortejaar</span>
-                  <strong>{form.birthYear || "-"}</strong>
-                </li>
-                <li>
-                  <span>Geslacht</span>
-                  <strong>{form.gender || "-"}</strong>
-                </li>
-                <li>
-                  <span>Hoogte</span>
-                  <strong>{form.height || "-"}</strong>
-                </li>
-                <li>
+                  <strong>{previewBirthYear}</strong>
+                </div>
+
+                <div>
+                  <span>Schofthoogte</span>
+                  <strong>{previewHeight}</strong>
+                </div>
+
+                <div>
+                  <span>Stamboek</span>
+                  <strong>{previewBreed}</strong>
+                </div>
+
+                <div>
                   <span>Kleur</span>
-                  <strong>{form.color || "-"}</strong>
-                </li>
-                <li>
-                  <span>Discipline</span>
-                  <strong>{form.discipline || "-"}</strong>
-                </li>
-                <li>
-                  <span>Locatie</span>
-                  <strong>{form.location || "-"}</strong>
-                </li>
-              </ul>
+                  <strong>{previewColor}</strong>
+                </div>
+
+                <div>
+                  <span>Geslacht</span>
+                  <strong>{form.gender || "Hengst"}</strong>
+                </div>
+
+                <div>
+                  <span>Huidige locatie</span>
+                  <strong>{previewLocation}</strong>
+                </div>
+              </div>
             </div>
 
-            <div className={styles.reviewCard}>
-              <h4>Afstamming & media</h4>
-              <ul>
-                <li>
-                  <span>Registratienummer</span>
-                  <strong>{form.registrationNumber || "-"}</strong>
-                </li>
-                <li>
-                  <span>UELN</span>
-                  <strong>{form.ueln || "-"}</strong>
-                </li>
-                <li>
-                  <span>Omslagfoto</span>
-                  <strong>{coverPreview ? "Toegevoegd" : "Niet toegevoegd"}</strong>
-                </li>
-                <li>
-                  <span>Galerij</span>
-                  <strong>{galleryPreviews.length} bestanden</strong>
-                </li>
-                <li>
-                  <span>Video</span>
-                  <strong>
-                    {form.videoUrl.trim() !== ""
-                      ? "Toegevoegd"
-                      : "Niet toegevoegd"}
-                  </strong>
-                </li>
-                <li>
-                  <span>Documenten</span>
-                  <strong>
-                    {
-                      Object.values(documents).filter((item) => item !== null)
-                        .length
-                    }{" "}
-                    geüpload
-                  </strong>
-                </li>
-              </ul>
-            </div>
+            <aside className={styles.previewSidebar}>
+              <div className={styles.previewBidCard}>
+                <div className={styles.previewBidHeader}>
+                  <div>
+                    <span>Huidig hoogste bod</span>
+                    <strong>{previewBid}</strong>
+                  </div>
 
-            <div className={styles.reviewCard}>
-              <h4>Beschrijving & prijs</h4>
-              <ul>
-                <li>
-                  <span>Prestatienotities</span>
-                  <strong>
-                    {form.performanceNotes.trim() !== ""
-                      ? "Ingevuld"
-                      : "Nog niet ingevuld"}
-                  </strong>
-                </li>
-                <li>
-                  <span>Curatornotitie</span>
-                  <strong>
-                    {form.curatorNote.trim() !== ""
-                      ? "Ingevuld"
-                      : "Nog niet ingevuld"}
-                  </strong>
-                </li>
-                <li>
-                  <span>Startbod</span>
-                  <strong>{form.startingBid || "-"}</strong>
-                </li>
-                <li>
-                  <span>Valuta</span>
-                  <strong>{form.currency || "-"}</strong>
-                </li>
-              </ul>
-            </div>
+                  <em>Bieden actief</em>
+                </div>
+
+                <div className={styles.previewMinimumBid}>
+                  <span>Volgend minimumbod</span>
+                  <strong>{previewBid}</strong>
+                </div>
+
+                <div className={styles.previewBidInput}>Voer biedbedrag in</div>
+
+                <div className={styles.previewQuickBids}>
+                  <button type="button">+ 500</button>
+                  <button type="button">+ 1.000</button>
+                  <button type="button">+ 5.000</button>
+                </div>
+
+                <button type="button" className={styles.previewPrimaryBid}>
+                  Plaats bod nu
+                </button>
+
+                <button type="button" className={styles.previewSecondaryBid}>
+                  Boek try-out
+                </button>
+
+                <p>*Door te bieden ga je akkoord met de veilingvoorwaarden.</p>
+              </div>
+
+              <div className={styles.previewActivityCard}>
+                <div className={styles.previewActivityTop}>
+                  Je hebt nog geen bod geplaatst
+                </div>
+
+                <h4>Recente biedactiviteit</h4>
+
+                <div className={styles.previewActivityList}>
+                  <div>
+                    <span>
+                      <strong>Bieder #712</strong>
+                      <small>2 min geleden</small>
+                    </span>
+                    <strong>{previewBid}</strong>
+                  </div>
+
+                  <div>
+                    <span>
+                      <strong>Bieder #104</strong>
+                      <small>5 min geleden</small>
+                    </span>
+                    <strong>{form.currency} 48.000</strong>
+                  </div>
+
+                  <div>
+                    <span>
+                      <strong>Bieder #889</strong>
+                      <small>12 min geleden</small>
+                    </span>
+                    <strong>{form.currency} 45.000</strong>
+                  </div>
+                </div>
+
+                <button type="button">Bekijk alle biedingen</button>
+              </div>
+            </aside>
           </div>
+
+          <section className={styles.previewSectionBlock}>
+            <h3>Notitie van de curator</h3>
+
+            <p>
+              {form.curatorNote.trim() ||
+                `${previewTitle} is een modern sportpaard met een sterke uitstraling, correcte bouw en veel potentieel voor sport of fokkerij. Voeg in stap 1 een curatornotitie toe om deze tekst te personaliseren.`}
+            </p>
+
+            <div className={styles.previewVideoCard}>
+              {previewMainImage ? (
+                <img src={previewMainImage} alt={previewTitle} />
+              ) : null}
+
+              <div className={styles.previewVideoOverlay}>
+                <CirclePlay size={44} strokeWidth={1.8} />
+                <span>
+                  {form.videoUrl.trim()
+                    ? "Videopreview beschikbaar"
+                    : "4K prestatievideo"}
+                </span>
+              </div>
+            </div>
+          </section>
+
+          <section className={styles.previewSectionBlock}>
+            <div className={styles.previewDecorTitle}>
+              <span />
+              <h3>Bloedlijn & prestaties</h3>
+            </div>
+
+            <div className={styles.previewTextGrid}>
+              <div>
+                <h4>Vaderlijn</h4>
+                <p>
+                  De vaderlijn staat bekend om sportiviteit, instelling en
+                  prestatiegericht vermogen.
+                </p>
+              </div>
+
+              <div>
+                <h4>Moederlijn</h4>
+                <p>
+                  De moederlijn biedt een sterke basis voor balans, rijdbaarheid
+                  en karakter.
+                </p>
+              </div>
+
+              <div>
+                <h4>Prestatiehoogtepunten</h4>
+                <p>
+                  {form.performanceNotes.trim() ||
+                    "Voeg prestatienotities toe om wedstrijdresultaten en kwaliteiten te tonen."}
+                </p>
+              </div>
+
+              <div>
+                <h4>Foknotities</h4>
+                <p>
+                  Deze combinatie van bloed, type en presentatie maakt het paard
+                  interessant voor kopers en investeerders.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          <section className={styles.previewSectionBlock}>
+            <h3>Documentatie & rapporten</h3>
+
+            <div className={styles.previewDocumentList}>
+              {documentMeta.map((doc) => (
+                <div key={doc.key}>
+                  <span>{doc.title}</span>
+                  <strong>{documents[doc.key] || "Nog niet toegevoegd"}</strong>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          <section className={styles.previewSectionBlock}>
+            <div className={styles.previewDecorTitle}>
+              <span />
+              <h3>Pedigree & afstamming</h3>
+            </div>
+
+            <div className={styles.previewPedigreePanel}>
+              <div>
+                <span>Vader</span>
+                <strong>{form.registrationNumber || "Onbekend"}</strong>
+                <small>{previewBreed}</small>
+              </div>
+
+              <div>
+                <span>Moeder</span>
+                <strong>{form.ueln || "Onbekend"}</strong>
+                <small>{previewBreed}</small>
+              </div>
+
+              <div>
+                <strong>Diamant de Semilly</strong>
+                <strong>Carthina Z</strong>
+                <strong>Nabab de Reve</strong>
+                <strong>Ulara</strong>
+              </div>
+
+              <div>
+                <strong>Le Tot de Semilly</strong>
+                <strong>Carthago Z</strong>
+                <strong>Quidam de Revel</strong>
+                <strong>Chin Chin</strong>
+              </div>
+            </div>
+          </section>
         </section>
       ) : null}
 
