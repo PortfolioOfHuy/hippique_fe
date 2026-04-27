@@ -13,11 +13,70 @@ type PageProps = {
   params: Promise<{ slug: string }>;
 };
 
+type AuctionStatus = "upcoming" | "live" | "ended";
+
+function getAuctionStatusLabel(status: AuctionStatus) {
+  if (status === "live") return "Live veiling";
+  if (status === "upcoming") return "Binnenkort";
+  return "Veiling gesloten";
+}
+
+function getBidPermissionLabel(canBid: boolean) {
+  return canBid ? "Je kunt bieden" : "Bieden niet mogelijk";
+}
+
+function getBidPermissionText({
+  isAuctionLive,
+  canBid,
+}: {
+  isAuctionLive: boolean;
+  canBid: boolean;
+}) {
+  if (!isAuctionLive) {
+    return "Deze veiling is momenteel niet geopend voor biedingen.";
+  }
+
+  if (canBid) {
+    return "Je account voldoet aan de voorwaarden om een bod te plaatsen.";
+  }
+
+  return "Deze veiling is live, maar je account voldoet nog niet aan alle biedvoorwaarden.";
+}
+
 export default async function HorseDetailPage({ params }: PageProps) {
   const { slug } = await params;
   const horse = getHorseBySlug(slug);
 
   const auctionEndsAt = "2026-08-23T19:59:00";
+
+  /**
+   * Later kun je deze waarden uit je backend/session halen:
+   * - isAuctionLive: status van de veiling zelf
+   * - canBid: of de huidige gebruiker mag bieden
+   *
+   * Voorbeeld:
+   * const isAuctionLive = auction.status === "LIVE";
+   * const canBid =
+   *   user.isLoggedIn &&
+   *   user.emailVerified &&
+   *   user.phoneVerified &&
+   *   user.depositActive &&
+   *   !user.isBlocked;
+   */
+  const auctionStatus: AuctionStatus = "live";
+  const isAuctionLive = auctionStatus === "live";
+
+  /**
+   * Zet deze tijdelijk op true om de variant "Je kunt bieden" te testen.
+   * Zet false om te tonen dat de veiling live is, maar de gebruiker nog niet mag bieden.
+   */
+  const canBid = false;
+
+  const bidPermissionLabel = getBidPermissionLabel(canBid);
+  const bidPermissionText = getBidPermissionText({
+    isAuctionLive,
+    canBid,
+  });
 
   if (!horse || horse.category === "elite") {
     notFound();
@@ -44,8 +103,13 @@ export default async function HorseDetailPage({ params }: PageProps) {
         <div className={styles.inner}>
           <div className={styles.auctionBarLeft}>
             <div className={styles.auctionMeta}>
-              <span className={styles.liveBadge}>Live veiling</span>
-              <span className={styles.eventCode}>Evenement-ID: EC-2026-AUG</span>
+              <span className={styles.liveBadge}>
+                {getAuctionStatusLabel(auctionStatus)}
+              </span>
+
+              <span className={styles.eventCode}>
+                Evenement-ID: EC-2026-AUG
+              </span>
             </div>
 
             <div>
@@ -55,7 +119,10 @@ export default async function HorseDetailPage({ params }: PageProps) {
 
               <p className={styles.collectionSubtitle}>
                 Zorgvuldig geselecteerde sportpaarden uit Europese en
-                Noord-Amerikaanse topfoklijnen. Live bieden is nu actief.
+                Noord-Amerikaanse topfoklijnen.{" "}
+                {isAuctionLive
+                  ? "De veiling is live. Controleer je biedstatus om te zien of je een bod kunt plaatsen."
+                  : "Deze veiling is momenteel niet geopend voor biedingen."}
               </p>
             </div>
           </div>
@@ -197,6 +264,28 @@ export default async function HorseDetailPage({ params }: PageProps) {
           </div>
 
           <aside className={styles.sidebar}>
+            <div className={styles.bidStatusCard}>
+              <div>
+                <span className={styles.bidStatusLabel}>Biedstatus</span>
+
+                <strong
+                  className={
+                    canBid ? styles.bidStatusAvailable : styles.bidStatusBlocked
+                  }
+                >
+                  {bidPermissionLabel}
+                </strong>
+              </div>
+
+              <p>{bidPermissionText}</p>
+
+              {!canBid ? (
+                <a href="/profiel" className={styles.bidStatusAction}>
+                  Biedvoorwaarden controleren
+                </a>
+              ) : null}
+            </div>
+
             <AuctionBidPanel horse={horse} />
 
             <div className={styles.activityCard}>
