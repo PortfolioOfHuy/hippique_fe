@@ -36,6 +36,10 @@ type LanguageWithTimezone = {
   utcLabel: string;
 };
 
+const BASE_LANGUAGE = "nl";
+const STORAGE_LANGUAGE_KEY = "site-language";
+const STORAGE_TIMEZONE_KEY = "site-timezone";
+
 const navItems = [
   { label: "Home", href: "/" },
   { label: "Elite", href: "/elite" },
@@ -156,7 +160,7 @@ function isActivePath(pathname: string, href: string) {
 }
 
 function getTimezoneInfo(lang: string) {
-  return timezoneMap[lang];
+  return timezoneMap[lang] || timezoneMap[BASE_LANGUAGE];
 }
 
 function getLanguageDisplayName(lang: string, fallbackLabel: string) {
@@ -164,13 +168,16 @@ function getLanguageDisplayName(lang: string, fallbackLabel: string) {
 }
 
 function getSavedLanguage() {
-  if (typeof window === "undefined") return "";
-  return window.localStorage.getItem("site-language") || "";
+  if (typeof window === "undefined") return BASE_LANGUAGE;
+  return window.localStorage.getItem(STORAGE_LANGUAGE_KEY) || BASE_LANGUAGE;
 }
 
 function getSavedTimezone() {
-  if (typeof window === "undefined") return "";
-  return window.localStorage.getItem("site-timezone") || "";
+  if (typeof window === "undefined") return timezoneMap[BASE_LANGUAGE].timezone;
+  return (
+    window.localStorage.getItem(STORAGE_TIMEZONE_KEY) ||
+    timezoneMap[BASE_LANGUAGE].timezone
+  );
 }
 
 function formatCurrentTime(timezone: string) {
@@ -188,38 +195,16 @@ function formatCurrentTime(timezone: string) {
   }
 }
 
-function initGoogleTranslate() {
-  if (
-    typeof window === "undefined" ||
-    !window.google ||
-    !window.google.translate ||
-    !window.google.translate.TranslateElement
-  ) {
-    return;
-  }
+function setGoogleTranslateCookie(lang: string) {
+  if (typeof document === "undefined") return;
 
-  const desktopEl = document.getElementById("google_translate_element_desktop");
-  const mobileEl = document.getElementById("google_translate_element_mobile");
+  const value = lang === BASE_LANGUAGE ? "" : `/${BASE_LANGUAGE}/${lang}`;
+  const expires = lang === BASE_LANGUAGE ? "Thu, 01 Jan 1970 00:00:00 GMT" : "";
 
-  if (desktopEl && desktopEl.childElementCount === 0) {
-    new window.google.translate.TranslateElement(
-      {
-        pageLanguage: "nl",
-        autoDisplay: false,
-      },
-      "google_translate_element_desktop",
-    );
-  }
-
-  if (mobileEl && mobileEl.childElementCount === 0) {
-    new window.google.translate.TranslateElement(
-      {
-        pageLanguage: "nl",
-        autoDisplay: false,
-      },
-      "google_translate_element_mobile",
-    );
-  }
+  document.cookie = `googtrans=${value};path=/;${expires ? `expires=${expires};` : ""}`;
+  document.cookie = `googtrans=${value};path=/;domain=${window.location.hostname};${
+    expires ? `expires=${expires};` : ""
+  }`;
 }
 
 function removeGoogleTranslateArtifacts() {
@@ -231,7 +216,6 @@ function removeGoogleTranslateArtifacts() {
   const selectors = [
     "iframe.goog-te-banner-frame",
     ".goog-te-banner-frame",
-    ".skiptranslate",
     "#goog-gt-tt",
     ".goog-tooltip",
     ".goog-text-highlight",
@@ -253,6 +237,40 @@ function removeGoogleTranslateArtifacts() {
   });
 }
 
+function initGoogleTranslate() {
+  if (
+    typeof window === "undefined" ||
+    !window.google ||
+    !window.google.translate ||
+    !window.google.translate.TranslateElement
+  ) {
+    return;
+  }
+
+  const desktopEl = document.getElementById("google_translate_element_desktop");
+  const mobileEl = document.getElementById("google_translate_element_mobile");
+
+  if (desktopEl && desktopEl.childElementCount === 0) {
+    new window.google.translate.TranslateElement(
+      {
+        pageLanguage: BASE_LANGUAGE,
+        autoDisplay: false,
+      },
+      "google_translate_element_desktop",
+    );
+  }
+
+  if (mobileEl && mobileEl.childElementCount === 0) {
+    new window.google.translate.TranslateElement(
+      {
+        pageLanguage: BASE_LANGUAGE,
+        autoDisplay: false,
+      },
+      "google_translate_element_mobile",
+    );
+  }
+}
+
 function readGoogleLanguages(): LanguageItem[] {
   if (typeof window === "undefined") return [];
 
@@ -260,18 +278,27 @@ function readGoogleLanguages(): LanguageItem[] {
     ".goog-te-combo",
   ) as HTMLSelectElement | null;
 
-  if (!select) return [];
+  const baseItem: LanguageItem = {
+    value: BASE_LANGUAGE,
+    label: languageNameMap[BASE_LANGUAGE] || "Dutch",
+  };
 
-  return Array.from(select.options)
+  if (!select) return [baseItem];
+
+  const googleItems = Array.from(select.options)
     .map((option) => ({
       value: option.value,
       label: option.text.trim(),
     }))
     .filter((item) => item.value && item.label);
+
+  const hasBaseLanguage = googleItems.some((item) => item.value === BASE_LANGUAGE);
+
+  return hasBaseLanguage ? googleItems : [baseItem, ...googleItems];
 }
 
 function triggerGoogleTranslate(lang: string) {
-  if (!lang) return false;
+  if (!lang || lang === BASE_LANGUAGE) return false;
 
   const selects = document.querySelectorAll(".goog-te-combo");
 
@@ -292,10 +319,17 @@ export default function Header() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [languages, setLanguages] = useState<LanguageItem[]>([]);
+  const [languages, setLanguages] = useState<LanguageItem[]>([
+    {
+      value: BASE_LANGUAGE,
+      label: languageNameMap[BASE_LANGUAGE] || "Dutch",
+    },
+  ]);
   const [translateReady, setTranslateReady] = useState(false);
-  const [selectedLanguage, setSelectedLanguage] = useState("");
-  const [selectedTimezone, setSelectedTimezone] = useState("");
+  const [selectedLanguage, setSelectedLanguage] = useState(BASE_LANGUAGE);
+  const [selectedTimezone, setSelectedTimezone] = useState(
+    timezoneMap[BASE_LANGUAGE].timezone,
+  );
   const [currentTime, setCurrentTime] = useState("");
 
   const langRef = useRef<HTMLDivElement | null>(null);
@@ -317,10 +351,10 @@ export default function Header() {
   }, [languages]);
 
   const selectedLanguageItem = useMemo(() => {
-    if (!selectedLanguage) return null;
-
     return (
-      languageOptions.find((item) => item.value === selectedLanguage) ?? null
+      languageOptions.find((item) => item.value === selectedLanguage) ??
+      languageOptions.find((item) => item.value === BASE_LANGUAGE) ??
+      null
     );
   }, [languageOptions, selectedLanguage]);
 
@@ -333,13 +367,10 @@ export default function Header() {
   useEffect(() => {
     const savedLanguage = getSavedLanguage();
     const savedTimezone = getSavedTimezone();
+    const info = getTimezoneInfo(savedLanguage);
 
-    if (savedLanguage) {
-      const info = getTimezoneInfo(savedLanguage);
-
-      setSelectedLanguage(savedLanguage);
-      setSelectedTimezone(savedTimezone || info?.timezone || "");
-    }
+    setSelectedLanguage(savedLanguage);
+    setSelectedTimezone(savedTimezone || info?.timezone || "");
   }, []);
 
   useEffect(() => {
@@ -416,16 +447,19 @@ export default function Header() {
           setTranslateReady(true);
 
           const savedLanguage = getSavedLanguage();
+          const info = getTimezoneInfo(savedLanguage);
 
-          if (savedLanguage) {
-            const info = getTimezoneInfo(savedLanguage);
+          setSelectedLanguage(savedLanguage);
+          setSelectedTimezone(getSavedTimezone() || info?.timezone || "");
 
-            setSelectedLanguage(savedLanguage);
-            setSelectedTimezone(info?.timezone || getSavedTimezone());
-
-            if (savedLanguage !== "nl") {
+          if (savedLanguage && savedLanguage !== BASE_LANGUAGE) {
+            window.setTimeout(() => {
               triggerGoogleTranslate(savedLanguage);
-            }
+
+              window.setTimeout(() => {
+                removeGoogleTranslateArtifacts();
+              }, 300);
+            }, 500);
           }
 
           window.setTimeout(() => {
@@ -453,22 +487,32 @@ export default function Header() {
   }, []);
 
   function selectLanguage(item: LanguageWithTimezone) {
-    if (translateReady) {
-      triggerGoogleTranslate(item.value);
-    }
+    const isChanged = selectedLanguage !== item.value;
 
     setSelectedLanguage(item.value);
     setSelectedTimezone(item.timezone);
     setLangOpen(false);
+    setProfileOpen(false);
+    setMobileOpen(false);
 
     if (typeof window !== "undefined") {
-      window.localStorage.setItem("site-language", item.value);
-      window.localStorage.setItem("site-timezone", item.timezone);
+      window.localStorage.setItem(STORAGE_LANGUAGE_KEY, item.value);
+      window.localStorage.setItem(STORAGE_TIMEZONE_KEY, item.timezone);
+
+      setGoogleTranslateCookie(item.value);
+    }
+
+    if (item.value !== BASE_LANGUAGE && translateReady) {
+      triggerGoogleTranslate(item.value);
     }
 
     window.setTimeout(() => {
       removeGoogleTranslateArtifacts();
-    }, 150);
+
+      if (isChanged) {
+        window.location.reload();
+      }
+    }, 300);
   }
 
   function renderTranslateHeader() {
@@ -496,7 +540,7 @@ export default function Header() {
   }
 
   function renderLanguageList() {
-    if (!translateReady) {
+    if (!translateReady && languageOptions.length <= 1) {
       return <div className={styles.languageLoading}>Laden...</div>;
     }
 
@@ -533,7 +577,7 @@ export default function Header() {
         strategy="afterInteractive"
       />
 
-      <header className={styles.header}>
+      <header className={`${styles.header} notranslate`} translate="no">
         <div className={styles.inner}>
           <Link href="/" className={styles.logoLink} aria-label="Hippique Auctions">
             <Image
@@ -627,7 +671,10 @@ export default function Header() {
                   <span>Mijn profiel</span>
                 </Link>
 
-                <Link href="/advertentie-plaatsen" className={styles.profileDropdownItem}>
+                <Link
+                  href="/advertentie-plaatsen"
+                  className={styles.profileDropdownItem}
+                >
                   <PlusCircle size={17} strokeWidth={2.1} />
                   <span>Advertentie plaatsen</span>
                 </Link>

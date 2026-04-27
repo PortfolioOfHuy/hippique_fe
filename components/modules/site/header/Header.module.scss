@@ -378,9 +378,11 @@
 
 .googleTranslateHost {
   position: absolute;
-  inset: 0;
-  width: 0;
-  height: 0;
+  inset: auto;
+  right: 0;
+  bottom: 0;
+  width: 1px;
+  height: 1px;
   overflow: hidden;
   opacity: 0;
   pointer-events: none;
@@ -392,6 +394,13 @@
 
 .googleTranslateHost :global(.goog-te-gadget-simple) {
   display: none !important;
+}
+
+.googleTranslateHost :global(select.goog-te-combo) {
+  width: 1px !important;
+  height: 1px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
 }
 
 .registerButton,
