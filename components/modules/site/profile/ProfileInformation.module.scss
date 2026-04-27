@@ -1,30 +1,268 @@
-.card {
-  padding: 34px;
-  border-radius: var(--radius-card);
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(10, 25, 47, 0.08);
-  box-shadow:
-    0 22px 60px rgba(10, 25, 47, 0.06),
-    inset 0 1px 0 rgba(255, 255, 255, 0.82);
+.page {
+  display: grid;
+  gap: 36px;
+  color: var(--hippique-primary);
 }
 
-.cardHeader {
-  margin-bottom: 28px;
+.alertBox {
   display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 18px;
+  align-items: center;
+  gap: 14px;
+  min-height: 58px;
+  padding: 0 22px;
+  border: 1px solid rgba(245, 158, 11, 0.45);
+  border-radius: var(--radius-sm);
+  background: rgba(255, 251, 235, 0.82);
+  color: #ea580c;
 
-  h2 {
-    font-size: clamp(27px, 2.2vw, 36px);
-    line-height: 1.12;
+  svg {
+    flex: 0 0 auto;
+    color: #f97316;
   }
 
   p {
-    margin-top: 8px;
-    color: rgba(10, 25, 47, 0.58);
+    color: #ea580c;
     font-size: var(--fs-small);
-    line-height: 1.6;
+    font-weight: 600;
+    line-height: 1.5;
+  }
+
+  a {
+    color: #9a3412;
+    font-weight: 800;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+.pageHeader {
+  h1 {
+    margin: 0;
+    color: var(--hippique-primary);
+    font-size: clamp(38px, 4vw, 54px);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.04em;
+  }
+
+  p {
+    margin-top: 12px;
+    color: var(--admin-text-soft);
+    font-size: var(--fs-body-lg);
+    line-height: 1.5;
+  }
+}
+
+.requirementBox {
+  display: grid;
+  grid-template-columns: 64px minmax(0, 1fr);
+  gap: 18px;
+  align-items: center;
+  padding: 26px 28px;
+  border: 1px solid rgba(10, 25, 47, 0.06);
+  border-radius: var(--radius-card);
+  background: rgba(255, 255, 255, 0.72);
+  box-shadow: 0 16px 38px rgba(10, 25, 47, 0.045);
+
+  span {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--hippique-primary);
+    font-size: var(--fs-caption);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  p {
+    max-width: 860px;
+    color: var(--admin-text-soft);
+    font-size: var(--fs-small);
+    line-height: 1.75;
+  }
+
+  strong {
+    color: var(--hippique-primary);
+    font-weight: 900;
+  }
+}
+
+.requirementIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-pill);
+  background: var(--hippique-primary);
+  color: #ffffff;
+  box-shadow: 0 8px 18px rgba(10, 25, 47, 0.22);
+}
+
+.readinessSection {
+  h2 {
+    margin: 0 0 26px;
+    color: rgba(10, 25, 47, 0.42);
+    font-size: var(--fs-caption);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+  }
+}
+
+.readinessGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+}
+
+.readinessCard {
+  display: flex;
+  flex-direction: column;
+  min-height: 336px;
+  padding: 34px 34px 30px;
+  border: 1px solid rgba(10, 25, 47, 0.06);
+  border-radius: var(--radius-card);
+  background: #ffffff;
+  box-shadow: 0 16px 38px rgba(10, 25, 47, 0.045);
+
+  h3 {
+    margin: 22px 0 12px;
+    color: var(--hippique-primary);
+    font-size: clamp(24px, 2vw, 32px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    color: var(--admin-text-soft);
+    font-size: var(--fs-small);
+    line-height: 1.75;
+  }
+
+  button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: fit-content;
+    min-width: 170px;
+    min-height: 44px;
+    margin-top: auto;
+    padding: 0 22px;
+    border-radius: var(--radius-pill);
+    background: #8a6419;
+    color: #ffffff;
+    font-size: var(--fs-caption);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    cursor: pointer;
+    box-shadow: inset 0 -2px 0 rgba(10, 25, 47, 0.18);
+    transition:
+      background 0.22s ease,
+      transform 0.22s ease,
+      box-shadow 0.22s ease;
+
+    &:hover,
+    &:focus-visible {
+      background: var(--hippique-tertiary);
+      transform: translateY(-1px);
+      box-shadow: 0 12px 24px rgba(10, 25, 47, 0.12);
+    }
+  }
+}
+
+.readinessTop {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+
+  span {
+    color: rgba(10, 25, 47, 0.42);
+    font-size: var(--fs-caption);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 24px;
+    padding: 0 14px;
+    border-radius: var(--radius-pill);
+    font-size: 10px;
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+.statusVerified {
+  background: rgba(34, 197, 94, 0.16);
+  color: #15803d;
+}
+
+.statusPending {
+  background: rgba(245, 158, 11, 0.16);
+  color: #92400e;
+}
+
+.statusActive {
+  background: rgba(34, 197, 94, 0.16);
+  color: #15803d;
+}
+
+.readinessIcon {
+  display: none;
+}
+
+.card {
+  padding: 44px 50px 46px;
+  border: 1px solid rgba(10, 25, 47, 0.06);
+  border-radius: var(--radius-xl);
+  background: #ffffff;
+  box-shadow: 0 18px 42px rgba(10, 25, 47, 0.045);
+}
+
+.cardHeader,
+.passwordHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 36px;
+
+  h2 {
+    margin: 0;
+    color: var(--hippique-primary);
+    font-size: clamp(28px, 2.4vw, 38px);
+    font-weight: 800;
+    line-height: 1.08;
+    letter-spacing: -0.03em;
+  }
+}
+
+.secureNote {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 12px;
+  color: var(--admin-text-muted);
+  font-size: var(--fs-small);
+  line-height: 1.5;
+
+  svg {
+    color: var(--admin-text-muted);
+    flex: 0 0 auto;
   }
 }
 
@@ -36,141 +274,274 @@
 
 .editButton,
 .ghostButton,
-.goldButton {
-  min-height: 46px;
-  padding: 0 18px;
-
+.updatePasswordButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-
-  border-radius: var(--radius-button);
-  font-size: 14px;
-  font-weight: 850;
+  gap: 9px;
+  min-height: 42px;
+  padding: 0 22px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-caption);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   cursor: pointer;
   white-space: nowrap;
-
   transition:
-    transform 0.22s ease,
-    border-color 0.22s ease,
     background 0.22s ease,
+    border-color 0.22s ease,
     color 0.22s ease,
+    transform 0.22s ease,
     box-shadow 0.22s ease;
 }
 
 .editButton,
-.ghostButton {
-  border: 1px solid rgba(10, 25, 47, 0.12);
-  background: rgba(10, 25, 47, 0.03);
-  color: var(--hippique-primary);
+.updatePasswordButton {
+  border: 1px solid #8a6419;
+  background: #8a6419;
+  color: #ffffff;
+  box-shadow: inset 0 -2px 0 rgba(10, 25, 47, 0.18);
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
+    background: var(--hippique-tertiary);
+    border-color: var(--hippique-tertiary);
     transform: translateY(-1px);
-    border-color: rgba(197, 160, 89, 0.38);
-    color: #8a6419;
-    background: rgba(197, 160, 89, 0.08);
+    box-shadow: 0 12px 24px rgba(10, 25, 47, 0.12);
   }
 }
 
-.goldButton {
-  border: 1px solid var(--hippique-secondary);
-  background: var(--hippique-secondary);
+.ghostButton {
+  border: 1px solid rgba(10, 25, 47, 0.14);
+  background: #ffffff;
   color: var(--hippique-primary);
-  box-shadow: 0 14px 26px rgba(197, 160, 89, 0.18);
 
-  &:hover {
+  &:hover,
+  &:focus-visible {
+    border-color: #8a6419;
+    color: #8a6419;
     transform: translateY(-1px);
-    background: var(--hippique-tertiary);
-    border-color: var(--hippique-tertiary);
-    color: #ffffff;
   }
 }
 
 .successBox {
-  margin-bottom: 22px;
+  margin-bottom: 28px;
   padding: 14px 16px;
   border-radius: var(--radius-md);
+  border: 1px solid rgba(34, 197, 94, 0.16);
   background: rgba(34, 197, 94, 0.08);
-  border: 1px solid rgba(34, 197, 94, 0.14);
   color: #15803d;
   font-size: var(--fs-small);
+  font-weight: 600;
   line-height: 1.6;
 }
 
 .infoGrid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 26px 46px;
+  gap: 42px 92px;
 }
 
 .infoItem {
-  padding-bottom: 18px;
-  border-bottom: 1px solid rgba(10, 25, 47, 0.07);
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  gap: 10px;
+
+  p {
+    margin: 0;
+    color: var(--hippique-primary);
+    font-size: var(--fs-body-lg);
+    font-weight: 500;
+    line-height: 1.45;
+  }
+
+  input {
+    width: 100%;
+    height: 46px;
+    padding: 0 14px;
+    border: 1px solid rgba(10, 25, 47, 0.12);
+    border-radius: var(--radius-input);
+    background: rgba(10, 25, 47, 0.035);
+    color: var(--hippique-primary);
+    font-size: var(--fs-small);
+    outline: none;
+    transition:
+      border-color 0.22s ease,
+      box-shadow 0.22s ease,
+      background 0.22s ease;
+
+    &:focus {
+      border-color: var(--hippique-secondary);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.14);
+    }
+  }
+}
+
+.infoLabel {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  color: rgba(10, 25, 47, 0.42);
+  font-size: var(--fs-caption);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+
+  svg {
+    color: var(--admin-text-muted);
+    flex: 0 0 auto;
+  }
+}
+
+.passwordHeader {
+  margin-bottom: 28px;
+
+  svg {
+    color: #8a6419;
+  }
+}
+
+.passwordBlock {
+  h3 {
+    margin: 0 0 28px;
+    color: var(--hippique-primary);
+    font-size: clamp(20px, 1.7vw, 26px);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+  }
+}
+
+.passwordGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 34px;
+  max-width: 1030px;
+}
+
+.passwordField {
+  display: grid;
   gap: 10px;
 
   span {
     color: rgba(10, 25, 47, 0.42);
-    font-size: 13px;
+    font-size: var(--fs-caption);
     font-weight: 900;
-    line-height: 1.4;
+    line-height: 1;
     letter-spacing: 0.14em;
     text-transform: uppercase;
   }
 
-  p {
-    color: var(--hippique-primary);
-    font-size: clamp(18px, 1.45vw, 20px);
-    font-weight: 500;
-    line-height: 1.6;
-  }
-
-  input,
-  textarea {
+  input {
     width: 100%;
-    padding: 14px 16px;
+    height: 56px;
+    padding: 0 18px;
+    border: 1px solid rgba(10, 25, 47, 0.04);
     border-radius: var(--radius-input);
-    border: 1px solid rgba(10, 25, 47, 0.12);
-    background: rgba(10, 25, 47, 0.04);
+    background: #f3f0ea;
     color: var(--hippique-primary);
     font-size: var(--fs-small);
     outline: none;
-  }
+    transition:
+      border-color 0.22s ease,
+      box-shadow 0.22s ease,
+      background 0.22s ease;
 
-  textarea {
-    min-height: 96px;
+    &:focus {
+      border-color: var(--hippique-secondary);
+      background: #ffffff;
+      box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.14);
+    }
   }
 }
 
-.infoItemFull {
-  grid-column: 1 / -1;
+.updatePasswordButton {
+  min-width: 260px;
+  margin: 48px auto 0;
+  display: flex;
+}
+
+@media (max-width: 1199px) {
+  .readinessGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .readinessCard {
+    min-height: auto;
+  }
+
+  .infoGrid {
+    gap: 34px 48px;
+  }
+}
+
+@media (max-width: 991px) {
+  .card {
+    padding: 34px 28px;
+  }
+
+  .infoGrid,
+  .passwordGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cardHeader,
+  .passwordHeader {
+    flex-direction: column;
+  }
+
+  .updatePasswordButton {
+    margin-left: 0;
+    margin-right: 0;
+  }
 }
 
 @media (max-width: 767px) {
-  .card {
-    padding: 22px;
-    border-radius: var(--radius-lg);
+  .page {
+    gap: 28px;
   }
 
-  .cardHeader {
-    flex-direction: column;
+  .alertBox {
+    align-items: flex-start;
+    padding: 16px;
+  }
+
+  .requirementBox {
+    grid-template-columns: 1fr;
+    padding: 22px;
+  }
+
+  .readinessCard {
+    padding: 26px 22px;
+  }
+
+  .card {
+    padding: 28px 22px;
+    border-radius: var(--radius-lg);
   }
 
   .actionGroup,
   .editButton,
   .ghostButton,
-  .goldButton {
+  .updatePasswordButton {
     width: 100%;
   }
 
-  .infoGrid {
-    grid-template-columns: 1fr;
-    gap: 22px;
+  .pageHeader h1 {
+    font-size: clamp(34px, 10vw, 44px);
+  }
+}
+
+@media (max-width: 480px) {
+  .readinessTop {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
-  .infoItemFull {
-    grid-column: auto;
+  .passwordField input {
+    height: 52px;
   }
 }

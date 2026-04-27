@@ -1,132 +1,178 @@
 .page {
   width: 100%;
   min-height: calc(100vh - 80px);
-  padding: 36px 16px 72px;
-  background: #f7f3ec;
+  padding: 64px 18px 88px;
+  background:
+    radial-gradient(circle at top left, rgba(197, 160, 89, 0.14), transparent 34%),
+    linear-gradient(180deg, #fbf7ef 0%, var(--hippique-neutral) 100%);
   color: var(--hippique-primary);
 }
 
 .formShell {
-  width: min(100%, 720px);
+  width: min(100%, 860px);
   margin: 0 auto;
 }
 
-.formSection {
+.hero {
   margin-bottom: 42px;
+  text-align: center;
+
+  h1 {
+    margin: 12px 0 0;
+    color: var(--hippique-primary);
+    font-size: var(--fs-h1);
+    font-weight: 800;
+    line-height: 1.02;
+    letter-spacing: -0.045em;
+  }
+
+  p {
+    width: min(100%, 680px);
+    margin: 18px auto 0;
+    color: var(--admin-text-soft);
+    font-size: var(--fs-body-lg);
+    line-height: 1.75;
+  }
+}
+
+.kicker {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 30px;
+  padding: 0 14px;
+  border-radius: var(--radius-pill);
+  background: rgba(197, 160, 89, 0.13);
+  color: var(--hippique-secondary);
+  font-size: var(--fs-caption);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.formSection {
+  margin-bottom: 32px;
 }
 
 .sectionTitle {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
+  display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
   margin-bottom: 14px;
 
   span {
-    color: var(--admin-text-muted);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 34px;
+    height: 34px;
+    border-radius: var(--radius-pill);
+    background: var(--hippique-primary);
+    color: #ffffff;
     font-size: var(--fs-caption);
-    font-weight: 700;
+    font-weight: 900;
     line-height: 1;
-    letter-spacing: 0.08em;
   }
 
   h2 {
-    position: relative;
     margin: 0;
     color: var(--hippique-primary);
-    font-size: var(--fs-body-lg);
-    font-weight: 600;
-    line-height: 1.2;
-    letter-spacing: 0;
-  }
-
-  h2::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    bottom: -10px;
-    height: 1px;
-    background: rgba(10, 25, 47, 0.12);
+    font-size: var(--fs-h4);
+    font-weight: 800;
+    line-height: 1.15;
+    letter-spacing: -0.02em;
   }
 }
 
-.panel {
-  padding: 34px 34px 30px;
-  border: 1px solid rgba(10, 25, 47, 0.12);
-  border-radius: var(--radius-card);
-  background: #ffffff;
-  box-shadow: 0 12px 28px rgba(10, 25, 47, 0.035);
+.panel,
+.termsBox {
+  position: relative;
+  overflow: hidden;
+  padding: 34px;
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow:
+    0 18px 42px rgba(10, 25, 47, 0.055),
+    inset 0 1px 0 rgba(255, 255, 255, 0.85);
+}
+
+.panel::before,
+.termsBox::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto;
+  height: 4px;
+  background: linear-gradient(
+    90deg,
+    var(--hippique-secondary),
+    rgba(197, 160, 89, 0.16)
+  );
 }
 
 .twoColumns {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px;
+  gap: 22px;
 }
 
 .field {
-  position: relative;
   display: flex;
   flex-direction: column;
-  margin-bottom: 24px;
+  gap: 9px;
+  margin-bottom: 22px;
 
   &:last-child {
     margin-bottom: 0;
   }
 
   label {
-    position: relative;
-    z-index: 1;
-    width: fit-content;
-    margin-left: 14px;
-    margin-bottom: -7px;
-    padding: 0 5px;
-    background: #ffffff;
-    color: var(--admin-text-soft);
-    font-size: 10px;
-    font-weight: 600;
-    line-height: 1.2;
+    color: rgba(10, 25, 47, 0.56);
+    font-size: var(--fs-caption);
+    font-weight: 900;
+    line-height: 1;
+    letter-spacing: 0.11em;
+    text-transform: uppercase;
   }
 
   input,
   select {
     width: 100%;
-    height: 52px;
-    padding: 0 14px;
-    border: 1px solid rgba(10, 25, 47, 0.14);
+    height: 54px;
+    padding: 0 16px;
+    border: 1px solid rgba(10, 25, 47, 0.1);
     border-radius: var(--radius-input);
     background: #ffffff;
     color: var(--hippique-primary);
     font-size: var(--fs-small);
-    font-weight: 400;
+    font-weight: 600;
     line-height: 1;
     outline: none;
     box-shadow: none;
     appearance: none;
     transition:
-      border-color 0.2s ease,
-      background 0.2s ease,
-      box-shadow 0.2s ease;
+      border-color 0.22s ease,
+      background 0.22s ease,
+      box-shadow 0.22s ease,
+      transform 0.22s ease;
 
     &::placeholder {
-      color: #9aa4b2;
+      color: rgba(10, 25, 47, 0.34);
+      font-weight: 500;
     }
 
     &:focus {
       border-color: var(--hippique-secondary);
-      box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
+      background: #ffffff;
+      box-shadow: 0 0 0 4px rgba(197, 160, 89, 0.12);
     }
   }
 
   select {
-    padding-right: 40px;
+    padding-right: 44px;
     cursor: pointer;
   }
-}
-
-.field:first-child input {
-  background: #eef3f7;
 }
 
 .passwordWrap,
@@ -146,19 +192,20 @@
 .eyeButton {
   position: absolute;
   top: 50%;
-  right: 13px;
+  right: 12px;
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 34px;
+  height: 34px;
   border-radius: var(--radius-pill);
   color: var(--admin-text-muted);
   cursor: pointer;
   transform: translateY(-50%);
   transition:
-    background 0.2s ease,
-    color 0.2s ease;
+    background 0.22s ease,
+    color 0.22s ease;
 
   &:hover,
   &:focus-visible {
@@ -171,81 +218,130 @@
 .selectWrap svg {
   position: absolute;
   top: 50%;
-  right: 13px;
+  right: 15px;
+  z-index: 2;
   color: var(--admin-text-muted);
   pointer-events: none;
   transform: translateY(-50%);
 }
 
+.helperText {
+  margin-top: -8px;
+  color: var(--admin-text-muted);
+  font-size: var(--fs-caption);
+  font-weight: 600;
+  line-height: 1.6;
+}
+
 .phoneWrap {
   input {
-    padding-left: 74px;
+    padding-left: 182px;
   }
 }
 
-.flag {
+.phoneCountrySelect {
   position: absolute;
-  left: 13px;
+  left: 10px;
+  z-index: 3;
+  width: 106px !important;
+  height: 36px !important;
+  padding: 0 26px 0 10px !important;
+  border: 1px solid rgba(10, 25, 47, 0.08) !important;
+  border-radius: var(--radius-button) !important;
+  background: rgba(10, 25, 47, 0.035) !important;
+  color: var(--hippique-primary) !important;
+  font-size: 13px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  cursor: pointer;
+  box-shadow: none !important;
+}
+
+.phoneDialCode {
+  position: absolute;
+  left: 126px;
   z-index: 2;
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 38px;
-  height: 28px;
-  padding-right: 10px;
-  border-right: 1px solid rgba(10, 25, 47, 0.14);
-  font-size: 15px;
-  line-height: 1;
-}
-
-.helperText {
-  margin-top: -8px;
-  color: var(--admin-text-soft);
-  font-size: 11px;
-  line-height: 1.5;
+  height: 30px;
+  padding-left: 12px;
+  border-left: 1px solid rgba(10, 25, 47, 0.1);
+  color: var(--hippique-secondary);
+  font-size: 13px;
+  font-weight: 900;
+  pointer-events: none;
 }
 
 .termsBox {
-  margin: 18px 0 24px;
-  padding: 24px 28px;
-  border: 1px solid rgba(10, 25, 47, 0.12);
-  border-radius: var(--radius-card);
-  background: #ffffff;
-  box-shadow: 0 12px 28px rgba(10, 25, 47, 0.035);
+  display: grid;
+  gap: 18px;
+  margin: 34px 0 26px;
+}
+
+.termsHeader {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 14px;
+  align-items: start;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(10, 25, 47, 0.08);
+
+  svg {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 44px;
+    height: 44px;
+    padding: 10px;
+    border-radius: var(--radius-pill);
+    background: rgba(197, 160, 89, 0.12);
+    color: var(--hippique-secondary);
+  }
+
+  h3 {
+    margin: 0;
+    color: var(--hippique-primary);
+    font-size: var(--fs-h4);
+    font-weight: 800;
+    line-height: 1.12;
+  }
+
+  p {
+    margin-top: 8px;
+    color: var(--admin-text-soft);
+    font-size: var(--fs-small);
+    line-height: 1.65;
+  }
 }
 
 .checkboxRow {
   display: grid;
-  grid-template-columns: 16px minmax(0, 1fr);
-  gap: 10px;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 12px;
   align-items: flex-start;
-  margin-bottom: 16px;
   color: var(--admin-text-soft);
-  font-size: 12px;
-  line-height: 1.6;
-
-  &:last-child {
-    margin-bottom: 0;
-  }
+  font-size: var(--fs-small);
+  line-height: 1.7;
 
   input {
-    width: 14px;
-    height: 14px;
-    margin-top: 2px;
+    width: 16px;
+    height: 16px;
+    margin-top: 5px;
     border-radius: var(--radius-xs);
     cursor: pointer;
-    accent-color: var(--hippique-primary);
+    accent-color: var(--hippique-secondary);
   }
 
   a {
     color: var(--hippique-primary);
-    font-weight: 700;
+    font-weight: 800;
     text-decoration: none;
 
     &:hover,
     &:focus-visible {
       color: var(--hippique-secondary);
       text-decoration: underline;
+      text-underline-offset: 3px;
     }
   }
 }
@@ -255,52 +351,68 @@
   align-items: center;
   justify-content: center;
   gap: 12px;
-  min-width: 154px;
-  min-height: 48px;
-  padding: 0 28px;
-  border: 0;
+  min-width: 210px;
+  min-height: 54px;
+  padding: 0 30px;
+  border: 1px solid var(--hippique-primary);
   border-radius: var(--radius-button);
   background: var(--hippique-primary);
   color: #ffffff;
-  font-size: 11px;
-  font-weight: 800;
+  font-size: var(--fs-caption);
+  font-weight: 900;
   line-height: 1;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
+  box-shadow: 0 14px 30px rgba(10, 25, 47, 0.14);
   transition:
     background 0.22s ease,
+    border-color 0.22s ease,
+    color 0.22s ease,
     transform 0.22s ease,
     box-shadow 0.22s ease;
 
   span {
-    font-size: 16px;
+    font-size: 18px;
     line-height: 1;
   }
 
   &:hover,
   &:focus-visible {
-    background: var(--hippique-tertiary);
+    border-color: var(--hippique-secondary);
+    background: var(--hippique-secondary);
+    color: #ffffff;
     transform: translateY(-1px);
-    box-shadow: 0 12px 24px rgba(10, 25, 47, 0.12);
+    box-shadow: 0 18px 34px rgba(197, 160, 89, 0.22);
   }
 }
 
 @media (max-width: 767px) {
   .page {
-    padding: 28px 14px 56px;
+    padding: 44px 14px 64px;
   }
 
   .formShell {
     width: 100%;
   }
 
-  .formSection {
+  .hero {
     margin-bottom: 34px;
+    text-align: left;
+
+    p {
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 
-  .panel {
-    padding: 26px 18px 24px;
+  .formSection {
+    margin-bottom: 28px;
+  }
+
+  .panel,
+  .termsBox {
+    padding: 26px 18px 22px;
     border-radius: var(--radius-lg);
   }
 
@@ -309,91 +421,46 @@
     gap: 0;
   }
 
-  .termsBox {
-    padding: 20px 18px;
-    border-radius: var(--radius-lg);
-  }
-
   .submitButton {
     width: 100%;
   }
 }
 
 @media (max-width: 480px) {
-  .sectionTitle {
-    h2 {
-      font-size: var(--fs-body);
-    }
+  .hero h1 {
+    font-size: clamp(34px, 12vw, 44px);
   }
 
   .field {
     input,
     select {
-      height: 48px;
+      height: 50px;
       font-size: 14px;
-      border-radius: var(--radius-input);
     }
   }
 
-  .phoneWrap {
-    input {
-      padding-left: 68px;
-    }
-  }
-
-  .flag {
-    min-width: 34px;
-  }
-}
-
-.phoneCountrySelect {
-  position: absolute;
-  left: 12px;
-  z-index: 3;
-  width: 104px !important;
-  height: 34px !important;
-  padding: 0 22px 0 8px !important;
-  border: 0 !important;
-  border-right: 1px solid rgba(10, 25, 47, 0.14) !important;
-  border-radius: 0 !important;
-  background: transparent !important;
-  color: var(--hippique-primary) !important;
-  font-size: 13px !important;
-  font-weight: 700 !important;
-  cursor: pointer;
-  box-shadow: none !important;
-}
-
-.phoneDialCode {
-  position: absolute;
-  left: 124px;
-  z-index: 2;
-  color: var(--admin-text-muted);
-  font-size: 13px;
-  font-weight: 700;
-  pointer-events: none;
-}
-
-.phoneWrap {
-  input {
-    padding-left: 176px !important;
-  }
-}
-
-@media (max-width: 480px) {
   .phoneCountrySelect {
     width: 92px !important;
     font-size: 12px !important;
   }
 
   .phoneDialCode {
-    left: 110px;
+    left: 108px;
     font-size: 12px;
   }
 
   .phoneWrap {
     input {
-      padding-left: 158px !important;
+      padding-left: 158px;
+    }
+  }
+
+  .termsHeader {
+    grid-template-columns: 1fr;
+
+    svg {
+      width: 42px;
+      height: 42px;
     }
   }
 }

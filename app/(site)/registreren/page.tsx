@@ -1,7 +1,7 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { Eye, CalendarDays, ChevronDown } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { CalendarDays, ChevronDown, Eye, ShieldCheck } from "lucide-react";
 import styles from "./RegistrerenPage.module.scss";
 
 type PhoneCountry = {
@@ -216,21 +216,42 @@ function getFlagEmoji(countryCode: string) {
     );
 }
 
+function getDutchCountryName(
+  countryCode: string,
+  fallback: string,
+  canUseIntl: boolean,
+) {
+  if (!canUseIntl) {
+    return fallback;
+  }
+
+  try {
+    const displayNames = new Intl.DisplayNames(["nl"], { type: "region" });
+    return displayNames.of(countryCode) || fallback;
+  } catch {
+    return fallback;
+  }
+}
+
 function PhoneField({
   id,
   label,
   required,
+  defaultCountry = "NL",
+  canUseIntl,
 }: {
   id: string;
   label: string;
   required?: boolean;
+  defaultCountry?: string;
+  canUseIntl: boolean;
 }) {
-  const [selectedCode, setSelectedCode] = useState("US");
+  const [selectedCode, setSelectedCode] = useState(defaultCountry);
 
   const selectedCountry = useMemo(() => {
     return (
       phoneCountries.find((country) => country.code === selectedCode) ??
-      phoneCountries.find((country) => country.code === "US") ??
+      phoneCountries.find((country) => country.code === "NL") ??
       phoneCountries[0]
     );
   }, [selectedCode]);
@@ -246,17 +267,21 @@ function PhoneField({
         <select
           className={styles.phoneCountrySelect}
           value={selectedCode}
-          aria-label={`${label} country code`}
+          aria-label={`${label} landcode`}
           onChange={(event) => setSelectedCode(event.target.value)}
         >
           {phoneCountries.map((country) => (
             <option key={country.code} value={country.code}>
-              {getFlagEmoji(country.code)} {country.name} {country.dialCode}
+              {getFlagEmoji(country.code)}{" "}
+              {getDutchCountryName(country.code, country.name, canUseIntl)}{" "}
+              {country.dialCode}
             </option>
           ))}
         </select>
 
-        <span className={styles.phoneDialCode}>{selectedCountry.dialCode}</span>
+        <span className={styles.phoneDialCode}>
+          {selectedCountry.dialCode}
+        </span>
 
         <input
           id={id}
@@ -273,82 +298,100 @@ function PhoneField({
 }
 
 export default function RegistrerenPage() {
+    const [canUseIntl, setCanUseIntl] = useState(false);
+
+  useEffect(() => {
+    setCanUseIntl(true);
+  }, []);
+
   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
-
     window.location.href = "/inloggen";
   }
 
   return (
     <main className={styles.page}>
       <form className={styles.formShell} onSubmit={handleSubmit}>
+        <header className={styles.hero}>
+          <span className={styles.kicker}>Hippique veilinghuis</span>
+
+          <h1>Account aanmaken</h1>
+
+          <p>
+            Registreer je als koper, fokker, stalhouder of agent en krijg
+            toegang tot exclusieve paardenveilingen, embryo’s en
+            fokkerijaanbiedingen.
+          </p>
+        </header>
+
         <section className={styles.formSection}>
           <div className={styles.sectionTitle}>
             <span>01</span>
-            <h2>Account Information</h2>
+            <h2>Accountgegevens</h2>
           </div>
 
           <div className={styles.panel}>
             <div className={styles.field}>
-              <label htmlFor="email">Email address*</label>
+              <label htmlFor="email">E-mailadres*</label>
               <input
                 id="email"
                 name="email"
                 type="email"
-                placeholder="Enter your email"
+                placeholder="Vul je e-mailadres in"
                 autoComplete="email"
               />
             </div>
 
             <div className={styles.twoColumns}>
               <div className={styles.field}>
-                <label htmlFor="password">Password*</label>
+                <label htmlFor="password">Wachtwoord*</label>
 
                 <div className={styles.passwordWrap}>
                   <input
                     id="password"
                     name="password"
                     type="password"
-                    placeholder="Create password"
+                    placeholder="Maak een wachtwoord aan"
                     autoComplete="new-password"
                   />
 
                   <button
                     type="button"
                     className={styles.eyeButton}
-                    aria-label="Show password"
+                    aria-label="Wachtwoord tonen"
                   >
-                    <Eye size={15} strokeWidth={1.8} />
+                    <Eye size={16} strokeWidth={1.9} />
                   </button>
                 </div>
               </div>
 
               <div className={styles.field}>
-                <label htmlFor="confirmPassword">Confirm password*</label>
+                <label htmlFor="confirmPassword">
+                  Wachtwoord bevestigen*
+                </label>
 
                 <div className={styles.passwordWrap}>
                   <input
                     id="confirmPassword"
                     name="confirmPassword"
                     type="password"
-                    placeholder="Confirm password"
+                    placeholder="Herhaal je wachtwoord"
                     autoComplete="new-password"
                   />
 
                   <button
                     type="button"
                     className={styles.eyeButton}
-                    aria-label="Show confirm password"
+                    aria-label="Bevestigd wachtwoord tonen"
                   >
-                    <Eye size={15} strokeWidth={1.8} />
+                    <Eye size={16} strokeWidth={1.9} />
                   </button>
                 </div>
               </div>
             </div>
 
             <p className={styles.helperText}>
-              Password must be at least 8 characters and include 1 uppercase
-              letter and 1 number.
+              Gebruik minimaal 8 tekens, waaronder 1 hoofdletter en 1 cijfer.
             </p>
           </div>
         </section>
@@ -356,102 +399,113 @@ export default function RegistrerenPage() {
         <section className={styles.formSection}>
           <div className={styles.sectionTitle}>
             <span>02</span>
-            <h2>Personal Information</h2>
+            <h2>Persoonlijke gegevens</h2>
           </div>
 
           <div className={styles.panel}>
             <div className={styles.field}>
-              <label htmlFor="title">Title*</label>
+              <label htmlFor="title">Aanspreektitel*</label>
 
               <div className={styles.selectWrap}>
                 <select id="title" name="title" defaultValue="">
                   <option value="" disabled>
-                    Select title
+                    Kies een aanspreektitel
                   </option>
-                  <option value="mr">Mr.</option>
-                  <option value="mrs">Mrs.</option>
-                  <option value="ms">Ms.</option>
+                  <option value="mr">Dhr.</option>
+                  <option value="mrs">Mevr.</option>
+                  <option value="ms">Mej.</option>
                   <option value="dr">Dr.</option>
                 </select>
 
-                <ChevronDown size={16} strokeWidth={1.8} />
+                <ChevronDown size={17} strokeWidth={1.9} />
               </div>
             </div>
 
             <div className={styles.twoColumns}>
               <div className={styles.field}>
-                <label htmlFor="firstName">First name*</label>
-                <input id="firstName" name="firstName" type="text" />
+                <label htmlFor="firstName">Voornaam*</label>
+                <input
+                  id="firstName"
+                  name="firstName"
+                  type="text"
+                  placeholder="Vul je voornaam in"
+                />
               </div>
 
               <div className={styles.field}>
-                <label htmlFor="lastName">Last name*</label>
-                <input id="lastName" name="lastName" type="text" />
+                <label htmlFor="lastName">Achternaam*</label>
+                <input
+                  id="lastName"
+                  name="lastName"
+                  type="text"
+                  placeholder="Vul je achternaam in"
+                />
               </div>
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="dateOfBirth">Date of birth * (+18)</label>
+              <label htmlFor="dateOfBirth">Geboortedatum* (+18)</label>
 
               <div className={styles.dateWrap}>
                 <input
                   id="dateOfBirth"
                   name="dateOfBirth"
                   type="text"
-                  placeholder="mm/dd/yyyy"
+                  placeholder="dd-mm-jjjj"
                 />
 
-                <CalendarDays size={16} strokeWidth={1.8} />
+                <CalendarDays size={17} strokeWidth={1.9} />
               </div>
             </div>
 
             <div className={styles.twoColumns}>
               <div className={styles.field}>
-                <label htmlFor="language">Language*</label>
+                <label htmlFor="language">Taal*</label>
 
                 <div className={styles.selectWrap}>
-                  <select id="language" name="language" defaultValue="english">
-                    <option value="english">English</option>
-                    <option value="dutch">Dutch</option>
-                    <option value="german">German</option>
-                    <option value="french">French</option>
+                  <select id="language" name="language" defaultValue="nl">
+                    <option value="nl">Nederlands</option>
+                    <option value="en">Engels</option>
+                    <option value="de">Duits</option>
+                    <option value="fr">Frans</option>
+                    <option value="vi">Vietnamees</option>
                   </select>
 
-                  <ChevronDown size={16} strokeWidth={1.8} />
+                  <ChevronDown size={17} strokeWidth={1.9} />
                 </div>
               </div>
 
               <div className={styles.field}>
-                <label htmlFor="timezone">Time zone*</label>
+                <label htmlFor="timezone">Tijdzone*</label>
 
                 <div className={styles.selectWrap}>
-                  <select id="timezone" name="timezone" defaultValue="est">
-                    <option value="est">EST (Eastern Standard Time)</option>
-                    <option value="cet">CET (Central European Time)</option>
-                    <option value="gmt">GMT (Greenwich Mean Time)</option>
-                    <option value="ict">ICT (Indochina Time)</option>
+                  <select id="timezone" name="timezone" defaultValue="cet">
+                    <option value="cet">CET - Midden-Europese tijd</option>
+                    <option value="gmt">GMT - Greenwich Mean Time</option>
+                    <option value="est">EST - Eastern Standard Time</option>
+                    <option value="ict">ICT - Indochina Time</option>
                   </select>
 
-                  <ChevronDown size={16} strokeWidth={1.8} />
+                  <ChevronDown size={17} strokeWidth={1.9} />
                 </div>
               </div>
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="businessType">Business type*</label>
+              <label htmlFor="businessType">Type gebruiker*</label>
 
               <div className={styles.selectWrap}>
                 <select id="businessType" name="businessType" defaultValue="">
                   <option value="" disabled>
-                    Select a type
+                    Kies een type
                   </option>
-                  <option value="private">Private buyer</option>
-                  <option value="stable">Stable</option>
-                  <option value="breeder">Breeder</option>
+                  <option value="private">Particuliere koper</option>
+                  <option value="stable">Stal</option>
+                  <option value="breeder">Fokker</option>
                   <option value="agent">Agent</option>
                 </select>
 
-                <ChevronDown size={16} strokeWidth={1.8} />
+                <ChevronDown size={17} strokeWidth={1.9} />
               </div>
             </div>
           </div>
@@ -460,62 +514,98 @@ export default function RegistrerenPage() {
         <section className={styles.formSection}>
           <div className={styles.sectionTitle}>
             <span>03</span>
-            <h2>Contact Details</h2>
+            <h2>Contactgegevens</h2>
           </div>
 
           <div className={styles.panel}>
             <div className={styles.field}>
-              <label htmlFor="street">Street and number*</label>
-              <input id="street" name="street" type="text" />
+              <label htmlFor="street">Straat en huisnummer*</label>
+              <input
+                id="street"
+                name="street"
+                type="text"
+                placeholder="Bijv. Hoofdstraat 12"
+              />
             </div>
 
             <div className={styles.twoColumns}>
               <div className={styles.field}>
-                <label htmlFor="postalCode">Postal code*</label>
-                <input id="postalCode" name="postalCode" type="text" />
+                <label htmlFor="postalCode">Postcode*</label>
+                <input
+                  id="postalCode"
+                  name="postalCode"
+                  type="text"
+                  placeholder="Bijv. 1012 AB"
+                />
               </div>
 
               <div className={styles.field}>
-                <label htmlFor="city">City*</label>
-                <input id="city" name="city" type="text" />
+                <label htmlFor="city">Plaats*</label>
+                <input
+                  id="city"
+                  name="city"
+                  type="text"
+                  placeholder="Bijv. Amsterdam"
+                />
               </div>
             </div>
 
             <div className={styles.field}>
-              <label htmlFor="country">Country*</label>
+              <label htmlFor="country">Land*</label>
 
               <div className={styles.selectWrap}>
-                <select id="country" name="country" defaultValue="US">
+                <select id="country" name="country" defaultValue="NL">
                   {phoneCountries.map((country) => (
                     <option key={country.code} value={country.code}>
-                      {country.name}
+                      {getDutchCountryName(country.code, country.name, canUseIntl)}
                     </option>
                   ))}
                 </select>
 
-                <ChevronDown size={16} strokeWidth={1.8} />
+                <ChevronDown size={17} strokeWidth={1.9} />
               </div>
             </div>
 
             <div className={styles.twoColumns}>
-              <PhoneField id="phone1" label="Phone 1" required />
-              <PhoneField id="phone2" label="Phone 2" />
+              <PhoneField
+                id="phone1"
+                label="Telefoon 1"
+                required
+                canUseIntl={canUseIntl}
+              />
+
+              <PhoneField
+                id="phone2"
+                label="Telefoon 2"
+                canUseIntl={canUseIntl}
+              />
             </div>
 
-            <PhoneField id="fax" label="Fax" />
+            <PhoneField id="fax" label="Fax" canUseIntl={canUseIntl} />
           </div>
         </section>
 
         <section className={styles.termsBox}>
+          <div className={styles.termsHeader}>
+            <ShieldCheck size={20} strokeWidth={2.2} />
+            <div>
+              <h3>Toestemming en voorkeuren</h3>
+              <p>
+                Controleer je lidmaatschap en privacyvoorkeuren voordat je je
+                account aanmaakt.
+              </p>
+            </div>
+          </div>
+
           <label className={styles.checkboxRow}>
             <input type="checkbox" name="membership" />
 
             <span>
-              I wish to become a member of the Studbook Zangersheide.
-              Membership is €74,20 per year in Europe, €95,40 per year for the
-              rest of the world.{" "}
+              Ik wil lid worden van het stamboek Zangersheide. Het
+              lidmaatschap kost €74,20 per jaar binnen Europa en €95,40 per
+              jaar voor de rest van de wereld.{" "}
               <a href="/informatie" target="_blank">
-                More information
+                Meer informatie
               </a>
             </span>
           </label>
@@ -524,15 +614,15 @@ export default function RegistrerenPage() {
             <input type="checkbox" name="privacy" />
 
             <span>
-              I agree that my personal data will be processed in accordance with
-              the <a href="/privacybeleid">Privacy Policy</a> and{" "}
-              <a href="/cookies">Cookie Policy</a>.
+              Ik ga ermee akkoord dat mijn persoonsgegevens worden verwerkt
+              volgens het <a href="/privacybeleid">privacybeleid</a> en het{" "}
+              <a href="/cookies">cookiebeleid</a>.
             </span>
           </label>
         </section>
 
         <button type="submit" className={styles.submitButton}>
-          SIGN UP
+          Account aanmaken
           <span>→</span>
         </button>
       </form>
