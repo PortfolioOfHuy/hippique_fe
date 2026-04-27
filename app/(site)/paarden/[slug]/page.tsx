@@ -34,6 +34,10 @@ export default async function HorseDetailPage({ params }: PageProps) {
   const nextHorseHref = nextHorse ? `/paarden/${nextHorse.slug}` : "/veilingen";
   const lotNumber = currentIndex >= 0 ? currentIndex + 1 : 1;
 
+  const relatedAuctionHorses = auctionHorses
+    .filter((item) => item.slug !== horse.slug)
+    .slice(0, 3);
+
   return (
     <main className={styles.page}>
       <div className={styles.auctionBar}>
@@ -66,7 +70,7 @@ export default async function HorseDetailPage({ params }: PageProps) {
 
             <div className={styles.statBox}>
               <span className={styles.statLabel}>Geregistreerde bieders</span>
-              <strong className={styles.statValue}>142</strong>
+              <strong className={styles.statValue1}>142</strong>
             </div>
           </div>
         </div>
@@ -392,6 +396,83 @@ export default async function HorseDetailPage({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+        {relatedAuctionHorses.length > 0 ? (
+          <section className={styles.relatedHorsesSection}>
+            <div className={styles.relatedHorsesHeader}>
+              <div>
+                <span className={styles.relatedHorsesKicker}>
+                  Veilingcollectie
+                </span>
+
+                <h3 className={styles.relatedHorsesTitle}>
+                  Andere veilingpaarden
+                </h3>
+              </div>
+
+              <a href="/veilingen" className={styles.relatedHorsesViewAll}>
+                Bekijk alle kavels →
+              </a>
+            </div>
+
+            <div className={styles.relatedHorsesGrid}>
+              {relatedAuctionHorses.map((item) => {
+                const href = `/paarden/${item.slug}`;
+
+                return (
+                  <article key={item.id} className={styles.relatedHorseCard}>
+                    <a href={href} className={styles.relatedHorseImageLink}>
+                      <div className={styles.relatedHorseImageWrap}>
+                        <Image
+                          src={item.image}
+                          alt={item.imageAlt}
+                          fill
+                          className={styles.relatedHorseImage}
+                          sizes="(max-width: 991px) 100vw, 33vw"
+                        />
+
+                        <span className={styles.relatedHorseBadge}>
+                          {item.badge}
+                        </span>
+                      </div>
+                    </a>
+
+                    <div className={styles.relatedHorseBody}>
+                      <h4 className={styles.relatedHorseTitle}>
+                        <a href={href}>{item.title}</a>
+                      </h4>
+
+                      <p className={styles.relatedHorseSubtitle}>
+                        {item.subtitle}
+                      </p>
+
+                      <div className={styles.relatedHorseMeta}>
+                        <span>{item.location}</span>
+                        <span>{item.discipline}</span>
+                      </div>
+
+                      <div className={styles.relatedHorseBottom}>
+                        <div>
+                          <span className={styles.relatedHorsePriceLabel}>
+                            Huidig bod
+                          </span>
+
+                          <strong className={styles.relatedHorsePrice}>
+                            {item.bid}
+                          </strong>
+                        </div>
+
+                        <a href={href} className={styles.relatedHorseButton}>
+                          Details bekijken
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
       </div>
     </main>
   );

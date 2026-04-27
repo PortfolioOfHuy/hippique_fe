@@ -504,10 +504,6 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
           Plaats bod nu
         </button>
 
-        <button type="button" className={styles.secondaryBidButton}>
-          Boek try-out
-        </button>
-
         <p className={styles.bidNote}>
           *Door te bieden ga je akkoord met de veilingvoorwaarden. Alle biedingen
           zijn exclusief btw en transportkosten.

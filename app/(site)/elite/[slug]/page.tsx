@@ -34,6 +34,10 @@ export default async function EliteDetailPage({ params }: PageProps) {
   const nextHorseHref = nextHorse ? `/elite/${nextHorse.slug}` : "/elite";
   const lotNumber = currentIndex >= 0 ? currentIndex + 1 : 1;
 
+  const relatedEliteHorses = eliteHorses
+    .filter((item) => item.slug !== horse.slug)
+    .slice(0, 3);
+
   return (
     <main className={styles.page}>
       <div className={styles.auctionBar}>
@@ -66,7 +70,7 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
             <div className={styles.statBox}>
               <span className={styles.statLabel}>Geregistreerde bieders</span>
-              <strong className={styles.statValue}>142</strong>
+              <strong className={styles.statValue1}>142</strong>
             </div>
           </div>
         </div>
@@ -393,6 +397,83 @@ export default async function EliteDetailPage({ params }: PageProps) {
             </div>
           </div>
         </section>
+
+        {relatedEliteHorses.length > 0 ? (
+          <section className={styles.relatedEliteSection}>
+            <div className={styles.relatedEliteHeader}>
+              <div>
+                <span className={styles.relatedEliteKicker}>
+                  Elite collectie
+                </span>
+
+                <h3 className={styles.relatedEliteTitle}>
+                  Andere elitepaarden
+                </h3>
+              </div>
+
+              <a href="/elite" className={styles.relatedEliteViewAll}>
+                Bekijk alle elitepaarden →
+              </a>
+            </div>
+
+            <div className={styles.relatedEliteGrid}>
+              {relatedEliteHorses.map((item) => {
+                const href = `/elite/${item.slug}`;
+
+                return (
+                  <article key={item.id} className={styles.relatedEliteCard}>
+                    <a href={href} className={styles.relatedEliteImageLink}>
+                      <div className={styles.relatedEliteImageWrap}>
+                        <Image
+                          src={item.image}
+                          alt={item.imageAlt}
+                          fill
+                          className={styles.relatedEliteImage}
+                          sizes="(max-width: 991px) 100vw, 33vw"
+                        />
+
+                        <span className={styles.relatedEliteBadge}>
+                          {item.badge}
+                        </span>
+                      </div>
+                    </a>
+
+                    <div className={styles.relatedEliteBody}>
+                      <h4 className={styles.relatedEliteCardTitle}>
+                        <a href={href}>{item.title}</a>
+                      </h4>
+
+                      <p className={styles.relatedEliteSubtitle}>
+                        {item.subtitle}
+                      </p>
+
+                      <div className={styles.relatedEliteMeta}>
+                        <span>{item.location}</span>
+                        <span>{item.discipline}</span>
+                      </div>
+
+                      <div className={styles.relatedEliteBottom}>
+                        <div>
+                          <span className={styles.relatedElitePriceLabel}>
+                            Huidig bod
+                          </span>
+
+                          <strong className={styles.relatedElitePrice}>
+                            {item.bid}
+                          </strong>
+                        </div>
+
+                        <a href={href} className={styles.relatedEliteButton}>
+                          Details bekijken
+                        </a>
+                      </div>
+                    </div>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        ) : null}
       </div>
     </main>
   );
