@@ -150,7 +150,7 @@ function HorseCard({ horse }: { horse: HorseItem }) {
           </div>
 
           <Link href={horse.href} className={styles.bidButton}>
-            Bieden
+            Bied mee
           </Link>
         </div>
       </div>
