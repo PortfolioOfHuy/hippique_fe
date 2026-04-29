@@ -40,11 +40,6 @@ export default function ListingTypeTabs({
           <span className={styles.label}>Selecteer categorie</span>
           <h2>Type vermelding</h2>
         </div>
-
-        <div className={styles.selectedBox}>
-          <span>Geselecteerd</span>
-          <strong>{activeLabel}</strong>
-        </div>
       </div>
 
       <div className={styles.tabList} role="tablist" aria-label="Type vermelding">

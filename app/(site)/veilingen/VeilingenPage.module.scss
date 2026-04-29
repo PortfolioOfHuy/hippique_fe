@@ -602,3 +602,30 @@
     padding: 12px 14px;
   }
 }
+
+.emptyState {
+  display: grid;
+  place-items: center;
+  min-height: 260px;
+  padding: 42px 24px;
+  border: 1px dashed rgba(10, 25, 47, 0.16);
+  border-radius: var(--radius-xl);
+  background: #ffffff;
+  text-align: center;
+}
+
+.emptyState h2 {
+  margin: 0;
+  color: var(--hippique-primary);
+  font-size: var(--fs-h3);
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.emptyState p {
+  max-width: 520px;
+  margin: 10px auto 0;
+  color: var(--admin-text-muted);
+  font-size: var(--fs-small);
+  line-height: 1.7;
+}
