@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus } from "lucide-react";
+import { Plus, Undo2 } from "lucide-react";
 import styles from "./DepositsRefunds.module.scss";
 
 type DepositSummaryItem = {
@@ -161,11 +161,22 @@ export default function DepositsRefunds() {
         <section className={styles.panel}>
           <div className={styles.panelHeader}>
             <div className={styles.panelHeaderMain}>
-              <h3>Stortingsgeschiedenis</h3>
+              <h3>Stortingen</h3>
             </div>
 
-            <div className={styles.panelMeta}>
-              {depositHistory.length} transacties
+            <div className={styles.panelHeaderActions}>
+              <div className={styles.panelMeta}>
+                {depositHistory.length} transacties
+              </div>
+
+              <button
+                type="button"
+                className={styles.requestButton}
+                aria-label="Cọc tiền"
+                title="Cọc tiền"
+              >
+                <Plus size={16} strokeWidth={2.4} />
+              </button>
             </div>
           </div>
 
@@ -227,11 +238,11 @@ export default function DepositsRefunds() {
 
             <button
               type="button"
-              className={styles.requestButton}
+              className={styles.refundButton}
               aria-label="Terugbetaling aanvragen"
               title="Terugbetaling aanvragen"
             >
-              <Plus size={16} strokeWidth={2.4} />
+              <Undo2 size={16} strokeWidth={2.4} />
             </button>
           </div>
 
