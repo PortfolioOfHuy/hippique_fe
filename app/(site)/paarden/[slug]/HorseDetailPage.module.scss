@@ -487,10 +487,7 @@
 
 .primaryBidButton:hover,
 .primaryBidButton:focus-visible {
-  border-color: var(--hippique-tertiary);
-  background: var(--hippique-tertiary);
-  box-shadow: 0 12px 24px rgba(142, 111, 62, 0.22);
-  transform: translateY(-2px);
+  background: var(--hippique-primary);
 }
 
 .secondaryBidButton {
