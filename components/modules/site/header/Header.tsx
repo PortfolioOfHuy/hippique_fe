@@ -914,14 +914,6 @@ export default function Header() {
                   <span>Advertentie plaatsen</span>
                 </HeaderLink>
 
-                <HeaderLink
-                  href="/opnieuw-verkopen"
-                  className={styles.profileDropdownItem}
-                >
-                  <RotateCcw size={17} strokeWidth={2.1} />
-                  <span>Opnieuw verkopen</span>
-                </HeaderLink>
-
                 <div className={styles.profileDropdownDivider} />
 
                 <HeaderLink

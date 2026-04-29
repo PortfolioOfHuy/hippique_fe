@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Eye, Gavel, RefreshCcw, ShieldCheck } from "lucide-react";
+import { Eye, Gavel, RefreshCcw } from "lucide-react";
 import type { ProfileTabKey } from "./profile-data";
 import styles from "./AuctionTabsPanel.module.scss";
 
@@ -118,6 +118,7 @@ const dataMap: Record<AuctionTabsPanelProps["type"], AuctionItem[]> = {
       startPrice: 90000,
     },
   ],
+
   embryoveilingen: [
     {
       id: "embryo-1",
@@ -132,20 +133,22 @@ const dataMap: Record<AuctionTabsPanelProps["type"], AuctionItem[]> = {
       date: "Live nu",
       time: "Nog 01:22:10",
       href: "/veilingen/chacco-blue-ratina-z",
+      startPrice: 32500,
     },
     {
       id: "embryo-2",
       title: "Emerald x Comme Il Faut",
-      subtitle: "Premium embryo voor topsportfokkerij",
+      subtitle: "Premium embryo voor topsportfokkerij, opnieuw beschikbaar",
       category: "Embryo",
       image: "/img/horses/horse-1.jpg",
       lotCode: "Embryo #07",
-      status: "outbid",
-      currentBid: "€21.000",
-      nextBid: "€22.000",
+      status: "closed_no_winner",
+      currentBid: "Geen winnend bod",
+      nextBid: "Opnieuw aanbieden",
       date: "12 okt 2024",
-      time: "09:15",
+      time: "Afgesloten",
       href: "/veilingen/emerald-comme-il-faut",
+      startPrice: 21000,
     },
     {
       id: "embryo-3",
@@ -160,8 +163,10 @@ const dataMap: Record<AuctionTabsPanelProps["type"], AuctionItem[]> = {
       date: "28 nov 2024",
       time: "19:30",
       href: "/veilingen/cornet-obolensky-baloubet",
+      startPrice: 18000,
     },
   ],
+
   spermaveilingen: [
     {
       id: "semen-1",
@@ -176,6 +181,7 @@ const dataMap: Record<AuctionTabsPanelProps["type"], AuctionItem[]> = {
       date: "Live nu",
       time: "Nog 00:48:12",
       href: "/veilingen/emerald-vant-ruytershof",
+      startPrice: 2800,
     },
     {
       id: "semen-2",
@@ -190,20 +196,22 @@ const dataMap: Record<AuctionTabsPanelProps["type"], AuctionItem[]> = {
       date: "18 sep 2024",
       time: "15:00",
       href: "/veilingen/grand-prix-select",
+      startPrice: 1950,
     },
     {
       id: "semen-3",
       title: "Oldenburger Premier Line",
-      subtitle: "Exclusieve dekking uit premium dressuurlijn",
+      subtitle: "Exclusieve dekking uit premium dressuurlijn, opnieuw beschikbaar",
       category: "Sperma",
       image: "/img/horses/horse-2.jpg",
       lotCode: "Sperma #09",
-      status: "closed",
-      currentBid: "€2.350",
-      nextBid: "Afgerond",
+      status: "closed_no_winner",
+      currentBid: "Geen winnend bod",
+      nextBid: "Opnieuw aanbieden",
       date: "01 aug 2024",
-      time: "21:00",
+      time: "Afgesloten",
       href: "/veilingen/oldenburger-premier-line",
+      startPrice: 2350,
     },
   ],
 };
@@ -229,13 +237,48 @@ function formatEuro(value: number) {
   }).format(value);
 }
 
-function getRelistHref(item: AuctionItem) {
+function getRelistType(type: AuctionTabsPanelProps["type"]) {
+  const typeMap: Record<AuctionTabsPanelProps["type"], string> = {
+    paardenveilingen: "paard",
+    embryoveilingen: "embryo",
+    spermaveilingen: "sperma",
+  };
+
+  return typeMap[type];
+}
+
+function getRelistNoticeText(type: AuctionTabsPanelProps["type"]) {
+  const textMap: Record<
+    AuctionTabsPanelProps["type"],
+    {
+      title: string;
+      description: string;
+    }
+  > = {
+    paardenveilingen: {
+      title: "Deze veiling is zonder winnaar geëindigd.",
+      description: "Je kunt dit paard opnieuw aanbieden met een automatisch verlaagde startprijs van",
+    },
+    embryoveilingen: {
+      title: "Deze embryoveiling is zonder winnaar geëindigd.",
+      description: "Je kunt dit embryo opnieuw aanbieden met een automatisch verlaagde startprijs van",
+    },
+    spermaveilingen: {
+      title: "Deze spermaveiling is zonder winnaar geëindigd.",
+      description: "Je kunt dit sperma opnieuw aanbieden met een automatisch verlaagde startprijs van",
+    },
+  };
+
+  return textMap[type];
+}
+
+function getRelistHref(item: AuctionItem, type: AuctionTabsPanelProps["type"]) {
   const originalPrice = item.startPrice ?? 0;
   const reducedPrice = Math.round(originalPrice * 0.9);
 
   const params = new URLSearchParams({
     mode: "relist",
-    type: "paard",
+    type: getRelistType(type),
     sourceAuctionId: item.id,
     title: item.title,
     subtitle: item.subtitle,
@@ -244,7 +287,7 @@ function getRelistHref(item: AuctionItem) {
     startPrice: String(reducedPrice),
   });
 
-  return `/advertentie-plaatsen?${params.toString()}`;
+  return `/opnieuw-verkopen?${params.toString()}`;
 }
 
 export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
@@ -259,31 +302,15 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
         <p>{content.description}</p>
       </header>
 
-      <div className={styles.statsGrid}>
-        <article>
-          <span>Actieve biedingen</span>
-          <strong>{items.filter((item) => item.status === "live").length}</strong>
-        </article>
-
-        <article>
-          <span>Opgeslagen kavels</span>
-          <strong>{items.length}</strong>
-        </article>
-
-        <article>
-          <span>Gewonnen veilingen</span>
-          <strong>{items.filter((item) => item.status === "won").length}</strong>
-        </article>
-      </div>
-
       <div className={styles.list}>
         {items.map((item) => {
-          const canRelist =
-            type === "paardenveilingen" && item.status === "closed_no_winner";
+          const canRelist = item.status === "closed_no_winner";
 
           const reducedPrice = item.startPrice
             ? Math.round(item.startPrice * 0.9)
             : null;
+
+          const relistNotice = getRelistNoticeText(type);
 
           return (
             <article key={item.id} className={styles.card}>
@@ -318,10 +345,9 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
 
                 {canRelist && reducedPrice ? (
                   <div className={styles.relistNotice}>
-                    <strong>Deze veiling is zonder winnaar geëindigd.</strong>
+                    <strong>{relistNotice.title}</strong>
                     <span>
-                      Je kunt dit paard opnieuw aanbieden met een automatisch
-                      verlaagde startprijs van {formatEuro(reducedPrice)}.
+                      {relistNotice.description} {formatEuro(reducedPrice)}.
                     </span>
                   </div>
                 ) : null}
@@ -350,7 +376,10 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
 
                 <div className={styles.cardActions}>
                   {canRelist ? (
-                    <a href={getRelistHref(item)} className={styles.relistAction}>
+                    <a
+                      href={getRelistHref(item, type)}
+                      className={styles.relistAction}
+                    >
                       <RefreshCcw size={16} strokeWidth={2.2} />
                       <span>Opnieuw aanbieden</span>
                     </a>
@@ -370,18 +399,6 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
             </article>
           );
         })}
-      </div>
-
-      <div className={styles.infoPanel}>
-        <ShieldCheck size={20} strokeWidth={2.2} />
-        <div>
-          <h3>Geverifieerde deelname</h3>
-          <p>
-            Deze tab is voorbereid als klantomgeving. Later kun je hier echte
-            biedingen, gewonnen kavels en veilingstatussen vanuit je backend
-            koppelen.
-          </p>
-        </div>
       </div>
     </section>
   );

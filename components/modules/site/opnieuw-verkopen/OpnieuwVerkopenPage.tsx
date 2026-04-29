@@ -1,7 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import Image from "next/image";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -14,7 +13,6 @@ import {
 } from "antd";
 import type { UploadFile, UploadProps } from "antd";
 import {
-  BadgeEuro,
   CheckCircle2,
   ClipboardList,
   FileText,
@@ -23,6 +21,19 @@ import {
   UploadCloud,
 } from "lucide-react";
 import styles from "./OpnieuwVerkopenPage.module.scss";
+
+type ListingType = "paard" | "embryo" | "sperma";
+
+type RelistData = {
+  isRelist: boolean;
+  type: ListingType;
+  sourceAuctionId: string;
+  title: string;
+  subtitle: string;
+  lotCode: string;
+  originalPrice: number | null;
+  reducedPrice: number | null;
+};
 
 type ResaleFormValues = {
   horseName: string;
@@ -37,6 +48,29 @@ type ResaleFormValues = {
   reason?: string;
   notes?: string;
   agree: boolean;
+};
+
+const emptyRelistData: RelistData = {
+  isRelist: false,
+  type: "paard",
+  sourceAuctionId: "",
+  title: "",
+  subtitle: "",
+  lotCode: "",
+  originalPrice: null,
+  reducedPrice: null,
+};
+
+const listingTypeLabels: Record<ListingType, string> = {
+  paard: "paard",
+  embryo: "embryo",
+  sperma: "sperma",
+};
+
+const listingTypeFormLabels: Record<ListingType, string> = {
+  paard: "Naam van het paard",
+  embryo: "Naam / titel van het embryo",
+  sperma: "Naam / titel van het sperma",
 };
 
 const disciplineOptions = [
@@ -62,35 +96,113 @@ const currencyOptions = [
 const steps = [
   {
     icon: ClipboardList,
-    title: "Gegevens invullen",
+    title: "Gegevens controleren",
     description:
-      "Vul de basisinformatie in van het paard dat u opnieuw wilt aanbieden.",
+      "Controleer de gegevens van het item dat u opnieuw wilt aanbieden.",
   },
   {
     icon: FileText,
     title: "Documenten toevoegen",
     description:
-      "Voeg veterinaire keuringen, röntgenfoto’s en prestatiegegevens toe.",
+      "Voeg veterinaire keuringen, röntgenfoto’s, video’s of andere relevante documenten toe.",
   },
   {
     icon: Gavel,
-    title: "Veilingvoorstel ontvangen",
+    title: "Opnieuw aanbieden",
     description:
-      "Ons team beoordeelt uw aanvraag en stelt een passende verkoopstrategie voor.",
+      "De nieuwe startprijs wordt automatisch met 10% verlaagd en doorgestuurd voor beoordeling.",
   },
 ];
 
 const benefits = [
+  "Automatische verlaging van de startprijs met 10%",
   "Persoonlijke begeleiding door het veilingteam",
   "Internationaal bereik onder serieuze kopers",
-  "Professionele presentatie van uw paard",
+  "Professionele presentatie van uw veilingitem",
   "Transparante bied- en verkoopprocedure",
 ];
+
+function parsePriceParam(value: string | null) {
+  if (!value) return null;
+
+  const parsed = Number(value.replace(/[^\d]/g, ""));
+
+  return Number.isNaN(parsed) ? null : parsed;
+}
+
+function getValidListingType(value: string | null): ListingType {
+  if (value === "embryo" || value === "sperma" || value === "paard") {
+    return value;
+  }
+
+  return "paard";
+}
+
+function formatEuro(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function getRelistReason(type: ListingType) {
+  const label = listingTypeLabels[type];
+
+  return `Opnieuw aanbieden omdat de vorige veiling van dit ${label} zonder winnaar is geëindigd.`;
+}
 
 export default function OpnieuwVerkopenPage() {
   const [form] = Form.useForm<ResaleFormValues>();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [relistData, setRelistData] = useState<RelistData>(emptyRelistData);
+
+  const listingLabel = listingTypeLabels[relistData.type];
+  const listingNameLabel = listingTypeFormLabels[relistData.type];
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const searchParams = new URLSearchParams(window.location.search);
+
+    const mode = searchParams.get("mode");
+    const type = getValidListingType(searchParams.get("type"));
+    const title = searchParams.get("title") ?? "";
+    const subtitle = searchParams.get("subtitle") ?? "";
+    const lotCode = searchParams.get("lotCode") ?? "";
+    const sourceAuctionId = searchParams.get("sourceAuctionId") ?? "";
+
+    const originalPrice = parsePriceParam(searchParams.get("originalPrice"));
+    const passedStartPrice = parsePriceParam(searchParams.get("startPrice"));
+
+    const reducedPrice = originalPrice
+      ? Math.round(originalPrice * 0.9)
+      : passedStartPrice;
+
+    const nextRelistData: RelistData = {
+      isRelist: mode === "relist",
+      type,
+      sourceAuctionId,
+      title,
+      subtitle,
+      lotCode,
+      originalPrice,
+      reducedPrice,
+    };
+
+    setRelistData(nextRelistData);
+
+    if (nextRelistData.isRelist) {
+      form.setFieldsValue({
+        horseName: nextRelistData.title,
+        previousLot: nextRelistData.lotCode,
+        reservePrice: nextRelistData.reducedPrice ?? undefined,
+        currency: "EUR",
+        reason: getRelistReason(type),
+      });
+    }
+  }, [form]);
 
   const uploadProps = useMemo<UploadProps>(
     () => ({
@@ -118,6 +230,12 @@ export default function OpnieuwVerkopenPage() {
 
     console.log("Resale request:", {
       ...values,
+      mode: relistData.isRelist ? "relist" : "new_request",
+      listingType: relistData.type,
+      sourceAuctionId: relistData.sourceAuctionId,
+      originalPrice: relistData.originalPrice,
+      reducedPrice: relistData.reducedPrice,
+      discountPercent: relistData.isRelist ? 10 : 0,
       files: fileList.map((file) => ({
         name: file.name,
         size: file.size,
@@ -125,7 +243,11 @@ export default function OpnieuwVerkopenPage() {
       })),
     });
 
-    message.success("Uw aanvraag voor opnieuw verkopen is ontvangen.");
+    message.success(
+      relistData.isRelist
+        ? "Uw aanvraag om opnieuw aan te bieden is ontvangen."
+        : "Uw aanvraag voor opnieuw verkopen is ontvangen.",
+    );
 
     form.resetFields();
     setFileList([]);
@@ -134,57 +256,6 @@ export default function OpnieuwVerkopenPage() {
 
   return (
     <main className={styles.page}>
-      <section className={styles.hero}>
-        <div className={styles.inner}>
-          <div className={styles.heroGrid}>
-            <div className={styles.heroContent}>
-              <span className={styles.eyebrow}>Opnieuw verkopen</span>
-
-              <h1 className={styles.title}>
-                Bied uw paard opnieuw aan via Hippique Auctions
-              </h1>
-
-              <p className={styles.subtitle}>
-                Heeft u eerder een paard gekocht of aangeboden en wilt u het nu
-                opnieuw verkopen? Dien eenvoudig uw aanvraag in. Ons team neemt
-                contact met u op voor beoordeling, documentatie en de beste
-                veilingstrategie.
-              </p>
-
-              <div className={styles.heroActions}>
-                <a href="#resale-form" className={styles.primaryLink}>
-                  Aanvraag starten
-                </a>
-
-                <a href="#werkwijze" className={styles.secondaryLink}>
-                  Bekijk werkwijze
-                </a>
-              </div>
-            </div>
-
-            <div className={styles.heroVisual}>
-              <div className={styles.heroImageWrap}>
-                <Image
-                  src="/img/home/elite/horse-1.webp"
-                  alt="Opnieuw verkopen via Hippique Auctions"
-                  fill
-                  priority
-                  className={styles.heroImage}
-                  sizes="(max-width: 991px) 100vw, 44vw"
-                />
-              </div>
-
-              <div className={styles.floatingCard}>
-                <BadgeEuro size={22} strokeWidth={1.9} />
-                <div>
-                  <span>Veilingadvies</span>
-                  <strong>Persoonlijk voorstel</strong>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <section id="werkwijze" className={styles.stepsSection}>
         <div className={styles.inner}>
@@ -227,13 +298,13 @@ export default function OpnieuwVerkopenPage() {
               <span className={styles.sectionEyebrow}>Aanvraagformulier</span>
 
               <h2 className={styles.panelTitle}>
-                Vertel ons meer over het paard
+                Controleer de gegevens voor herplaatsing
               </h2>
 
               <p className={styles.panelText}>
-                Vul de gegevens zo volledig mogelijk in. Hoe meer informatie wij
-                ontvangen, hoe sneller wij een passend veilingvoorstel kunnen
-                maken.
+                Vul de gegevens zo volledig mogelijk in. Bij opnieuw aanbieden
+                wordt de startprijs automatisch 10% lager gezet dan de vorige
+                prijs.
               </p>
 
               <div className={styles.benefitList}>
@@ -258,6 +329,46 @@ export default function OpnieuwVerkopenPage() {
             </aside>
 
             <div className={styles.formCard}>
+              {relistData.isRelist ? (
+                <div className={styles.relistSummary}>
+                  <div className={styles.relistInfo}>
+                    <span>Opnieuw aanbieden</span>
+                    <strong>{relistData.title || "Veilingitem"}</strong>
+
+                    {relistData.subtitle ? <p>{relistData.subtitle}</p> : null}
+
+                    {relistData.lotCode ? (
+                      <small>Vorige lotnummer: {relistData.lotCode}</small>
+                    ) : null}
+                  </div>
+
+                  <div className={styles.relistPriceBox}>
+                    <div>
+                      <span>Vorige prijs</span>
+                      <strong>
+                        {relistData.originalPrice
+                          ? formatEuro(relistData.originalPrice)
+                          : "Niet bekend"}
+                      </strong>
+                    </div>
+
+                    <div>
+                      <span>Korting</span>
+                      <strong>-10%</strong>
+                    </div>
+
+                    <div>
+                      <span>Nieuwe startprijs</span>
+                      <strong>
+                        {relistData.reducedPrice
+                          ? formatEuro(relistData.reducedPrice)
+                          : "Niet bekend"}
+                      </strong>
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+
               <Form
                 form={form}
                 layout="vertical"
@@ -271,12 +382,12 @@ export default function OpnieuwVerkopenPage() {
               >
                 <div className={styles.formTwoColumns}>
                   <Form.Item
-                    label="Naam van het paard"
+                    label={listingNameLabel}
                     name="horseName"
                     rules={[
                       {
                         required: true,
-                        message: "Vul de naam van het paard in.",
+                        message: `Vul de naam of titel van het ${listingLabel} in.`,
                       },
                     ]}
                   >
@@ -316,7 +427,10 @@ export default function OpnieuwVerkopenPage() {
                   </Form.Item>
 
                   <Form.Item label="Geslacht" name="gender">
-                    <Select placeholder="Kies geslacht" options={genderOptions} />
+                    <Select
+                      placeholder="Kies geslacht"
+                      options={genderOptions}
+                    />
                   </Form.Item>
 
                   <Form.Item label="Huidige locatie" name="location">
@@ -325,23 +439,36 @@ export default function OpnieuwVerkopenPage() {
                 </div>
 
                 <div className={styles.formTwoColumns}>
-<Form.Item label="Gewenste minimumprijs" name="reservePrice">
-  <InputNumber<number>
-    min={0}
-    step={500}
-    placeholder="65000"
-    formatter={(value) =>
-      value ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".") : ""
-    }
-    parser={(value) => {
-      if (!value) return 0;
+                  <Form.Item
+                    label={
+                      relistData.isRelist
+                        ? "Nieuwe startprijs (-10%)"
+                        : "Gewenste minimumprijs"
+                    }
+                    name="reservePrice"
+                  >
+                    <InputNumber<number>
+                      disabled={
+                        relistData.isRelist &&
+                        Boolean(relistData.reducedPrice)
+                      }
+                      min={0}
+                      step={500}
+                      placeholder="65000"
+                      formatter={(value) =>
+                        value
+                          ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ".")
+                          : ""
+                      }
+                      parser={(value) => {
+                        if (!value) return 0;
 
-      const parsed = Number(value.replace(/[^\d]/g, ""));
+                        const parsed = Number(value.replace(/[^\d]/g, ""));
 
-      return Number.isNaN(parsed) ? 0 : parsed;
-    }}
-  />
-</Form.Item>
+                        return Number.isNaN(parsed) ? 0 : parsed;
+                      }}
+                    />
+                  </Form.Item>
 
                   <Form.Item label="Valuta" name="currency">
                     <Select options={currencyOptions} />
@@ -417,7 +544,9 @@ export default function OpnieuwVerkopenPage() {
                   loading={submitting}
                   className={styles.submitButton}
                 >
-                  Aanvraag verzenden
+                  {relistData.isRelist
+                    ? "Opnieuw aanbieden verzenden"
+                    : "Aanvraag verzenden"}
                 </Button>
               </Form>
             </div>
