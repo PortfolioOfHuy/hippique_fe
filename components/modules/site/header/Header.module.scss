@@ -99,39 +99,32 @@
   gap: 12px;
 }
 
+.languageDropdown,
 .translateDropdown,
 .profileDropdown {
   position: relative;
   flex: 0 0 auto;
 }
 
-.translateDropdown {
-  z-index: 30;
+.languageDropdown {
+  z-index: 32;
 }
 
-.profileDropdown {
+.translateDropdown {
   z-index: 31;
 }
 
+.profileDropdown {
+  z-index: 33;
+}
+
+.languageToggleButton,
 .translateIconButton,
-.profileIconButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-
-  width: 46px;
-  height: 44px;
-  padding: 0;
-
-  border: 1px solid rgba(245, 242, 237, 0.18);
-  border-radius: var(--radius-button);
-  background: transparent;
-  color: var(--hippique-neutral);
-
-  cursor: pointer;
+.profileIconButton,
+.profileButton {
   appearance: none;
+  cursor: pointer;
   text-decoration: none;
-
   transition:
     border-color 0.25s ease,
     color 0.25s ease,
@@ -140,12 +133,65 @@
     box-shadow 0.25s ease;
 }
 
+.languageToggleButton,
+.translateIconButton,
+.profileIconButton {
+  border: 1px solid rgba(245, 242, 237, 0.18);
+  border-radius: var(--radius-button);
+  background: transparent;
+  color: var(--hippique-neutral);
+}
+
+.languageToggleButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 72px;
+  height: 44px;
+  padding: 0 14px;
+  font-size: var(--fs-small);
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.translateIconButton,
+.profileIconButton {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 44px;
+  padding: 0;
+}
+
+.profileButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 186px;
+  height: 44px;
+  padding: 0 12px 0 8px;
+  border: 1px solid rgba(245, 242, 237, 0.18);
+  border-radius: var(--radius-button);
+  background: rgba(255, 255, 255, 0.02);
+  color: var(--hippique-neutral);
+}
+
+.languageToggleButton:hover,
+.languageToggleButton:focus-visible,
+.languageToggleButtonOpen,
 .translateIconButton:hover,
 .translateIconButton:focus-visible,
 .translateIconButtonOpen,
 .profileIconButton:hover,
 .profileIconButton:focus-visible,
-.profileIconButtonOpen {
+.profileIconButtonOpen,
+.profileButton:hover,
+.profileButton:focus-visible,
+.profileButtonOpen {
   border-color: var(--hippique-secondary);
   color: var(--hippique-secondary);
   background: rgba(197, 160, 89, 0.08);
@@ -154,10 +200,74 @@
 }
 
 .translateIconButton svg,
-.profileIconButton svg {
+.profileIconButton svg,
+.languageToggleButton svg,
+.profileButton svg {
   width: 18px;
   height: 18px;
   stroke: currentColor;
+}
+
+.profileAvatar,
+.profileDropdownAvatar,
+.mobileProfileAvatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 999px;
+  border: 1px solid rgba(197, 160, 89, 0.34);
+  background: rgba(197, 160, 89, 0.12);
+  color: var(--hippique-secondary);
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.profileAvatar {
+  width: 32px;
+  height: 32px;
+  font-size: 13px;
+}
+
+.profileButtonText {
+  min-width: 0;
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+}
+
+.profileButtonName {
+  max-width: 104px;
+  color: var(--hippique-neutral);
+  font-size: var(--fs-small);
+  font-weight: 800;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileButtonRole {
+  max-width: 104px;
+  color: rgba(245, 242, 237, 0.62);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileButton:hover .profileButtonName,
+.profileButton:focus-visible .profileButtonName,
+.profileButtonOpen .profileButtonName {
+  color: var(--hippique-secondary);
+}
+
+.profileButtonChevron {
+  flex: 0 0 auto;
 }
 
 .translateDropdownMenu,
@@ -189,7 +299,7 @@
 }
 
 .profileDropdownMenu {
-  width: 260px;
+  width: 300px;
   padding: 10px;
   z-index: 45;
 }
@@ -210,25 +320,45 @@
 
 .profileDropdownHeader {
   margin-bottom: 8px;
+  padding: 10px;
+}
+
+.profileDropdownIdentity {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px;
+  border-radius: var(--radius-lg);
+  background: rgba(255, 255, 255, 0.035);
+
+  div {
+    min-width: 0;
+  }
 
   span {
     display: block;
-    color: rgba(245, 242, 237, 0.58);
+    color: rgba(245, 242, 237, 0.62);
     font-size: var(--fs-caption);
     font-weight: 700;
     line-height: 1.4;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
   }
 
   strong {
     display: block;
-    margin-top: 4px;
     color: var(--hippique-secondary);
     font-size: var(--fs-body);
     font-weight: 800;
     line-height: 1.4;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+}
+
+.profileDropdownAvatar {
+  width: 44px;
+  height: 44px;
+  font-size: 15px;
 }
 
 .profileDropdownItem {
@@ -266,6 +396,20 @@
     color: var(--hippique-secondary);
     transform: translateY(-1px);
   }
+}
+
+.profileDropdownDivider {
+  height: 1px;
+  margin: 8px 4px;
+  background: rgba(245, 242, 237, 0.08);
+}
+
+.profileDropdownLogin {
+  color: var(--hippique-secondary);
+}
+
+.profileDropdownRegister {
+  color: var(--hippique-neutral);
 }
 
 .profileDropdownLogout {
@@ -370,6 +514,28 @@
   padding-right: 8px;
 }
 
+.languageButtonRight {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex: 0 0 auto;
+}
+
+.languageShortCode {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 34px;
+  height: 24px;
+  padding: 0 8px;
+  border-radius: var(--radius-pill);
+  background: rgba(197, 160, 89, 0.1);
+  color: var(--hippique-secondary);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
 .languageLoading {
   padding: 12px;
   color: rgba(245, 242, 237, 0.72);
@@ -469,10 +635,10 @@
 }
 
 .mobileTranslateButton,
+.mobileLanguageButton,
 .mobileToggle {
   align-items: center;
   justify-content: center;
-  width: 42px;
   height: 42px;
   border: 1px solid rgba(245, 242, 237, 0.18);
   border-radius: var(--radius-md);
@@ -486,17 +652,35 @@
     transform 0.25s ease;
 }
 
-.mobileTranslateButton {
+.mobileTranslateButton,
+.mobileLanguageButton {
   display: inline-flex;
+}
+
+.mobileTranslateButton,
+.mobileToggle {
+  width: 42px;
+}
+
+.mobileLanguageButton {
+  min-width: 54px;
+  padding: 0 12px;
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .mobileToggle {
   display: none;
+  width: 42px;
 }
 
 .mobileTranslateButton:hover,
 .mobileTranslateButton:focus-visible,
 .mobileTranslateButtonOpen,
+.mobileLanguageButton:hover,
+.mobileLanguageButton:focus-visible,
 .mobileToggle:hover,
 .mobileToggle:focus-visible {
   border-color: var(--hippique-secondary);
@@ -620,6 +804,45 @@
 .mobileClose:focus-visible {
   border-color: var(--hippique-secondary);
   color: var(--hippique-secondary);
+}
+
+.mobileProfileSummary {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding: 14px 16px;
+  border: 1px solid rgba(245, 242, 237, 0.08);
+  border-radius: var(--radius-xl);
+  background: rgba(255, 255, 255, 0.03);
+
+  div {
+    min-width: 0;
+  }
+
+  strong,
+  span {
+    display: block;
+    line-height: 1.35;
+  }
+
+  strong {
+    color: var(--hippique-secondary);
+    font-size: var(--fs-body);
+    font-weight: 800;
+  }
+
+  span {
+    color: rgba(245, 242, 237, 0.64);
+    font-size: var(--fs-caption);
+    font-weight: 700;
+  }
+}
+
+.mobileProfileAvatar {
+  width: 42px;
+  height: 42px;
+  font-size: 14px;
 }
 
 .mobileNav {
@@ -776,10 +999,25 @@
     font-size: var(--fs-body);
   }
 
+  .languageToggleButton {
+    min-width: 68px;
+    height: 42px;
+  }
+
   .translateIconButton,
   .profileIconButton {
     width: 44px;
     height: 42px;
+  }
+
+  .profileButton {
+    min-width: 170px;
+    height: 42px;
+  }
+
+  .profileButtonName,
+  .profileButtonRole {
+    max-width: 88px;
   }
 
   .translateDropdownMenu {
@@ -787,7 +1025,7 @@
   }
 
   .profileDropdownMenu {
-    width: 250px;
+    width: 290px;
   }
 }
 

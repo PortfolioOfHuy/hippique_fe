@@ -3,7 +3,6 @@
 import { ChangeEvent, ReactNode, useMemo, useState } from "react";
 import {
   BadgePlus,
-  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   CirclePlay,
@@ -22,8 +21,19 @@ type Step = 1 | 2 | 3;
 
 export type HorseListingType = "paard" | "jonge-paarden" | "elite-paarden";
 
+export type RelistData = {
+  mode: "relist";
+  sourceAuctionId: string;
+  title: string;
+  subtitle: string;
+  lotCode: string;
+  originalPrice: number;
+  startPrice: number;
+};
+
 type HorseListingWizardProps = {
   type?: HorseListingType;
+  relistData?: RelistData | null;
 };
 
 type HorseListingContent = {
@@ -51,6 +61,7 @@ type HorseFormState = {
   curatorNote: string;
   startingBid: string;
   currency: string;
+  sourceAuctionId: string;
 };
 
 type DocumentKey =
@@ -88,24 +99,6 @@ const horseListingContent: Record<HorseListingType, HorseListingContent> = {
   },
 };
 
-const initialForm: HorseFormState = {
-  horseName: "",
-  breed: "",
-  birthYear: "",
-  gender: "hengst",
-  height: "",
-  color: "",
-  discipline: "dressuur",
-  location: "",
-  performanceNotes: "",
-  registrationNumber: "",
-  ueln: "",
-  videoUrl: "",
-  curatorNote: "",
-  startingBid: "",
-  currency: "EUR",
-};
-
 const documentMeta: Array<{
   key: DocumentKey;
   title: string;
@@ -138,13 +131,47 @@ const documentMeta: Array<{
   },
 ];
 
+function createInitialForm(relistData?: RelistData | null): HorseFormState {
+  return {
+    horseName: relistData?.title ?? "",
+    breed: "",
+    birthYear: "",
+    gender: "hengst",
+    height: "",
+    color: "",
+    discipline: "dressuur",
+    location: "",
+    performanceNotes: relistData?.subtitle ?? "",
+    registrationNumber: "",
+    ueln: "",
+    videoUrl: "",
+    curatorNote: relistData
+      ? `Deze vermelding is opnieuw aangeboden na een veiling zonder winnaar. De startprijs is automatisch met 10% verlaagd.`
+      : "",
+    startingBid: relistData?.startPrice ? String(relistData.startPrice) : "",
+    currency: "EUR",
+    sourceAuctionId: relistData?.sourceAuctionId ?? "",
+  };
+}
+
+function formatEuro(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
 export default function HorseListingWizard({
   type = "paard",
+  relistData = null,
 }: HorseListingWizardProps) {
   const content = horseListingContent[type];
 
   const [step, setStep] = useState<Step>(1);
-  const [form, setForm] = useState<HorseFormState>(initialForm);
+  const [form, setForm] = useState<HorseFormState>(() =>
+    createInitialForm(relistData),
+  );
   const [coverPreview, setCoverPreview] = useState<string | null>(null);
   const [galleryPreviews, setGalleryPreviews] = useState<string[]>([]);
   const [documents, setDocuments] = useState<DocumentState>({
@@ -153,6 +180,8 @@ export default function HorseListingWizard({
     healthReport: null,
     horsePassport: null,
   });
+
+  const isRelistMode = relistData?.mode === "relist";
 
   function updateField<K extends keyof HorseFormState>(
     key: K,
@@ -244,8 +273,20 @@ export default function HorseListingWizard({
     <div className={styles.wrapper}>
       <div className={styles.topMeta}>
         <span>Stap {String(step).padStart(2, "0")} / 03</span>
-        <strong>Bezig</strong>
+        <strong>{isRelistMode ? "Opnieuw aanbieden" : "Bezig"}</strong>
       </div>
+
+      {isRelistMode ? (
+        <div className={styles.relistInlineNotice}>
+          <strong>Opnieuw aanbieden na veiling zonder winnaar</strong>
+          <span>
+            De startprijs is automatisch verlaagd van{" "}
+            {formatEuro(relistData.originalPrice)} naar{" "}
+            {formatEuro(relistData.startPrice)}. Je kunt de gegevens hieronder
+            nog aanpassen voordat je de plaatsing opnieuw aanvraagt.
+          </span>
+        </div>
+      ) : null}
 
       <div className={styles.progressNav}>
         <button
@@ -298,6 +339,14 @@ export default function HorseListingWizard({
               <h3>Basisinformatie</h3>
               <span>{content.introLabel}</span>
             </div>
+
+            {isRelistMode ? (
+              <input
+                type="hidden"
+                name="sourceAuctionId"
+                value={form.sourceAuctionId}
+              />
+            ) : null}
 
             <div className={styles.formGridTwo}>
               <div className={styles.field}>
@@ -590,13 +639,22 @@ export default function HorseListingWizard({
 
             <div className={styles.formGridTwo}>
               <div className={styles.field}>
-                <label htmlFor="startingBid">Startbod</label>
+                <label htmlFor="startingBid">
+                  {isRelistMode ? "Nieuw startbod" : "Startbod"}
+                </label>
                 <input
                   id="startingBid"
                   value={form.startingBid}
                   onChange={(e) => updateField("startingBid", e.target.value)}
                   placeholder="bijv. 50000"
                 />
+
+                {isRelistMode ? (
+                  <small className={styles.fieldHint}>
+                    Eerder startbod: {formatEuro(relistData.originalPrice)} ·
+                    Nieuw startbod: {formatEuro(relistData.startPrice)}
+                  </small>
+                ) : null}
               </div>
 
               <div className={styles.field}>
@@ -623,7 +681,9 @@ export default function HorseListingWizard({
               <div className={styles.previewAuctionMeta}>
                 <span className={styles.previewLiveBadge}>Preview</span>
                 <span className={styles.previewEventCode}>
-                  Event-ID: DRAFT-AUCTION
+                  {isRelistMode
+                    ? `Relist-ID: ${form.sourceAuctionId}`
+                    : "Event-ID: DRAFT-AUCTION"}
                 </span>
               </div>
 
@@ -656,7 +716,7 @@ export default function HorseListingWizard({
             <span>← Terug naar collectie</span>
 
             <div className={styles.previewTopNavRight}>
-              <span>Kavel #01</span>
+              <span>{relistData?.lotCode || "Kavel #01"}</span>
               <span>Biedperiode · Draft preview</span>
               <span>Volgende kavel →</span>
             </div>
@@ -761,11 +821,11 @@ export default function HorseListingWizard({
               <div className={styles.previewBidCard}>
                 <div className={styles.previewBidHeader}>
                   <div>
-                    <span>Huidig hoogste bod</span>
+                    <span>Startbod</span>
                     <strong>{previewBid}</strong>
                   </div>
 
-                  <em>Bieden actief</em>
+                  <em>{isRelistMode ? "Opnieuw aangeboden" : "Bieden actief"}</em>
                 </div>
 
                 <div className={styles.previewMinimumBid}>
@@ -957,7 +1017,9 @@ export default function HorseListingWizard({
                 </p>
               </div>
 
-              <div className={styles.paymentStatus}>Klaar voor afronding</div>
+              <div className={styles.paymentStatus}>
+                {isRelistMode ? "Herplaatsing klaar" : "Klaar voor afronding"}
+              </div>
             </div>
 
             <div className={styles.paymentGrid}>
@@ -968,16 +1030,26 @@ export default function HorseListingWizard({
                     <span>Type vermelding</span>
                     <strong>{content.typeLabel}</strong>
                   </li>
+
+                  {isRelistMode ? (
+                    <li>
+                      <span>Bronveiling</span>
+                      <strong>{form.sourceAuctionId}</strong>
+                    </li>
+                  ) : null}
+
                   <li>
                     <span>Naam / titel</span>
                     <strong>{form.horseName || "-"}</strong>
                   </li>
+
                   <li>
                     <span>Startbod</span>
                     <strong>
                       {form.startingBid || "0"} {form.currency}
                     </strong>
                   </li>
+
                   <li>
                     <span>Media gereed</span>
                     <strong>
@@ -990,8 +1062,14 @@ export default function HorseListingWizard({
               <div className={styles.paymentInfo}>
                 <h4>Publicatiepakket</h4>
                 <div className={styles.planCard}>
-                  <strong>Veilingplaatsing standaard</strong>
-                  <span>Professionele listing + review + publicatiekoppeling</span>
+                  <strong>
+                    {isRelistMode
+                      ? "Herplaatsing veiling standaard"
+                      : "Veilingplaatsing standaard"}
+                  </strong>
+                  <span>
+                    Professionele listing + review + publicatiekoppeling
+                  </span>
                   <b>€ 195,00</b>
                 </div>
               </div>
@@ -1049,7 +1127,11 @@ export default function HorseListingWizard({
             </button>
           ) : (
             <button type="button" className={styles.primaryButton}>
-              <span>Publicatie aanvragen</span>
+              <span>
+                {isRelistMode
+                  ? "Herplaatsing aanvragen"
+                  : "Publicatie aanvragen"}
+              </span>
               <FileText size={16} strokeWidth={2.4} />
             </button>
           )}

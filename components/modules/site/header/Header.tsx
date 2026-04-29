@@ -6,11 +6,14 @@ import Script from "next/script";
 import { usePathname } from "next/navigation";
 import {
   Check,
+  ChevronDown,
   Globe,
+  LogIn,
   LogOut,
   Menu,
   PlusCircle,
   RotateCcw,
+  UserPlus,
   UserRound,
   X,
 } from "lucide-react";
@@ -33,6 +36,12 @@ type LanguageWithTimezone = {
   label: string;
   timezone: string;
   utcLabel: string;
+};
+
+type TimezoneOption = {
+  timezone: string;
+  utcLabel: string;
+  label: string;
 };
 
 type HeaderLinkProps = {
@@ -222,6 +231,31 @@ function formatCurrentTime(timezone: string) {
   }
 }
 
+function getLanguageShortCode(lang: string) {
+  if (!lang) return BASE_LANGUAGE.toUpperCase();
+  return lang.split("-")[0].slice(0, 2).toUpperCase();
+}
+
+function getUserInitials(name: string) {
+  const value = name.trim();
+
+  if (!value) return "U";
+
+  const parts = value.split(/\s+/).filter(Boolean);
+
+  if (parts.length === 1) {
+    return parts[0].slice(0, 1).toUpperCase();
+  }
+
+  return `${parts[0][0] || ""}${parts[1][0] || ""}`.toUpperCase();
+}
+
+function getTimezoneLabel(timezone: string) {
+  const city = timezone.split("/").pop() || timezone;
+
+  return city.replace(/_/g, " ");
+}
+
 function setGoogleTranslateCookie(lang: string) {
   if (typeof document === "undefined" || typeof window === "undefined") return;
 
@@ -350,6 +384,7 @@ export default function Header() {
 
   const [mobileOpen, setMobileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
+  const [timezoneOpen, setTimezoneOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
   const [languages, setLanguages] = useState<LanguageItem[]>([
     {
@@ -366,8 +401,17 @@ export default function Header() {
 
   const langRef = useRef<HTMLDivElement | null>(null);
   const mobileLangRef = useRef<HTMLDivElement | null>(null);
+  const timezoneRef = useRef<HTMLDivElement | null>(null);
+  const mobileTimezoneRef = useRef<HTMLDivElement | null>(null);
   const profileRef = useRef<HTMLDivElement | null>(null);
   const pollRef = useRef<number | null>(null);
+
+  /**
+   * TODO: Khi có auth thật, thay 2 giá trị này bằng session/user data.
+   * Ví dụ: const profileName = session?.user?.name || "Gast";
+   */
+  const profileName = "Guest User";
+  const profileInitials = getUserInitials(profileName);
 
   const languageOptions = useMemo<LanguageWithTimezone[]>(() => {
     return languages.map((item) => {
@@ -382,6 +426,24 @@ export default function Header() {
     });
   }, [languages]);
 
+  const timezoneOptions = useMemo<TimezoneOption[]>(() => {
+    const options = languageOptions.map((item) => ({
+      timezone: item.timezone,
+      utcLabel: item.utcLabel,
+      label: getTimezoneLabel(item.timezone),
+    }));
+
+    const uniqueMap = new Map<string, TimezoneOption>();
+
+    options.forEach((item) => {
+      if (item.timezone && !uniqueMap.has(item.timezone)) {
+        uniqueMap.set(item.timezone, item);
+      }
+    });
+
+    return Array.from(uniqueMap.values());
+  }, [languageOptions]);
+
   const selectedLanguageItem = useMemo(() => {
     return (
       languageOptions.find((item) => item.value === selectedLanguage) ??
@@ -390,9 +452,23 @@ export default function Header() {
     );
   }, [languageOptions, selectedLanguage]);
 
+  const selectedTimezoneItem = useMemo(() => {
+    return (
+      timezoneOptions.find((item) => item.timezone === selectedTimezone) ??
+      {
+        timezone: selectedTimezone,
+        utcLabel: Object.values(timezoneMap).find(
+          (item) => item.timezone === selectedTimezone,
+        )?.utcLabel || "",
+        label: getTimezoneLabel(selectedTimezone),
+      }
+    );
+  }, [selectedTimezone, timezoneOptions]);
+
   useEffect(() => {
     setMobileOpen(false);
     setLangOpen(false);
+    setTimezoneOpen(false);
     setProfileOpen(false);
   }, [pathname]);
 
@@ -419,9 +495,15 @@ export default function Header() {
 
       const clickedDesktopLang = langRef.current?.contains(target);
       const clickedMobileLang = mobileLangRef.current?.contains(target);
+      const clickedDesktopTimezone = timezoneRef.current?.contains(target);
+      const clickedMobileTimezone = mobileTimezoneRef.current?.contains(target);
 
       if (!clickedDesktopLang && !clickedMobileLang) {
         setLangOpen(false);
+      }
+
+      if (!clickedDesktopTimezone && !clickedMobileTimezone) {
+        setTimezoneOpen(false);
       }
 
       if (profileRef.current && !profileRef.current.contains(target)) {
@@ -522,8 +604,16 @@ export default function Header() {
     const isChanged = selectedLanguage !== item.value;
 
     setSelectedLanguage(item.value);
+
+    /**
+     * Giữ logic cũ:
+     * Khi đổi ngôn ngữ thì timezone vẫn tự đổi theo mapping ngôn ngữ.
+     * Người dùng vẫn có thể đổi timezone riêng ở dropdown icon quả cầu.
+     */
     setSelectedTimezone(item.timezone);
+
     setLangOpen(false);
+    setTimezoneOpen(false);
     setProfileOpen(false);
     setMobileOpen(false);
 
@@ -545,18 +635,49 @@ export default function Header() {
     }, 300);
   }
 
-  function renderTranslateHeader() {
+  function selectTimezone(item: TimezoneOption) {
+    setSelectedTimezone(item.timezone);
+    setTimezoneOpen(false);
+
+    window.localStorage.setItem(STORAGE_TIMEZONE_KEY, item.timezone);
+
+    window.setTimeout(() => {
+      removeGoogleTranslateArtifacts();
+    }, 150);
+  }
+
+  function renderLanguageHeader() {
     return (
       <div className={styles.translateDropdownHeader}>
         <div className={styles.translateHeaderTop}>
           <span className={styles.translateHeaderCountry}>
             {selectedLanguageItem
-              ? `${selectedLanguageItem.label}${
-                  selectedLanguageItem.utcLabel
-                    ? ` (${selectedLanguageItem.utcLabel})`
+              ? `${selectedLanguageItem.label} (${getLanguageShortCode(
+                  selectedLanguageItem.value,
+                )})`
+              : "Selecteer taal"}
+          </span>
+        </div>
+
+        <div className={styles.translateHeaderMeta}>
+          <span>Standaardtaal: Nederlands</span>
+        </div>
+      </div>
+    );
+  }
+
+  function renderTimezoneHeader() {
+    return (
+      <div className={styles.translateDropdownHeader}>
+        <div className={styles.translateHeaderTop}>
+          <span className={styles.translateHeaderCountry}>
+            {selectedTimezoneItem
+              ? `${selectedTimezoneItem.label}${
+                  selectedTimezoneItem.utcLabel
+                    ? ` (${selectedTimezoneItem.utcLabel})`
                     : ""
                 }`
-              : "Selecteer taal"}
+              : "Selecteer tijdzone"}
           </span>
         </div>
 
@@ -585,6 +706,38 @@ export default function Header() {
             active ? styles.languageButtonActive : ""
           }`}
           onClick={() => selectLanguage(item)}
+        >
+          <span className={styles.languageButtonMain}>
+            <span className={styles.languageCountry}>{item.label}</span>
+
+            <span className={styles.languageButtonRight}>
+              <span className={styles.languageShortCode}>
+                {getLanguageShortCode(item.value)}
+              </span>
+              {active ? <Check size={15} strokeWidth={2.4} /> : null}
+            </span>
+          </span>
+        </button>
+      );
+    });
+  }
+
+  function renderTimezoneList() {
+    if (!timezoneOptions.length) {
+      return <div className={styles.languageLoading}>Laden...</div>;
+    }
+
+    return timezoneOptions.map((item) => {
+      const active = selectedTimezone === item.timezone;
+
+      return (
+        <button
+          key={item.timezone}
+          type="button"
+          className={`${styles.languageButton} ${
+            active ? styles.languageButtonActive : ""
+          }`}
+          onClick={() => selectTimezone(item)}
         >
           <span className={styles.languageButtonMain}>
             <span className={styles.languageCountry}>
@@ -641,20 +794,22 @@ export default function Header() {
           </nav>
 
           <div className={styles.desktopActions}>
-            <div className={styles.translateDropdown} ref={langRef}>
+            <div className={styles.languageDropdown} ref={langRef}>
               <button
                 type="button"
-                className={`${styles.translateIconButton} ${
-                  langOpen ? styles.translateIconButtonOpen : ""
+                className={`${styles.languageToggleButton} ${
+                  langOpen ? styles.languageToggleButtonOpen : ""
                 }`}
-                aria-label="Taal en tijdzone kiezen"
+                aria-label="Taal kiezen"
                 aria-expanded={langOpen}
                 onClick={() => {
                   setLangOpen((prev) => !prev);
+                  setTimezoneOpen(false);
                   setProfileOpen(false);
                 }}
               >
-                <Globe size={18} strokeWidth={2} />
+                <span>{getLanguageShortCode(selectedLanguage)}</span>
+                <ChevronDown size={15} strokeWidth={2.2} />
               </button>
 
               <div
@@ -662,7 +817,7 @@ export default function Header() {
                   langOpen ? styles.translateDropdownMenuOpen : ""
                 }`}
               >
-                {renderTranslateHeader()}
+                {renderLanguageHeader()}
 
                 <div className={styles.languageList}>{renderLanguageList()}</div>
 
@@ -674,20 +829,59 @@ export default function Header() {
               </div>
             </div>
 
+            <div className={styles.translateDropdown} ref={timezoneRef}>
+              <button
+                type="button"
+                className={`${styles.translateIconButton} ${
+                  timezoneOpen ? styles.translateIconButtonOpen : ""
+                }`}
+                aria-label="Tijdzone kiezen"
+                aria-expanded={timezoneOpen}
+                onClick={() => {
+                  setTimezoneOpen((prev) => !prev);
+                  setLangOpen(false);
+                  setProfileOpen(false);
+                }}
+              >
+                <Globe size={18} strokeWidth={2} />
+              </button>
+
+              <div
+                className={`${styles.translateDropdownMenu} ${
+                  timezoneOpen ? styles.translateDropdownMenuOpen : ""
+                }`}
+              >
+                {renderTimezoneHeader()}
+
+                <div className={styles.languageList}>{renderTimezoneList()}</div>
+              </div>
+            </div>
+
             <div className={styles.profileDropdown} ref={profileRef}>
               <button
                 type="button"
-                className={`${styles.profileIconButton} ${
-                  profileOpen ? styles.profileIconButtonOpen : ""
+                className={`${styles.profileButton} ${
+                  profileOpen ? styles.profileButtonOpen : ""
                 }`}
                 aria-label="Accountmenu openen"
                 aria-expanded={profileOpen}
                 onClick={() => {
                   setProfileOpen((prev) => !prev);
                   setLangOpen(false);
+                  setTimezoneOpen(false);
                 }}
               >
-                <UserRound size={18} strokeWidth={2} />
+                <span className={styles.profileAvatar}>{profileInitials}</span>
+
+                <span className={styles.profileButtonText}>
+                  <span className={styles.profileButtonName}>{profileName}</span>
+                </span>
+
+                <ChevronDown
+                  size={15}
+                  strokeWidth={2.2}
+                  className={styles.profileButtonChevron}
+                />
               </button>
 
               <div
@@ -696,8 +890,15 @@ export default function Header() {
                 }`}
               >
                 <div className={styles.profileDropdownHeader}>
-                  <span>Welkom terug</span>
-                  <strong>Premium lid</strong>
+                  <div className={styles.profileDropdownIdentity}>
+                    <span className={styles.profileDropdownAvatar}>
+                      {profileInitials}
+                    </span>
+
+                    <div>
+                      <strong>{profileName}</strong>
+                    </div>
+                  </div>
                 </div>
 
                 <HeaderLink href="/profiel" className={styles.profileDropdownItem}>
@@ -721,6 +922,24 @@ export default function Header() {
                   <span>Opnieuw verkopen</span>
                 </HeaderLink>
 
+                <div className={styles.profileDropdownDivider} />
+
+                <HeaderLink
+                  href="/inloggen"
+                  className={`${styles.profileDropdownItem} ${styles.profileDropdownLogin}`}
+                >
+                  <LogIn size={17} strokeWidth={2.1} />
+                  <span>Inloggen</span>
+                </HeaderLink>
+
+                <HeaderLink
+                  href="/registreren"
+                  className={`${styles.profileDropdownItem} ${styles.profileDropdownRegister}`}
+                >
+                  <UserPlus size={17} strokeWidth={2.1} />
+                  <span>Registreren</span>
+                </HeaderLink>
+
                 <HeaderLink
                   href="/inloggen"
                   className={`${styles.profileDropdownItem} ${styles.profileDropdownLogout}`}
@@ -730,14 +949,6 @@ export default function Header() {
                 </HeaderLink>
               </div>
             </div>
-
-            <HeaderLink href="/registreren" className={styles.registerButton}>
-              Registreren
-            </HeaderLink>
-
-            <HeaderLink href="/inloggen" className={styles.loginButton}>
-              Inloggen
-            </HeaderLink>
           </div>
 
           <div
@@ -748,18 +959,19 @@ export default function Header() {
             <div className={styles.mobileTranslateDropdown} ref={mobileLangRef}>
               <button
                 type="button"
-                className={`${styles.mobileTranslateButton} ${
+                className={`${styles.mobileLanguageButton} ${
                   langOpen ? styles.mobileTranslateButtonOpen : ""
                 }`}
-                aria-label="Taal en tijdzone kiezen"
+                aria-label="Taal kiezen"
                 aria-expanded={langOpen}
                 onClick={() => {
                   setLangOpen((prev) => !prev);
+                  setTimezoneOpen(false);
                   setProfileOpen(false);
                   setMobileOpen(false);
                 }}
               >
-                <Globe size={19} strokeWidth={2} />
+                <span>{getLanguageShortCode(selectedLanguage)}</span>
               </button>
 
               <div
@@ -767,7 +979,7 @@ export default function Header() {
                   langOpen ? styles.mobileTranslateMenuOpen : ""
                 }`}
               >
-                {renderTranslateHeader()}
+                {renderLanguageHeader()}
 
                 <div className={styles.languageList}>{renderLanguageList()}</div>
 
@@ -779,6 +991,38 @@ export default function Header() {
               </div>
             </div>
 
+            <div
+              className={styles.mobileTranslateDropdown}
+              ref={mobileTimezoneRef}
+            >
+              <button
+                type="button"
+                className={`${styles.mobileTranslateButton} ${
+                  timezoneOpen ? styles.mobileTranslateButtonOpen : ""
+                }`}
+                aria-label="Tijdzone kiezen"
+                aria-expanded={timezoneOpen}
+                onClick={() => {
+                  setTimezoneOpen((prev) => !prev);
+                  setLangOpen(false);
+                  setProfileOpen(false);
+                  setMobileOpen(false);
+                }}
+              >
+                <Globe size={19} strokeWidth={2} />
+              </button>
+
+              <div
+                className={`${styles.mobileTranslateMenu} ${
+                  timezoneOpen ? styles.mobileTranslateMenuOpen : ""
+                }`}
+              >
+                {renderTimezoneHeader()}
+
+                <div className={styles.languageList}>{renderTimezoneList()}</div>
+              </div>
+            </div>
+
             <button
               type="button"
               className={styles.mobileToggle}
@@ -787,6 +1031,7 @@ export default function Header() {
               onClick={() => {
                 setMobileOpen(true);
                 setLangOpen(false);
+                setTimezoneOpen(false);
               }}
             >
               <Menu size={22} strokeWidth={2} />
@@ -831,6 +1076,14 @@ export default function Header() {
             >
               <X size={22} strokeWidth={2} />
             </button>
+          </div>
+
+          <div className={styles.mobileProfileSummary}>
+            <span className={styles.mobileProfileAvatar}>{profileInitials}</span>
+
+            <div>
+              <strong>{profileName}</strong>
+            </div>
           </div>
 
           <nav className={styles.mobileNav} aria-label="Hoofdnavigatie mobiel">
@@ -881,19 +1134,19 @@ export default function Header() {
             </HeaderLink>
 
             <HeaderLink
-              href="/registreren"
-              className={styles.registerButton}
-              onClick={() => setMobileOpen(false)}
-            >
-              Registreren
-            </HeaderLink>
-
-            <HeaderLink
               href="/inloggen"
               className={styles.loginButton}
               onClick={() => setMobileOpen(false)}
             >
               Inloggen
+            </HeaderLink>
+
+            <HeaderLink
+              href="/registreren"
+              className={styles.registerButton}
+              onClick={() => setMobileOpen(false)}
+            >
+              Registreren
             </HeaderLink>
 
             <HeaderLink

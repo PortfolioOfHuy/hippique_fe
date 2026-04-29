@@ -1431,3 +1431,36 @@
     min-height: 240px;
   }
 }
+
+.relistInlineNotice {
+  padding: 16px 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(197, 160, 89, 0.24);
+  background:
+    linear-gradient(135deg, rgba(197, 160, 89, 0.14), rgba(255, 255, 255, 0.86));
+  color: var(--hippique-primary);
+
+  strong {
+    display: block;
+    font-size: 15px;
+    font-weight: 900;
+    line-height: 1.35;
+  }
+
+  span {
+    display: block;
+    margin-top: 6px;
+    color: rgba(10, 25, 47, 0.68);
+    font-size: var(--fs-small);
+    line-height: 1.65;
+  }
+}
+
+.fieldHint {
+  display: block;
+  margin-top: 8px;
+  color: #8a6419;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1.5;
+}

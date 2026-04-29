@@ -1,9 +1,15 @@
 import Image from "next/image";
-import { Eye, Gavel, ShieldCheck } from "lucide-react";
+import { Eye, Gavel, RefreshCcw, ShieldCheck } from "lucide-react";
 import type { ProfileTabKey } from "./profile-data";
 import styles from "./AuctionTabsPanel.module.scss";
 
-type AuctionStatus = "live" | "upcoming" | "closed" | "won" | "outbid";
+type AuctionStatus =
+  | "live"
+  | "upcoming"
+  | "closed"
+  | "closed_no_winner"
+  | "won"
+  | "outbid";
 
 type AuctionItem = {
   id: string;
@@ -18,6 +24,7 @@ type AuctionItem = {
   date: string;
   time: string;
   href: string;
+  startPrice?: number;
 };
 
 type AuctionTabsPanelProps = {
@@ -63,6 +70,7 @@ const dataMap: Record<AuctionTabsPanelProps["type"], AuctionItem[]> = {
       date: "Live nu",
       time: "Nog 02:14:36",
       href: "/veilingen/royal-jumper",
+      startPrice: 145000,
     },
     {
       id: "horse-2",
@@ -77,6 +85,7 @@ const dataMap: Record<AuctionTabsPanelProps["type"], AuctionItem[]> = {
       date: "12 juni 2024",
       time: "18:00",
       href: "/veilingen/diamants-legacy",
+      startPrice: 82000,
     },
     {
       id: "horse-3",
@@ -91,6 +100,22 @@ const dataMap: Record<AuctionTabsPanelProps["type"], AuctionItem[]> = {
       date: "04 mei 2024",
       time: "20:30",
       href: "/veilingen/fine-design",
+      startPrice: 115000,
+    },
+    {
+      id: "horse-4",
+      title: "Noble Star",
+      subtitle: "Veelbelovend springpaard, opnieuw beschikbaar voor verkoop",
+      category: "Paard",
+      image: "/img/horses/horse-1.jpg",
+      lotCode: "Lot #61",
+      status: "closed_no_winner",
+      currentBid: "Geen winnend bod",
+      nextBid: "Opnieuw aanbieden",
+      date: "18 mei 2024",
+      time: "Afgesloten",
+      href: "/veilingen/noble-star",
+      startPrice: 90000,
     },
   ],
   embryoveilingen: [
@@ -188,11 +213,38 @@ function getStatusLabel(status: AuctionStatus) {
     live: "Live nu",
     upcoming: "Binnenkort",
     closed: "Gesloten",
+    closed_no_winner: "Geen winnaar",
     won: "Gewonnen",
     outbid: "Overboden",
   };
 
   return labels[status];
+}
+
+function formatEuro(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    maximumFractionDigits: 0,
+  }).format(value);
+}
+
+function getRelistHref(item: AuctionItem) {
+  const originalPrice = item.startPrice ?? 0;
+  const reducedPrice = Math.round(originalPrice * 0.9);
+
+  const params = new URLSearchParams({
+    mode: "relist",
+    type: "paard",
+    sourceAuctionId: item.id,
+    title: item.title,
+    subtitle: item.subtitle,
+    lotCode: item.lotCode,
+    originalPrice: String(originalPrice),
+    startPrice: String(reducedPrice),
+  });
+
+  return `/advertentie-plaatsen?${params.toString()}`;
 }
 
 export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
@@ -225,73 +277,99 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
       </div>
 
       <div className={styles.list}>
-        {items.map((item) => (
-          <article key={item.id} className={styles.card}>
-            <div className={styles.imageWrap}>
-              <Image
-                src={item.image}
-                alt={item.title}
-                width={220}
-                height={180}
-                className={styles.image}
-              />
+        {items.map((item) => {
+          const canRelist =
+            type === "paardenveilingen" && item.status === "closed_no_winner";
 
-              <span
-                className={`${styles.statusBadge} ${
-                  styles[`status_${item.status}`]
-                }`}
-              >
-                {getStatusLabel(item.status)}
-              </span>
-            </div>
+          const reducedPrice = item.startPrice
+            ? Math.round(item.startPrice * 0.9)
+            : null;
 
-            <div className={styles.cardBody}>
-              <div className={styles.cardTop}>
-                <div>
-                  <span className={styles.category}>{item.category}</span>
-                  <h3>{item.title}</h3>
-                  <p>{item.subtitle}</p>
-                </div>
+          return (
+            <article key={item.id} className={styles.card}>
+              <div className={styles.imageWrap}>
+                <Image
+                  src={item.image}
+                  alt={item.title}
+                  width={220}
+                  height={180}
+                  className={styles.image}
+                />
 
-                <span className={styles.lotCode}>{item.lotCode}</span>
+                <span
+                  className={`${styles.statusBadge} ${
+                    styles[`status_${item.status}`]
+                  }`}
+                >
+                  {getStatusLabel(item.status)}
+                </span>
               </div>
 
-              <div className={styles.metaGrid}>
-                <div>
-                  <span>Huidig bod</span>
-                  <strong>{item.currentBid}</strong>
+              <div className={styles.cardBody}>
+                <div className={styles.cardTop}>
+                  <div>
+                    <span className={styles.category}>{item.category}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.subtitle}</p>
+                  </div>
+
+                  <span className={styles.lotCode}>{item.lotCode}</span>
                 </div>
 
-                <div>
-                  <span>Volgend bod</span>
-                  <strong>{item.nextBid}</strong>
+                {canRelist && reducedPrice ? (
+                  <div className={styles.relistNotice}>
+                    <strong>Deze veiling is zonder winnaar geëindigd.</strong>
+                    <span>
+                      Je kunt dit paard opnieuw aanbieden met een automatisch
+                      verlaagde startprijs van {formatEuro(reducedPrice)}.
+                    </span>
+                  </div>
+                ) : null}
+
+                <div className={styles.metaGrid}>
+                  <div>
+                    <span>Huidig bod</span>
+                    <strong>{item.currentBid}</strong>
+                  </div>
+
+                  <div>
+                    <span>Volgend bod</span>
+                    <strong>{item.nextBid}</strong>
+                  </div>
+
+                  <div>
+                    <span>Datum</span>
+                    <strong>{item.date}</strong>
+                  </div>
+
+                  <div>
+                    <span>Tijd</span>
+                    <strong>{item.time}</strong>
+                  </div>
                 </div>
 
-                <div>
-                  <span>Datum</span>
-                  <strong>{item.date}</strong>
-                </div>
+                <div className={styles.cardActions}>
+                  {canRelist ? (
+                    <a href={getRelistHref(item)} className={styles.relistAction}>
+                      <RefreshCcw size={16} strokeWidth={2.2} />
+                      <span>Opnieuw aanbieden</span>
+                    </a>
+                  ) : (
+                    <a href={item.href} className={styles.primaryAction}>
+                      <Gavel size={16} strokeWidth={2.2} />
+                      <span>Bieden bekijken</span>
+                    </a>
+                  )}
 
-                <div>
-                  <span>Tijd</span>
-                  <strong>{item.time}</strong>
+                  <a href={item.href} className={styles.secondaryAction}>
+                    <Eye size={16} strokeWidth={2.2} />
+                    <span>Details</span>
+                  </a>
                 </div>
               </div>
-
-              <div className={styles.cardActions}>
-                <a href={item.href} className={styles.primaryAction}>
-                  <Gavel size={16} strokeWidth={2.2} />
-                  <span>Bieden bekijken</span>
-                </a>
-
-                <a href={item.href} className={styles.secondaryAction}>
-                  <Eye size={16} strokeWidth={2.2} />
-                  <span>Details</span>
-                </a>
-              </div>
-            </div>
-          </article>
-        ))}
+            </article>
+          );
+        })}
       </div>
 
       <div className={styles.infoPanel}>

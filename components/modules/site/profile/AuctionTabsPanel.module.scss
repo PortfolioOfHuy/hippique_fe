@@ -144,6 +144,10 @@
   color: rgba(10, 25, 47, 0.5);
 }
 
+.status_closed_no_winner {
+  color: #92400e;
+}
+
 .status_won {
   color: #15803d;
 }
@@ -207,6 +211,30 @@
   color: rgba(10, 25, 47, 0.62);
 }
 
+.relistNotice {
+  padding: 14px 16px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  background:
+    linear-gradient(135deg, rgba(197, 160, 89, 0.12), rgba(255, 255, 255, 0.75));
+
+  strong {
+    display: block;
+    color: var(--hippique-primary);
+    font-size: 14px;
+    font-weight: 900;
+    line-height: 1.35;
+  }
+
+  span {
+    display: block;
+    margin-top: 5px;
+    color: rgba(10, 25, 47, 0.66);
+    font-size: var(--fs-small);
+    line-height: 1.55;
+  }
+}
+
 .metaGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -251,7 +279,8 @@
 }
 
 .primaryAction,
-.secondaryAction {
+.secondaryAction,
+.relistAction {
   min-height: 46px;
   padding: 0 18px;
   display: inline-flex;
@@ -299,6 +328,21 @@
     border-color: rgba(197, 160, 89, 0.36);
     color: #8a6419;
     background: rgba(197, 160, 89, 0.08);
+  }
+}
+
+.relistAction {
+  border: 1px solid var(--hippique-primary);
+  background: var(--hippique-primary);
+  color: #ffffff;
+  box-shadow: 0 14px 28px rgba(10, 25, 47, 0.16);
+
+  &:hover {
+    transform: translateY(-1px);
+    border-color: var(--hippique-secondary);
+    background: var(--hippique-secondary);
+    color: var(--hippique-primary);
+    box-shadow: 0 16px 30px rgba(197, 160, 89, 0.22);
   }
 }
 
@@ -406,7 +450,8 @@
   }
 
   .primaryAction,
-  .secondaryAction {
+  .secondaryAction,
+  .relistAction {
     width: 100%;
   }
 }
