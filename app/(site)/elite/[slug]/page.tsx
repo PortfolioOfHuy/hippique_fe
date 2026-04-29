@@ -1,6 +1,16 @@
 import { notFound } from "next/navigation";
 import Image from "next/image";
-import { ChevronDown, Heart, Play, Share2 } from "lucide-react";
+import {
+  CalendarCheck,
+  ChevronDown,
+  Download,
+  Eye,
+  FileText,
+  Heart,
+  Play,
+  Share2,
+  ShieldCheck,
+} from "lucide-react";
 import {
   getEliteHorses,
   getHorseBySlug,
@@ -14,6 +24,80 @@ type PageProps = {
 };
 
 type AuctionStatus = "upcoming" | "live" | "ended";
+
+type DocumentationItem = {
+  id: string;
+  title: string;
+  status: string;
+  date: string;
+  fileType: string;
+  fileSize: string;
+  description: string;
+  items: string[];
+};
+
+const documentationItems: DocumentationItem[] = [
+  {
+    id: "vet-check",
+    title: "Veterinaire keuring",
+    status: "Goedgekeurd",
+    date: "14 augustus 2026",
+    fileType: "PDF",
+    fileSize: "2.4 MB",
+    description:
+      "Volledig veterinair keuringsrapport met algemene gezondheidscontrole, klinische bevindingen en geschiktheidsbeoordeling voor sportgebruik.",
+    items: [
+      "Algemene gezondheidscontrole voltooid",
+      "Geen klinisch relevante afwijkingen vastgesteld",
+      "Geschikt bevonden voor sport en veilingdeelname",
+    ],
+  },
+  {
+    id: "xray",
+    title: "Röntgenfoto's",
+    status: "Beschikbaar",
+    date: "12 augustus 2026",
+    fileType: "ZIP",
+    fileSize: "48.6 MB",
+    description:
+      "Digitale röntgenbeelden van benen, hoeven en gewrichten. De bestanden zijn beschikbaar voor geregistreerde kopers en veterinaire adviseurs.",
+    items: [
+      "Voorbenen en achterbenen inbegrepen",
+      "Beelden beschikbaar in hoge resolutie",
+      "Veterinaire toelichting toegevoegd",
+    ],
+  },
+  {
+    id: "performance-video",
+    title: "Prestatievideo",
+    status: "Gecontroleerd",
+    date: "10 augustus 2026",
+    fileType: "MP4",
+    fileSize: "186 MB",
+    description:
+      "Video-opname van beweging, galop en sprongtechniek. Inclusief vrijspringen en gereden fragmenten.",
+    items: [
+      "Vrijspringen in binnenpiste",
+      "Stap, draf en galop onder het zadel",
+      "Korte analyse van techniek en rijdbaarheid",
+    ],
+  },
+  {
+    id: "ownership",
+    title: "Eigendomsdocumenten",
+    status: "Vertrouwelijk",
+    date: "09 augustus 2026",
+    fileType: "PDF",
+    fileSize: "1.1 MB",
+    description:
+      "Documentatie over registratie, eigendom en overdrachtsinformatie. Volledig dossier wordt beschikbaar na verificatie.",
+    items: [
+      "Registratiegegevens gecontroleerd",
+      "Eigendom bevestigd door verkoper",
+      "Overdracht mogelijk na betalingsbevestiging",
+    ],
+  },
+];
 
 function getAuctionStatusLabel(status: AuctionStatus) {
   if (status === "live") return "Live veiling";
@@ -48,28 +132,8 @@ export default async function EliteDetailPage({ params }: PageProps) {
   const horse = getHorseBySlug(slug);
 
   const auctionEndsAt = "2026-08-23T19:59:00";
-
-  /**
-   * Later kun je deze waarden uit je backend/session halen:
-   * - auctionStatus: status van de veiling zelf
-   * - canBid: of de huidige gebruiker mag bieden
-   *
-   * Voorbeeld:
-   * const auctionStatus = auction.status;
-   * const canBid =
-   *   user.isLoggedIn &&
-   *   user.emailVerified &&
-   *   user.phoneVerified &&
-   *   user.depositActive &&
-   *   !user.isBlocked;
-   */
   const auctionStatus: AuctionStatus = "live";
   const isAuctionLive = auctionStatus === "live";
-
-  /**
-   * Zet tijdelijk true om de variant "Je kunt bieden" te test.
-   * Zet false om te tonen dat de veiling live is, maar de gebruiker nog niet mag bieden.
-   */
   const canBid = false;
 
   const bidPermissionLabel = getBidPermissionLabel(canBid);
@@ -262,17 +326,35 @@ export default async function EliteDetailPage({ params }: PageProps) {
           </div>
 
           <aside className={styles.sidebar}>
-            <div className={styles.bidStatusCard}>
-              <div>
-                <span className={styles.bidStatusLabel}>Biedstatus</span>
+            <div
+              className={`${styles.bidStatusCard} ${
+                canBid
+                  ? styles.bidStatusCardAvailable
+                  : styles.bidStatusCardBlocked
+              }`}
+            >
+              <div className={styles.bidStatusTop}>
+                <div className={styles.bidStatusIcon}>
+                  {canBid ? (
+                    <ShieldCheck size={22} strokeWidth={2.2} />
+                  ) : (
+                    <CalendarCheck size={22} strokeWidth={2.2} />
+                  )}
+                </div>
 
-                <strong
-                  className={
-                    canBid ? styles.bidStatusAvailable : styles.bidStatusBlocked
-                  }
-                >
-                  {bidPermissionLabel}
-                </strong>
+                <div className={styles.bidStatusText}>
+                  <span className={styles.bidStatusLabel}>Biedstatus</span>
+
+                  <strong
+                    className={
+                      canBid
+                        ? styles.bidStatusAvailable
+                        : styles.bidStatusBlocked
+                    }
+                  >
+                    {bidPermissionLabel}
+                  </strong>
+                </div>
               </div>
 
               <p>{bidPermissionText}</p>
@@ -377,7 +459,6 @@ export default async function EliteDetailPage({ params }: PageProps) {
           <div className={styles.twoColumnText}>
             <div className={styles.textCard}>
               <h4>Vaderlijn</h4>
-
               <p>
                 De vaderlijn staat bekend om modern springvermogen, elasticiteit
                 en scherpte op de hindernis. Deze afstamming levert al jarenlang
@@ -387,7 +468,6 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
             <div className={styles.textCard}>
               <h4>Moederlijn</h4>
-
               <p>
                 De moederlijn is prestatiegericht gefokt met focus op balans,
                 voorzichtigheid en instelling. Hierdoor ontstaat een complete en
@@ -397,7 +477,6 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
             <div className={styles.textCard}>
               <h4>Prestatiehoogtepunten</h4>
-
               <p>
                 {horse.title} heeft vroeg in zijn ontwikkeling veel kwaliteit
                 laten zien. De combinatie van kracht, reactievermogen en
@@ -407,7 +486,6 @@ export default async function EliteDetailPage({ params }: PageProps) {
 
             <div className={styles.textCard}>
               <h4>Foknotities</h4>
-
               <p>
                 Dankzij zijn moderne model, sterke bovenlijn en
                 prestatie-afstamming is dit paard niet alleen interessant voor
@@ -418,20 +496,73 @@ export default async function EliteDetailPage({ params }: PageProps) {
         </section>
 
         <section className={styles.sectionBlock}>
-          <h3 className={styles.sectionTitleLarge}>
-            Documentatie & rapporten
-          </h3>
+          <div className={styles.documentHeader}>
+            <div>
+              <span className={styles.documentKicker}>Dossier</span>
+
+              <h3 className={styles.sectionTitleLarge}>
+                Documentatie & rapporten
+              </h3>
+            </div>
+
+            <p>
+              Bekijk de beschikbare keuringen, rapporten en aanvullende
+              bestanden voor dit elitepaard.
+            </p>
+          </div>
 
           <div className={styles.accordionList}>
-            <button type="button" className={styles.accordionItem}>
-              <span>Veterinaire keuring</span>
-              <ChevronDown size={18} strokeWidth={1.8} />
-            </button>
+            {documentationItems.map((document) => (
+              <details key={document.id} className={styles.documentItem}>
+                <summary className={styles.documentSummary}>
+                  <div className={styles.documentSummaryLeft}>
+                    <span className={styles.documentIcon}>
+                      <FileText size={20} strokeWidth={2} />
+                    </span>
 
-            <button type="button" className={styles.accordionItem}>
-              <span>Röntgenfoto&apos;s</span>
-              <ChevronDown size={18} strokeWidth={1.8} />
-            </button>
+                    <div>
+                      <strong>{document.title}</strong>
+                      <small>
+                        {document.fileType} · {document.fileSize} ·{" "}
+                        {document.date}
+                      </small>
+                    </div>
+                  </div>
+
+                  <div className={styles.documentSummaryRight}>
+                    <span className={styles.documentStatus}>
+                      {document.status}
+                    </span>
+                    <ChevronDown size={18} strokeWidth={1.9} />
+                  </div>
+                </summary>
+
+                <div className={styles.documentBody}>
+                  <p>{document.description}</p>
+
+                  <div className={styles.documentInfoGrid}>
+                    {document.items.map((item) => (
+                      <div key={item} className={styles.documentInfoItem}>
+                        <ShieldCheck size={16} strokeWidth={2.1} />
+                        <span>{item}</span>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className={styles.documentActions}>
+                    <a href="#" className={styles.documentPrimaryAction}>
+                      <Eye size={16} strokeWidth={2} />
+                      Bekijken
+                    </a>
+
+                    <a href="#" className={styles.documentSecondaryAction}>
+                      <Download size={16} strokeWidth={2} />
+                      Downloaden
+                    </a>
+                  </div>
+                </div>
+              </details>
+            ))}
           </div>
         </section>
 
