@@ -21,20 +21,7 @@ export default function ProfileSidebar({
     <aside className={styles.sidebar}>
       <div className={styles.memberBox}>
         <span className={styles.memberStatus}>Geauthenticeerd</span>
-        <h2>Premium lid</h2>
         <p>Geverifieerde curator</p>
-
-        <div className={styles.memberBadges}>
-          <span>
-            <BadgeCheck size={15} strokeWidth={2.2} />
-            Premium
-          </span>
-
-          <span>
-            <ShieldCheck size={15} strokeWidth={2.2} />
-            Geverifieerd
-          </span>
-        </div>
       </div>
 
       <nav className={styles.sideNav} aria-label="Profielnavigatie">
