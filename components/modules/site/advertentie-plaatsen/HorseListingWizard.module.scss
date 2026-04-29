@@ -159,6 +159,15 @@
   grid-template-columns: 1.15fr 1fr;
 }
 
+.mediaLayout {
+  align-items: start;
+}
+
+.coverBlock,
+.galleryBlock {
+  min-width: 0;
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -229,8 +238,9 @@
 }
 
 .coverTile {
-  height: 100%;
-  min-height: 320px;
+  width: 100%;
+  height: auto;
+  min-height: 318px;
   border-radius: var(--radius-xl);
   border: 1px dashed rgba(10, 25, 47, 0.16);
   background:
@@ -239,8 +249,9 @@
 
   img {
     width: 100%;
-    height: 100%;
+    height: 318px;
     object-fit: cover;
+    display: block;
   }
 }
 
@@ -1463,4 +1474,474 @@
   font-size: 12px;
   font-weight: 800;
   line-height: 1.5;
+}
+/* ===== Redesigned payment & settlement step ===== */
+.paymentHeaderCompact {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  margin-bottom: 24px;
+
+  h3 {
+    font-size: clamp(26px, 2.2vw, 36px);
+    line-height: 1.14;
+  }
+
+  p {
+    max-width: 760px;
+    margin-top: 8px;
+    color: rgba(10, 25, 47, 0.62);
+    line-height: 1.7;
+  }
+}
+
+.paymentBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: var(--radius-pill);
+  background: rgba(197, 160, 89, 0.12);
+  color: #8a6419;
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.paymentLayout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(320px, 0.86fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.paymentOptionsColumn {
+  display: grid;
+  gap: 16px;
+}
+
+.settlementOptionCard {
+  padding: 20px 22px;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 16px;
+  align-items: start;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    transform 0.22s ease,
+    border-color 0.22s ease,
+    box-shadow 0.22s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    border-color: rgba(197, 160, 89, 0.28);
+    box-shadow: 0 16px 28px rgba(10, 25, 47, 0.06);
+  }
+}
+
+.settlementOptionCardActive {
+  border-color: rgba(197, 160, 89, 0.34);
+  box-shadow: 0 16px 32px rgba(10, 25, 47, 0.05);
+}
+
+.settlementOptionCardEnabled {
+  border-color: rgba(10, 25, 47, 0.14);
+  background: rgba(255, 255, 255, 1);
+}
+
+.settlementOptionIcon {
+  width: 44px;
+  height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  background: rgba(197, 160, 89, 0.12);
+  color: #8a6419;
+}
+
+.settlementOptionContent {
+  min-width: 0;
+
+  p {
+    margin-top: 8px;
+    color: rgba(10, 25, 47, 0.64);
+    line-height: 1.7;
+  }
+}
+
+.settlementOptionTitleRow {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+
+  strong {
+    font-size: 17px;
+    font-weight: 800;
+    line-height: 1.45;
+    color: var(--hippique-primary);
+  }
+}
+
+.settlementOptionCheck {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-pill);
+  color: #8a6419;
+}
+
+.optionToggle {
+  width: 48px;
+  height: 28px;
+  flex: 0 0 48px;
+  display: inline-flex;
+  align-items: center;
+  padding: 3px;
+  border-radius: 999px;
+  background: rgba(10, 25, 47, 0.12);
+  transition: background 0.22s ease;
+
+  span {
+    width: 22px;
+    height: 22px;
+    border-radius: 999px;
+    background: #ffffff;
+    box-shadow: 0 2px 6px rgba(10, 25, 47, 0.18);
+    transform: translateX(0);
+    transition: transform 0.22s ease;
+  }
+}
+
+.optionToggleActive {
+  background: var(--hippique-primary);
+
+  span {
+    transform: translateX(20px);
+  }
+}
+
+.cryptoSettlementPanel {
+  padding: 22px;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+}
+
+.cryptoSettlementHeader {
+  margin-bottom: 18px;
+
+  h4 {
+    font-size: 18px;
+    line-height: 1.35;
+  }
+}
+
+.cryptoWarningBox {
+  margin-bottom: 20px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(220, 38, 38, 0.18);
+  background: rgba(220, 38, 38, 0.05);
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+
+  strong {
+    display: block;
+    color: #991b1b;
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1.55;
+  }
+
+  span {
+    display: block;
+    margin-top: 4px;
+    color: rgba(153, 27, 27, 0.78);
+    font-size: 13px;
+    line-height: 1.6;
+  }
+}
+
+.cryptoWarningIcon {
+  color: #b91c1c;
+  margin-top: 2px;
+}
+
+.cryptoFieldGrid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.cryptoField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+
+  label {
+    color: rgba(10, 25, 47, 0.55);
+    font-size: 11px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  input,
+  select,
+  textarea {
+    min-height: 48px;
+    padding: 10px 0 12px;
+    border: 0;
+    border-bottom: 1px solid rgba(10, 25, 47, 0.12);
+    border-radius: 0;
+    background: transparent;
+    color: var(--hippique-primary);
+    box-shadow: none;
+    transition:
+      border-color 0.22s ease,
+      color 0.22s ease;
+  }
+
+  textarea {
+    min-height: 96px;
+    resize: vertical;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: var(--hippique-secondary);
+    box-shadow: none;
+    outline: none;
+  }
+
+  input::placeholder,
+  textarea::placeholder {
+    color: rgba(10, 25, 47, 0.34);
+  }
+}
+
+.cryptoFieldFull {
+  grid-column: 1 / -1;
+}
+
+.paymentSummaryCard {
+  position: sticky;
+  top: 24px;
+  padding: 24px 22px;
+  border-radius: var(--radius-card);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 18px 34px rgba(10, 25, 47, 0.05);
+}
+
+.paymentSummaryHeader {
+  margin-bottom: 18px;
+
+  h4 {
+    font-size: clamp(24px, 1.8vw, 34px);
+    line-height: 1.15;
+  }
+}
+
+.paymentSummaryRows {
+  display: grid;
+  gap: 12px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid rgba(10, 25, 47, 0.08);
+}
+
+.paymentSummaryRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+
+  span {
+    color: rgba(10, 25, 47, 0.68);
+    line-height: 1.55;
+  }
+
+  strong {
+    font-size: 18px;
+    font-weight: 800;
+    color: var(--hippique-primary);
+    white-space: nowrap;
+  }
+}
+
+.paymentSummaryTotal {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 0 20px;
+  border-bottom: 1px solid rgba(10, 25, 47, 0.08);
+
+  span {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--hippique-primary);
+  }
+
+  strong {
+    font-size: clamp(28px, 2.6vw, 42px);
+    font-weight: 900;
+    color: var(--hippique-primary);
+    line-height: 1;
+    letter-spacing: -0.03em;
+  }
+}
+
+.paymentSummaryNotes {
+  display: grid;
+  gap: 12px;
+  padding: 18px 0 20px;
+}
+
+.paymentSummaryNoteItem {
+  display: grid;
+  grid-template-columns: 16px minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  color: rgba(10, 25, 47, 0.68);
+
+  svg {
+    margin-top: 2px;
+    color: rgba(10, 25, 47, 0.58);
+  }
+
+  span {
+    font-size: 13px;
+    line-height: 1.6;
+  }
+}
+
+.paymentConfirmList {
+  display: grid;
+  gap: 14px;
+  padding: 18px 0 20px;
+  border-top: 1px solid rgba(10, 25, 47, 0.08);
+}
+
+.paymentConfirmItem {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  cursor: pointer;
+
+  input {
+    margin: 2px 0 0;
+    width: 18px;
+    height: 18px;
+    accent-color: var(--hippique-secondary);
+  }
+
+  span {
+    color: rgba(10, 25, 47, 0.74);
+    line-height: 1.6;
+  }
+}
+
+.paymentCheckoutButton {
+  width: 100%;
+  min-height: 58px;
+  padding: 0 18px;
+  border: 1px solid var(--hippique-secondary);
+  border-radius: var(--radius-button);
+  background: var(--hippique-secondary);
+  color: #ffffff !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  font-size: 16px;
+  font-weight: 900;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
+
+  &:hover:not(:disabled) {
+    background: var(--hippique-primary);
+    border-color: var(--hippique-primary);
+    transform: translateY(-1px);
+    box-shadow: 0 14px 28px rgba(10, 25, 47, 0.08);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.55;
+    box-shadow: none;
+  }
+}
+
+.paymentCheckoutHint {
+  margin-top: 10px;
+  color: #b45309;
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+@media (max-width: 1199px) {
+  .paymentLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .paymentSummaryCard {
+    position: static;
+  }
+}
+
+@media (max-width: 767px) {
+  .paymentHeaderCompact {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .cryptoFieldGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .cryptoFieldFull {
+    grid-column: auto;
+  }
+
+  .settlementOptionCard {
+    grid-template-columns: 1fr;
+  }
+
+  .settlementOptionTitleRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .paymentSummaryTotal {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.mediaRowTwo {
+  margin-top: 28px;
+  align-items: start;
 }

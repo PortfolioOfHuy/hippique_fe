@@ -2,18 +2,22 @@
 
 import { ChangeEvent, ReactNode, useMemo, useState } from "react";
 import {
+  AlertTriangle,
+  ArrowRight,
   BadgePlus,
+  CheckCircle2,
   ChevronLeft,
   ChevronRight,
   CirclePlay,
+  CreditCard,
   FileBadge2,
   FileCheck2,
-  FileText,
   HeartPulse,
   ImagePlus,
   ShieldCheck,
   Stethoscope,
   Upload,
+  Wallet,
 } from "lucide-react";
 import styles from "./HorseListingWizard.module.scss";
 
@@ -162,6 +166,15 @@ function formatEuro(value: number) {
   }).format(value);
 }
 
+function formatEuroDetailed(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 export default function HorseListingWizard({
   type = "paard",
   relistData = null,
@@ -181,7 +194,24 @@ export default function HorseListingWizard({
     horsePassport: null,
   });
 
+  const [enableCryptoSettlement, setEnableCryptoSettlement] = useState(false);
+  const [acceptedCryptoCurrency, setAcceptedCryptoCurrency] =
+    useState("USDT (Tether)");
+  const [blockchainNetwork, setBlockchainNetwork] = useState(
+    "ERC-20 (Ethereum)",
+  );
+  const [walletAddress, setWalletAddress] = useState("");
+  const [walletLabel, setWalletLabel] = useState("");
+  const [specialInstructions, setSpecialInstructions] = useState("");
+  const [confirmInformation, setConfirmInformation] = useState(false);
+  const [acceptTerms, setAcceptTerms] = useState(false);
+
   const isRelistMode = relistData?.mode === "relist";
+
+  const listingFee = 50;
+  const cryptoServiceFee = enableCryptoSettlement ? 10 : 0;
+  const totalDueNow = listingFee + cryptoServiceFee;
+  const canProceedToCheckout = confirmInformation && acceptTerms;
 
   function updateField<K extends keyof HorseFormState>(
     key: K,
@@ -1007,82 +1037,278 @@ export default function HorseListingWizard({
 
       {step === 3 ? (
         <section className={styles.paymentSection}>
-          <div className={styles.paymentCard}>
-            <div className={styles.paymentHeader}>
-              <div>
-                <h3>Betaling & publicatie</h3>
-                <p>
-                  Rond je plaatsing af en bereid de advertentie voor op
-                  publicatie in de veilingomgeving.
-                </p>
-              </div>
-
-              <div className={styles.paymentStatus}>
-                {isRelistMode ? "Herplaatsing klaar" : "Klaar voor afronding"}
-              </div>
-            </div>
-
-            <div className={styles.paymentGrid}>
-              <div className={styles.paymentInfo}>
-                <h4>Overzicht plaatsing</h4>
-                <ul>
-                  <li>
-                    <span>Type vermelding</span>
-                    <strong>{content.typeLabel}</strong>
-                  </li>
-
-                  {isRelistMode ? (
-                    <li>
-                      <span>Bronveiling</span>
-                      <strong>{form.sourceAuctionId}</strong>
-                    </li>
-                  ) : null}
-
-                  <li>
-                    <span>Naam / titel</span>
-                    <strong>{form.horseName || "-"}</strong>
-                  </li>
-
-                  <li>
-                    <span>Startbod</span>
-                    <strong>
-                      {form.startingBid || "0"} {form.currency}
-                    </strong>
-                  </li>
-
-                  <li>
-                    <span>Media gereed</span>
-                    <strong>
-                      {coverPreview || galleryPreviews.length > 0 ? "Ja" : "Nee"}
-                    </strong>
-                  </li>
-                </ul>
-              </div>
-
-              <div className={styles.paymentInfo}>
-                <h4>Publicatiepakket</h4>
-                <div className={styles.planCard}>
-                  <strong>
-                    {isRelistMode
-                      ? "Herplaatsing veiling standaard"
-                      : "Veilingplaatsing standaard"}
-                  </strong>
-                  <span>
-                    Professionele listing + review + publicatiekoppeling
-                  </span>
-                  <b>€ 195,00</b>
-                </div>
-              </div>
-            </div>
-
-            <div className={styles.paymentNote}>
-              <FileCheck2 size={18} strokeWidth={2} />
+          <div className={styles.paymentHeaderCompact}>
+            <div>
+              <h3>Betaling & afwikkelingsopties</h3>
               <p>
-                Deze stap is momenteel voorbereid als UI-flow. Zodra je backend
-                klaar is, kun je hier checkout, betaalstatus en submit-logica
-                koppelen.
+                Rond je veilingaanvraag af. De publicatiekosten worden via
+                Stripe betaald. Indien gewenst kun je daarnaast off-platform
+                crypto-afwikkelingsgegevens toevoegen voor koper en verkoper.
               </p>
             </div>
+
+            <div className={styles.paymentBadge}>
+              {isRelistMode ? "Herplaatsing" : "Nieuwe plaatsing"}
+            </div>
+          </div>
+
+          <div className={styles.paymentLayout}>
+            <div className={styles.paymentOptionsColumn}>
+              <button
+                type="button"
+                className={`${styles.settlementOptionCard} ${styles.settlementOptionCardActive}`}
+              >
+                <div className={styles.settlementOptionIcon}>
+                  <CreditCard size={20} strokeWidth={2.2} />
+                </div>
+
+                <div className={styles.settlementOptionContent}>
+                  <div className={styles.settlementOptionTitleRow}>
+                    <strong>Betaal publicatiekosten via Stripe</strong>
+                    <span className={styles.settlementOptionCheck}>
+                      <CheckCircle2 size={18} strokeWidth={2.5} />
+                    </span>
+                  </div>
+
+                  <p>
+                    Veilige kaartbetaling voor de publicatie van je
+                    veilingvermelding. Na bevestiging wordt de verkoper
+                    doorgestuurd naar Stripe Checkout.
+                  </p>
+                </div>
+              </button>
+
+              <button
+                type="button"
+                className={`${styles.settlementOptionCard} ${
+                  enableCryptoSettlement
+                    ? styles.settlementOptionCardEnabled
+                    : ""
+                }`}
+                onClick={() => setEnableCryptoSettlement((prev) => !prev)}
+              >
+                <div className={styles.settlementOptionIcon}>
+                  <Wallet size={20} strokeWidth={2.2} />
+                </div>
+
+                <div className={styles.settlementOptionContent}>
+                  <div className={styles.settlementOptionTitleRow}>
+                    <strong>
+                      Off-platform crypto-afwikkelingsgegevens inschakelen
+                    </strong>
+                    <span
+                      className={`${styles.optionToggle} ${
+                        enableCryptoSettlement ? styles.optionToggleActive : ""
+                      }`}
+                    >
+                      <span />
+                    </span>
+                  </div>
+
+                  <p>
+                    Voeg optioneel walletgegevens toe voor directe afwikkeling
+                    tussen koper en verkoper. Dit vervangt de Stripe-betaling
+                    voor de publicatiekosten niet. Bij inschakeling wordt een
+                    extra crypto service fee toegevoegd.
+                  </p>
+                </div>
+              </button>
+
+              {enableCryptoSettlement ? (
+                <div className={styles.cryptoSettlementPanel}>
+                  <div className={styles.cryptoSettlementHeader}>
+                    <h4>Off-platform crypto-afwikkelingsinformatie</h4>
+                  </div>
+
+                  <div className={styles.cryptoWarningBox}>
+                    <div className={styles.cryptoWarningIcon}>
+                      <AlertTriangle size={18} strokeWidth={2.3} />
+                    </div>
+
+                    <div>
+                      <strong>
+                        Koper en verkoper regelen de betaling rechtstreeks met
+                        elkaar. Het platform is niet betrokken bij deze
+                        transactie.
+                      </strong>
+                      <span>
+                        Walletgegevens worden uitsluitend geregistreerd voor
+                        informatieve afwikkelingsdoeleinden.
+                      </span>
+                    </div>
+                  </div>
+
+                  <div className={styles.cryptoFieldGrid}>
+                    <div className={styles.cryptoField}>
+                      <label htmlFor="acceptedCryptoCurrency">
+                        Geaccepteerde cryptocurrency
+                      </label>
+                      <select
+                        id="acceptedCryptoCurrency"
+                        value={acceptedCryptoCurrency}
+                        onChange={(e) =>
+                          setAcceptedCryptoCurrency(e.target.value)
+                        }
+                      >
+                        <option value="USDT (Tether)">USDT (Tether)</option>
+                        <option value="USDC">USDC</option>
+                        <option value="BTC">BTC</option>
+                        <option value="ETH">ETH</option>
+                      </select>
+                    </div>
+
+                    <div className={styles.cryptoField}>
+                      <label htmlFor="blockchainNetwork">
+                        Blockchain netwerk
+                      </label>
+                      <select
+                        id="blockchainNetwork"
+                        value={blockchainNetwork}
+                        onChange={(e) => setBlockchainNetwork(e.target.value)}
+                      >
+                        <option value="ERC-20 (Ethereum)">
+                          ERC-20 (Ethereum)
+                        </option>
+                        <option value="TRC-20 (Tron)">TRC-20 (Tron)</option>
+                        <option value="BEP-20 (BNB Smart Chain)">
+                          BEP-20 (BNB Smart Chain)
+                        </option>
+                        <option value="Solana">Solana</option>
+                      </select>
+                    </div>
+
+                    <div
+                      className={`${styles.cryptoField} ${styles.cryptoFieldFull}`}
+                    >
+                      <label htmlFor="walletAddress">Walletadres</label>
+                      <input
+                        id="walletAddress"
+                        value={walletAddress}
+                        onChange={(e) => setWalletAddress(e.target.value)}
+                        placeholder="0x..."
+                      />
+                    </div>
+
+                    <div
+                      className={`${styles.cryptoField} ${styles.cryptoFieldFull}`}
+                    >
+                      <label htmlFor="walletLabel">
+                        Walletlabel / naam eigenaar
+                      </label>
+                      <input
+                        id="walletLabel"
+                        value={walletLabel}
+                        onChange={(e) => setWalletLabel(e.target.value)}
+                        placeholder="bijv. John Doe - Primary USDT"
+                      />
+                    </div>
+
+                    <div
+                      className={`${styles.cryptoField} ${styles.cryptoFieldFull}`}
+                    >
+                      <label htmlFor="specialInstructions">
+                        Speciale instructies (optioneel)
+                      </label>
+                      <textarea
+                        id="specialInstructions"
+                        rows={4}
+                        value={specialInstructions}
+                        onChange={(e) =>
+                          setSpecialInstructions(e.target.value)
+                        }
+                        placeholder="Eventuele aanvullende instructies voor de koper..."
+                      />
+                    </div>
+                  </div>
+                </div>
+              ) : null}
+            </div>
+
+            <aside className={styles.paymentSummaryCard}>
+              <div className={styles.paymentSummaryHeader}>
+                <h4>Publicatiekostenoverzicht</h4>
+              </div>
+
+              <div className={styles.paymentSummaryRows}>
+                <div className={styles.paymentSummaryRow}>
+                  <span>Basis listing fee</span>
+                  <strong>{formatEuroDetailed(listingFee)}</strong>
+                </div>
+
+                <div className={styles.paymentSummaryRow}>
+                  <span>Crypto service fee</span>
+                  <strong>{formatEuroDetailed(cryptoServiceFee)}</strong>
+                </div>
+              </div>
+
+              <div className={styles.paymentSummaryTotal}>
+                <span>Totaal nu te betalen</span>
+                <strong>{formatEuroDetailed(totalDueNow)}</strong>
+              </div>
+
+              <div className={styles.paymentSummaryNotes}>
+                <div className={styles.paymentSummaryNoteItem}>
+                  <FileCheck2 size={15} strokeWidth={2.2} />
+                  <span>
+                    De crypto service fee wordt alleen toegepast wanneer
+                    crypto-afwikkelingsgegevens zijn ingeschakeld.
+                  </span>
+                </div>
+
+                <div className={styles.paymentSummaryNoteItem}>
+                  <ShieldCheck size={15} strokeWidth={2.2} />
+                  <span>Alle publicatiekosten worden betaald via Stripe.</span>
+                </div>
+
+                <div className={styles.paymentSummaryNoteItem}>
+                  <Wallet size={15} strokeWidth={2.2} />
+                  <span>
+                    Walletgegevens worden enkel opgeslagen als referentie voor
+                    off-platform afwikkeling.
+                  </span>
+                </div>
+              </div>
+
+              <div className={styles.paymentConfirmList}>
+                <label className={styles.paymentConfirmItem}>
+                  <input
+                    type="checkbox"
+                    checked={confirmInformation}
+                    onChange={(e) => setConfirmInformation(e.target.checked)}
+                  />
+                  <span>
+                    Ik bevestig dat alle verstrekte informatie correct is.
+                  </span>
+                </label>
+
+                <label className={styles.paymentConfirmItem}>
+                  <input
+                    type="checkbox"
+                    checked={acceptTerms}
+                    onChange={(e) => setAcceptTerms(e.target.checked)}
+                  />
+                  <span>
+                    Ik accepteer de Terms of Acquisition en het Auction
+                    Protocol.
+                  </span>
+                </label>
+              </div>
+
+              <button
+                type="button"
+                className={styles.paymentCheckoutButton}
+                disabled={!canProceedToCheckout}
+              >
+                <span>Doorgaan naar Stripe Checkout</span>
+                <ArrowRight size={18} strokeWidth={2.4} />
+              </button>
+
+              {!canProceedToCheckout ? (
+                <p className={styles.paymentCheckoutHint}>
+                  Vink eerst beide bevestigingen aan om verder te gaan.
+                </p>
+              ) : null}
+            </aside>
           </div>
         </section>
       ) : null}
@@ -1098,42 +1324,53 @@ export default function HorseListingWizard({
         </button>
 
         <div className={styles.actionRight}>
-          {step !== 2 ? (
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              onClick={() => setStep(2)}
-            >
-              Voorbeeld
-            </button>
-          ) : (
-            <button
-              type="button"
-              className={styles.secondaryButton}
-              onClick={() => setStep(1)}
-            >
-              Bewerken
-            </button>
-          )}
+          {step === 3 ? (
+            <>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => setStep(2)}
+              >
+                Terug naar voorbeeld
+              </button>
 
-          {step < 3 ? (
-            <button
-              type="button"
-              className={styles.primaryButton}
-              onClick={goToNextStep}
-            >
-              <span>{step === 2 ? "Verder naar betaling" : "Doorgaan"}</span>
-              <ChevronRight size={16} strokeWidth={2.4} />
-            </button>
+              <button
+                type="button"
+                className={styles.secondaryButton}
+                onClick={() => setStep(1)}
+              >
+                Bewerken
+              </button>
+            </>
           ) : (
-            <button type="button" className={styles.primaryButton}>
-              <span>
-                {isRelistMode
-                  ? "Herplaatsing aanvragen"
-                  : "Publicatie aanvragen"}
-              </span>
-              <FileText size={16} strokeWidth={2.4} />
-            </button>
+            <>
+              {step !== 2 ? (
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => setStep(2)}
+                >
+                  Voorbeeld
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  className={styles.secondaryButton}
+                  onClick={() => setStep(1)}
+                >
+                  Bewerken
+                </button>
+              )}
+
+              <button
+                type="button"
+                className={styles.primaryButton}
+                onClick={goToNextStep}
+              >
+                <span>{step === 2 ? "Verder naar betaling" : "Doorgaan"}</span>
+                <ChevronRight size={16} strokeWidth={2.4} />
+              </button>
+            </>
           )}
         </div>
       </div>
