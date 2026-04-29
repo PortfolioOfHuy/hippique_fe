@@ -392,12 +392,12 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
           </div>
         </div>
 
-        <div className={styles.popupFullNotice}>
-          <Mail size={15} strokeWidth={1.8} />
-          Bevestiging per e-mail verzonden
-        </div>
+        <div className={styles.popupNotifyRow}>
+          <span className={styles.popupNotifySuccess}>
+            <Mail size={14} strokeWidth={1.8} />
+            E-mail verzonden
+          </span>
 
-        <div className={styles.popupNotifyRowCenter}>
           <span className={styles.popupNotifyInfo}>
             <Bell size={14} strokeWidth={1.8} />
             Platformmelding

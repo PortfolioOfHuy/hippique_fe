@@ -1241,20 +1241,13 @@
   }
 }
 
-.popupNotifyRow,
-.popupNotifyRowCenter {
+.popupNotifyRow {
   display: flex;
   align-items: center;
-  gap: 10px;
-  margin-top: 14px;
-}
-
-.popupNotifyRow {
   justify-content: flex-start;
-}
-
-.popupNotifyRowCenter {
-  justify-content: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 14px;
 }
 
 .popupNotifySuccess,
