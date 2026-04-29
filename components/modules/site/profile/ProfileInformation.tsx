@@ -1,18 +1,17 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import { Button, Modal } from "antd";
 import {
   AlertCircle,
   CalendarDays,
   CheckCircle2,
-  KeyRound,
   Languages,
   LockKeyhole,
   Mail,
   PencilLine,
   Phone,
   Settings,
-  ShieldCheck,
   UserRound,
   WalletCards,
   X,
@@ -25,6 +24,26 @@ type ProfileInformationProps = {
   onSaveProfile: (profile: ProfileData) => void;
 };
 
+type VerificationStatus = {
+  emailVerified: boolean;
+  phoneVerified: boolean;
+  depositVerified: boolean;
+};
+
+type MissingVerification = {
+  id: "email" | "phone" | "deposit";
+  text: string;
+  title: string;
+  description: string;
+  actionLabel: string;
+};
+
+const verificationStatus: VerificationStatus = {
+  emailVerified: false,
+  phoneVerified: false,
+  depositVerified: false,
+};
+
 export default function ProfileInformation({
   profile,
   onSaveProfile,
@@ -32,6 +51,47 @@ export default function ProfileInformation({
   const [draftProfile, setDraftProfile] = useState<ProfileData>(profile);
   const [isEditing, setIsEditing] = useState(false);
   const [message, setMessage] = useState("");
+  const [selectedVerification, setSelectedVerification] =
+    useState<MissingVerification | null>(null);
+
+  const missingVerifications = useMemo<MissingVerification[]>(() => {
+    const items: MissingVerification[] = [];
+
+    if (!verificationStatus.emailVerified) {
+      items.push({
+        id: "email",
+        text: "Verifieer uw e-mailadres.",
+        title: "E-mailadres verifiëren",
+        description:
+          "Uw e-mailadres is nog niet bevestigd. Controleer uw inbox en klik op de verificatielink om uw account volledig te activeren.",
+        actionLabel: "E-mail opnieuw verzenden",
+      });
+    }
+
+    if (!verificationStatus.phoneVerified) {
+      items.push({
+        id: "phone",
+        text: "Verifieer uw telefoonnummer.",
+        title: "Telefoonnummer verifiëren",
+        description:
+          "Uw telefoonnummer is nog niet geverifieerd. Verifieer uw nummer om beveiligingsmeldingen en veilingupdates te ontvangen.",
+        actionLabel: "Telefoonnummer verifiëren",
+      });
+    }
+
+    if (!verificationStatus.depositVerified) {
+      items.push({
+        id: "deposit",
+        text: "Voltooi uw biedingsdeposito.",
+        title: "Biedingsdeposito voltooien",
+        description:
+          "Uw biedingsdeposito is nog niet voltooid. U kunt pas deelnemen aan veilingen wanneer alle verificatiestappen zijn afgerond.",
+        actionLabel: "Depositostap openen",
+      });
+    }
+
+    return items;
+  }, []);
 
   function startEdit() {
     setDraftProfile(profile);
@@ -48,7 +108,7 @@ export default function ProfileInformation({
   function saveProfile() {
     onSaveProfile(draftProfile);
     setIsEditing(false);
-    setMessage("Your profile information has been updated successfully.");
+    setMessage("Uw profielgegevens zijn succesvol bijgewerkt.");
   }
 
   function updateDraft<K extends keyof ProfileData>(
@@ -61,18 +121,40 @@ export default function ProfileInformation({
     }));
   }
 
+  function openVerificationModal(item: MissingVerification) {
+    setSelectedVerification(item);
+  }
+
+  function closeVerificationModal() {
+    setSelectedVerification(null);
+  }
+
   return (
     <div className={styles.page}>
-      <div className={styles.alertBox}>
-        <AlertCircle size={21} strokeWidth={2.4} />
-        <p>
-          Please verify your phone number. <a href="#phone-verification">Click here</a>
-        </p>
-      </div>
+      {missingVerifications.length > 0 ? (
+        <div className={styles.alertList}>
+          {missingVerifications.map((item) => (
+            <div key={item.id} className={styles.alertBox}>
+              <AlertCircle size={21} strokeWidth={2.4} />
+
+              <p>
+                {item.text}{" "}
+                <button
+                  type="button"
+                  className={styles.alertLink}
+                  onClick={() => openVerificationModal(item)}
+                >
+                  Klik hier
+                </button>
+              </p>
+            </div>
+          ))}
+        </div>
+      ) : null}
 
       <header className={styles.pageHeader}>
-        <h1>My Profile</h1>
-        <p>Detailed information and account management</p>
+        <h1>Mijn profiel</h1>
+        <p>Persoonlijke gegevens en accountbeheer</p>
       </header>
 
       <section className={styles.requirementBox}>
@@ -81,78 +163,92 @@ export default function ProfileInformation({
         </div>
 
         <div>
-          <span>Auction access requirements</span>
+          <span>Vereisten voor veilingtoegang</span>
           <p>
-            Complete <strong>2 of 3</strong> requirements. Verify your phone
-            number and maintain an active bidding deposit to participate in
-            premium auctions.
+            Voltooi de vereiste accountcontroles voordat u kunt deelnemen aan
+            premium veilingen. Uw e-mail, telefoonnummer en biedingsdeposito
+            moeten allemaal zijn geverifieerd.
           </p>
         </div>
       </section>
 
       <section className={styles.readinessSection}>
-        <h2>Account readiness</h2>
+        <h2>Accountstatus</h2>
 
         <div className={styles.readinessGrid}>
           <article className={styles.readinessCard}>
             <div className={styles.readinessTop}>
-              <span>Email status</span>
-              <strong className={styles.statusVerified}>Verified</strong>
+              <span>E-mailstatus</span>
+              <strong className={styles.statusUnverified}>
+                Niet geverifieerd
+              </strong>
             </div>
 
             <div className={styles.readinessIcon}>
               <Mail size={26} strokeWidth={2} />
             </div>
 
-            <h3>Email Verification</h3>
+            <h3>E-mailverificatie</h3>
 
             <p>
-              Your email address has been confirmed and is active on your
-              account.
+              Uw e-mailadres is nog niet bevestigd. Verifieer uw e-mailadres om
+              uw account volledig te activeren.
             </p>
 
-            <button type="button">Manage email</button>
+            <div className={styles.warningText}>
+              <AlertCircle size={17} strokeWidth={2.3} />
+              <span>Verifieer uw e-mailadres om verder te gaan.</span>
+            </div>
           </article>
 
-          <article className={styles.readinessCard} id="phone-verification">
+          <article className={styles.readinessCard}>
             <div className={styles.readinessTop}>
-              <span>Phone status</span>
-              <strong className={styles.statusPending}>Pending</strong>
+              <span>Telefoonstatus</span>
+              <strong className={styles.statusUnverified}>
+                Niet geverifieerd
+              </strong>
             </div>
 
             <div className={styles.readinessIcon}>
               <Phone size={26} strokeWidth={2} />
             </div>
 
-            <h3>Phone Verification</h3>
+            <h3>Telefoonverificatie</h3>
 
             <p>
-              Please verify your phone number to secure your account and receive
-              auction-related updates.
+              Uw telefoonnummer is nog niet geverifieerd. Verifieer uw nummer
+              om beveiligingsmeldingen en veilingupdates te ontvangen.
             </p>
 
-            <button type="button">Verify phone</button>
+            <div className={styles.warningText}>
+              <AlertCircle size={17} strokeWidth={2.3} />
+              <span>Verifieer uw telefoonnummer.</span>
+            </div>
           </article>
 
           <article className={styles.readinessCard}>
             <div className={styles.readinessTop}>
-              <span>Deposit status</span>
-              <strong className={styles.statusActive}>Active</strong>
+              <span>Depositostatus</span>
+              <strong className={styles.statusUnverified}>
+                Niet voltooid
+              </strong>
             </div>
 
             <div className={styles.readinessIcon}>
               <WalletCards size={26} strokeWidth={2} />
             </div>
 
-            <h3>Bidding Deposit</h3>
+            <h3>Biedingsdeposito</h3>
 
             <p>
-              Your bidding deposit fee has been received and your account is
-              eligible for auction participation once all verification steps are
-              complete.
+              Uw biedingsdeposito is nog niet voltooid. U kunt pas deelnemen aan
+              veilingen wanneer alle verificatiestappen zijn afgerond.
             </p>
 
-            <button type="button">Manage deposit</button>
+            <div className={styles.warningText}>
+              <AlertCircle size={17} strokeWidth={2.3} />
+              <span>Voltooi uw biedingsdeposito om mee te kunnen bieden.</span>
+            </div>
           </article>
         </div>
       </section>
@@ -160,12 +256,12 @@ export default function ProfileInformation({
       <section className={styles.card}>
         <div className={styles.cardHeader}>
           <div>
-            <h2>Profile Information</h2>
+            <h2>Profielgegevens</h2>
 
             <p className={styles.secureNote}>
               <LockKeyhole size={14} strokeWidth={2.2} />
-              Some sensitive information is encrypted and can only be changed by
-              contacting support.
+              Sommige gevoelige gegevens zijn beveiligd en kunnen alleen via
+              ondersteuning worden gewijzigd.
             </p>
           </div>
 
@@ -177,7 +273,7 @@ export default function ProfileInformation({
                 onClick={cancelEdit}
               >
                 <X size={15} strokeWidth={2.4} />
-                <span>Cancel</span>
+                <span>Annuleren</span>
               </button>
 
               <button
@@ -186,13 +282,17 @@ export default function ProfileInformation({
                 onClick={saveProfile}
               >
                 <CheckCircle2 size={15} strokeWidth={2.4} />
-                <span>Save profile</span>
+                <span>Profiel opslaan</span>
               </button>
             </div>
           ) : (
-            <button type="button" className={styles.editButton} onClick={startEdit}>
+            <button
+              type="button"
+              className={styles.editButton}
+              onClick={startEdit}
+            >
               <PencilLine size={15} strokeWidth={2.4} />
-              <span>Edit profile</span>
+              <span>Profiel bewerken</span>
             </button>
           )}
         </div>
@@ -202,7 +302,7 @@ export default function ProfileInformation({
         <div className={styles.infoGrid}>
           <InfoField
             icon={<LockKeyhole size={14} strokeWidth={2.2} />}
-            label="Reference #"
+            label="Referentie #"
             value={profile.reference}
             draftValue={draftProfile.reference}
             editing={isEditing}
@@ -211,7 +311,7 @@ export default function ProfileInformation({
 
           <InfoField
             icon={<UserRound size={14} strokeWidth={2.2} />}
-            label="Full name"
+            label="Volledige naam"
             value={profile.fullName}
             draftValue={draftProfile.fullName}
             editing={isEditing}
@@ -220,7 +320,7 @@ export default function ProfileInformation({
 
           <InfoField
             icon={<CalendarDays size={14} strokeWidth={2.2} />}
-            label="Birth date"
+            label="Geboortedatum"
             value={profile.birthDate}
             draftValue={draftProfile.birthDate}
             editing={isEditing}
@@ -229,7 +329,7 @@ export default function ProfileInformation({
 
           <InfoField
             icon={<Mail size={14} strokeWidth={2.2} />}
-            label="Email"
+            label="E-mail"
             value={profile.email}
             draftValue={draftProfile.email}
             editing={isEditing}
@@ -239,7 +339,7 @@ export default function ProfileInformation({
 
           <InfoField
             icon={<Languages size={14} strokeWidth={2.2} />}
-            label="Language"
+            label="Taal"
             value={profile.language}
             draftValue={draftProfile.language}
             editing={isEditing}
@@ -248,7 +348,7 @@ export default function ProfileInformation({
 
           <InfoField
             icon={<Phone size={14} strokeWidth={2.2} />}
-            label="Phone"
+            label="Telefoon"
             value={profile.phone}
             draftValue={draftProfile.phone}
             editing={isEditing}
@@ -258,38 +358,44 @@ export default function ProfileInformation({
         </div>
       </section>
 
-      <section className={styles.card}>
-        <div className={styles.passwordHeader}>
-          <h2>Security & Password</h2>
-          <ShieldCheck size={24} strokeWidth={2.2} />
-        </div>
+      <Modal
+        open={Boolean(selectedVerification)}
+        onCancel={closeVerificationModal}
+        footer={null}
+        centered
+        width={520}
+        className={styles.verificationModal}
+      >
+        {selectedVerification ? (
+          <div className={styles.modalContent}>
+            <div className={styles.modalIcon}>
+              <AlertCircle size={30} strokeWidth={2.3} />
+            </div>
 
-        <div className={styles.passwordBlock}>
-          <h3>Change Password</h3>
+            <h3>{selectedVerification.title}</h3>
 
-          <div className={styles.passwordGrid}>
-            <label className={styles.passwordField}>
-              <span>Current password</span>
-              <input type="password" placeholder="********" />
-            </label>
+            <p>{selectedVerification.description}</p>
 
-            <label className={styles.passwordField}>
-              <span>New password</span>
-              <input type="password" placeholder="Min. 12 characters" />
-            </label>
+            <div className={styles.modalActions}>
+              <Button
+                type="primary"
+                className={styles.modalPrimaryButton}
+                onClick={closeVerificationModal}
+              >
+                {selectedVerification.actionLabel}
+              </Button>
 
-            <label className={styles.passwordField}>
-              <span>Confirm password</span>
-              <input type="password" />
-            </label>
+              <Button
+                type="default"
+                className={styles.modalGhostButton}
+                onClick={closeVerificationModal}
+              >
+                Sluiten
+              </Button>
+            </div>
           </div>
-
-          <button type="button" className={styles.updatePasswordButton}>
-            <KeyRound size={15} strokeWidth={2.3} />
-            <span>Update password</span>
-          </button>
-        </div>
-      </section>
+        ) : null}
+      </Modal>
     </div>
   );
 }

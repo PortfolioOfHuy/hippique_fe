@@ -4,6 +4,11 @@
   color: var(--hippique-primary);
 }
 
+.alertList {
+  display: grid;
+  gap: 12px;
+}
+
 .alertBox {
   display: flex;
   align-items: center;
@@ -21,17 +26,125 @@
   }
 
   p {
+    margin: 0;
     color: #ea580c;
     font-size: var(--fs-small);
     font-weight: 600;
     line-height: 1.5;
   }
+}
 
-  a {
-    color: #9a3412;
+.alertLink {
+  display: inline;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #9a3412;
+  font: inherit;
+  font-weight: 800;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+
+  &:hover,
+  &:focus-visible {
+    color: #7c2d12;
+  }
+}
+
+.verificationModal {
+  :global(.ant-modal-content) {
+    padding: 0;
+    overflow: hidden;
+    border-radius: var(--radius-xl);
+    background: #ffffff;
+    box-shadow: 0 28px 70px rgba(10, 25, 47, 0.2);
+  }
+
+  :global(.ant-modal-close) {
+    top: 18px;
+    right: 18px;
+    color: rgba(10, 25, 47, 0.48);
+
+    &:hover {
+      color: var(--hippique-primary);
+    }
+  }
+}
+
+.modalContent {
+  padding: 38px 34px 32px;
+  text-align: center;
+
+  h3 {
+    margin: 18px 0 0;
+    color: var(--hippique-primary);
+    font-size: clamp(24px, 2.2vw, 32px);
     font-weight: 800;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    line-height: 1.12;
+    letter-spacing: -0.03em;
+  }
+
+  p {
+    max-width: 420px;
+    margin: 14px auto 0;
+    color: var(--admin-text-soft);
+    font-size: var(--fs-small);
+    line-height: 1.75;
+  }
+}
+
+.modalIcon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 68px;
+  height: 68px;
+  border-radius: var(--radius-pill);
+  background: rgba(239, 68, 68, 0.1);
+  color: #ef4444;
+}
+
+.modalActions {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.modalPrimaryButton,
+.modalGhostButton {
+  min-height: 44px;
+  padding: 0 22px;
+  border-radius: var(--radius-pill);
+  font-size: var(--fs-caption);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.modalPrimaryButton {
+  border-color: var(--hippique-primary) !important;
+  background: var(--hippique-primary) !important;
+  color: var(--hippique-secondary) !important;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--hippique-tertiary) !important;
+    background: var(--hippique-tertiary) !important;
+    color: #ffffff !important;
+  }
+}
+
+.modalGhostButton {
+  border-color: rgba(10, 25, 47, 0.14) !important;
+  color: var(--hippique-primary) !important;
+
+  &:hover,
+  &:focus-visible {
+    border-color: var(--hippique-secondary) !important;
+    color: var(--hippique-secondary) !important;
   }
 }
 
@@ -121,7 +234,7 @@
 .readinessCard {
   display: flex;
   flex-direction: column;
-  min-height: 336px;
+  min-height: 310px;
   padding: 34px 34px 30px;
   border: 1px solid rgba(10, 25, 47, 0.06);
   border-radius: var(--radius-card);
@@ -141,38 +254,6 @@
     color: var(--admin-text-soft);
     font-size: var(--fs-small);
     line-height: 1.75;
-  }
-
-  button {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: fit-content;
-    min-width: 170px;
-    min-height: 44px;
-    margin-top: auto;
-    padding: 0 22px;
-    border-radius: var(--radius-pill);
-    background: #8a6419;
-    color: #ffffff;
-    font-size: var(--fs-caption);
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    cursor: pointer;
-    box-shadow: inset 0 -2px 0 rgba(10, 25, 47, 0.18);
-    transition:
-      background 0.22s ease,
-      transform 0.22s ease,
-      box-shadow 0.22s ease;
-
-    &:hover,
-    &:focus-visible {
-      background: var(--hippique-tertiary);
-      transform: translateY(-1px);
-      box-shadow: 0 12px 24px rgba(10, 25, 47, 0.12);
-    }
   }
 }
 
@@ -203,22 +284,35 @@
     line-height: 1;
     letter-spacing: 0.08em;
     text-transform: uppercase;
+    white-space: nowrap;
   }
 }
 
-.statusVerified {
-  background: rgba(34, 197, 94, 0.16);
-  color: #15803d;
+.statusUnverified {
+  background: rgba(239, 68, 68, 0.12);
+  color: #dc2626;
 }
 
-.statusPending {
-  background: rgba(245, 158, 11, 0.16);
-  color: #92400e;
-}
+.warningText {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  margin-top: auto;
+  padding-top: 22px;
+  color: #dc2626;
+  font-size: var(--fs-small);
+  font-weight: 700;
+  line-height: 1.55;
 
-.statusActive {
-  background: rgba(34, 197, 94, 0.16);
-  color: #15803d;
+  svg {
+    flex: 0 0 auto;
+    margin-top: 2px;
+    color: #ef4444;
+  }
+
+  span {
+    color: #dc2626;
+  }
 }
 
 .readinessIcon {
@@ -233,8 +327,7 @@
   box-shadow: 0 18px 42px rgba(10, 25, 47, 0.045);
 }
 
-.cardHeader,
-.passwordHeader {
+.cardHeader {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
@@ -273,8 +366,7 @@
 }
 
 .editButton,
-.ghostButton,
-.updatePasswordButton {
+.ghostButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -297,8 +389,7 @@
     box-shadow 0.22s ease;
 }
 
-.editButton,
-.updatePasswordButton {
+.editButton {
   border: 1px solid #8a6419;
   background: #8a6419;
   color: #ffffff;
@@ -396,74 +487,6 @@
   }
 }
 
-.passwordHeader {
-  margin-bottom: 28px;
-
-  svg {
-    color: #8a6419;
-  }
-}
-
-.passwordBlock {
-  h3 {
-    margin: 0 0 28px;
-    color: var(--hippique-primary);
-    font-size: clamp(20px, 1.7vw, 26px);
-    font-weight: 800;
-    line-height: 1.15;
-    letter-spacing: -0.02em;
-  }
-}
-
-.passwordGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 28px 34px;
-  max-width: 1030px;
-}
-
-.passwordField {
-  display: grid;
-  gap: 10px;
-
-  span {
-    color: rgba(10, 25, 47, 0.42);
-    font-size: var(--fs-caption);
-    font-weight: 900;
-    line-height: 1;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-  }
-
-  input {
-    width: 100%;
-    height: 56px;
-    padding: 0 18px;
-    border: 1px solid rgba(10, 25, 47, 0.04);
-    border-radius: var(--radius-input);
-    background: #f3f0ea;
-    color: var(--hippique-primary);
-    font-size: var(--fs-small);
-    outline: none;
-    transition:
-      border-color 0.22s ease,
-      box-shadow 0.22s ease,
-      background 0.22s ease;
-
-    &:focus {
-      border-color: var(--hippique-secondary);
-      background: #ffffff;
-      box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.14);
-    }
-  }
-}
-
-.updatePasswordButton {
-  min-width: 260px;
-  margin: 48px auto 0;
-  display: flex;
-}
-
 @media (max-width: 1199px) {
   .readinessGrid {
     grid-template-columns: 1fr;
@@ -483,19 +506,12 @@
     padding: 34px 28px;
   }
 
-  .infoGrid,
-  .passwordGrid {
+  .infoGrid {
     grid-template-columns: 1fr;
   }
 
-  .cardHeader,
-  .passwordHeader {
+  .cardHeader {
     flex-direction: column;
-  }
-
-  .updatePasswordButton {
-    margin-left: 0;
-    margin-right: 0;
   }
 }
 
@@ -525,23 +541,32 @@
 
   .actionGroup,
   .editButton,
-  .ghostButton,
-  .updatePasswordButton {
+  .ghostButton {
     width: 100%;
   }
 
   .pageHeader h1 {
     font-size: clamp(34px, 10vw, 44px);
   }
+
+  .modalContent {
+  padding: 34px 22px 28px;
+}
+
+.modalActions {
+  display: grid;
+  grid-template-columns: 1fr;
+}
+
+.modalPrimaryButton,
+.modalGhostButton {
+  width: 100%;
+}
 }
 
 @media (max-width: 480px) {
   .readinessTop {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .passwordField input {
-    height: 52px;
   }
 }
