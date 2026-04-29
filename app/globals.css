@@ -23,7 +23,7 @@
 
   --admin-success: #22c55e;
   --admin-warning: #f59e0b;
-  --admin-danger: #ef4444;
+  --admin-danger: #dc2626;
 
   /* Font size */
   --fs-h1: clamp(40px, 4.8vw, 64px);

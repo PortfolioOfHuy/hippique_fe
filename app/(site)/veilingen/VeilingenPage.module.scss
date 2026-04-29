@@ -470,7 +470,6 @@
   min-height: 48px;
   margin-top: 18px;
   padding: 0 18px;
-  color: #ffffff !important;
   border-radius: var(--radius-pill);
   text-decoration: none;
   font-size: var(--fs-small);
@@ -478,6 +477,7 @@
   line-height: 1;
   letter-spacing: 0.08em;
   text-transform: uppercase;
+  color: #ffffff !important;
   transition:
     transform 0.25s ease,
     background 0.25s ease,
@@ -488,41 +488,36 @@
 .cardButton:hover,
 .cardButton:focus-visible {
   transform: translateY(-1px);
+  color: #ffffff !important;
 }
 
-.buttonLive {
+.buttonLive,
+.buttonUpcoming {
   background: var(--hippique-secondary);
   border: 1px solid var(--hippique-secondary);
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .buttonLive:hover,
-.buttonLive:focus-visible {
-  background: var(--hippique-tertiary);
-  border-color: var(--hippique-tertiary);
+.buttonLive:focus-visible,
+.buttonUpcoming:hover,
+.buttonUpcoming:focus-visible {
+  background: var(--hippique-primary);
+  border-color: var(--hippique-primary);
+  color: #ffffff !important;
 }
 
 .buttonEnding {
   background: var(--admin-danger);
   border: 1px solid var(--admin-danger);
-  color: #ffffff;
+  color: #ffffff !important;
 }
 
 .buttonEnding:hover,
 .buttonEnding:focus-visible {
-  background: var(--hippique-tertiary);
-  border-color: var(--hippique-tertiary);
-}
-
-.buttonUpcoming {
-  background: #ffffff;
-  border: 1px solid rgba(197, 160, 89, 0.55);
-  color: var(--hippique-secondary);
-}
-
-.buttonUpcoming:hover,
-.buttonUpcoming:focus-visible {
-  background: rgba(197, 160, 89, 0.08);
+  background: var(--admin-danger);
+  border-color: var(--admin-danger);
+  color: #ffffff !important;
 }
 
 @media (max-width: 1199px) {
