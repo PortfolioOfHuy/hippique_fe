@@ -1,5 +1,15 @@
+"use client";
+
+import { useMemo, useState } from "react";
 import Image from "next/image";
-import { Eye, Gavel, RefreshCcw } from "lucide-react";
+import {
+  Eye,
+  Gavel,
+  RefreshCcw,
+  Search,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 import type { ProfileTabKey } from "./profile-data";
 import styles from "./AuctionTabsPanel.module.scss";
 
@@ -10,6 +20,8 @@ type AuctionStatus =
   | "closed_no_winner"
   | "won"
   | "outbid";
+
+type AuctionFilter = "all" | AuctionStatus;
 
 type AuctionItem = {
   id: string;
@@ -40,18 +52,30 @@ const contentMap = {
     title: "Paardenveilingen",
     description:
       "Bekijk je actieve biedingen, opgeslagen kavels en deelname aan paardenveilingen.",
+    searchPlaceholder: "Zoek op paard, lotnummer of bloedlijn...",
+    emptyTitle: "Geen paardenveilingen gevonden",
+    emptyDescription:
+      "Pas je zoekterm of filter aan om meer paardenveilingen te bekijken.",
   },
   embryoveilingen: {
     kicker: "Mijn veilingen",
     title: "Embryoveilingen",
     description:
       "Volg je geselecteerde embryo’s, biedstatussen en aankomende embryoveilingen.",
+    searchPlaceholder: "Zoek op embryo, lotnummer of combinatie...",
+    emptyTitle: "Geen embryoveilingen gevonden",
+    emptyDescription:
+      "Pas je zoekterm of filter aan om meer embryoveilingen te bekijken.",
   },
   spermaveilingen: {
     kicker: "Mijn veilingen",
     title: "Spermaveilingen",
     description:
       "Beheer je biedingen en interesses voor sperma-aanbiedingen binnen de veiling.",
+    searchPlaceholder: "Zoek op sperma, lotnummer of hengst...",
+    emptyTitle: "Geen spermaveilingen gevonden",
+    emptyDescription:
+      "Pas je zoekterm of filter aan om meer spermaveilingen te bekijken.",
   },
 };
 
@@ -216,6 +240,16 @@ const dataMap: Record<AuctionTabsPanelProps["type"], AuctionItem[]> = {
   ],
 };
 
+const filterOrder: AuctionFilter[] = [
+  "all",
+  "live",
+  "upcoming",
+  "won",
+  "outbid",
+  "closed_no_winner",
+  "closed",
+];
+
 function getStatusLabel(status: AuctionStatus) {
   const labels: Record<AuctionStatus, string> = {
     live: "Live nu",
@@ -227,6 +261,11 @@ function getStatusLabel(status: AuctionStatus) {
   };
 
   return labels[status];
+}
+
+function getFilterLabel(filter: AuctionFilter) {
+  if (filter === "all") return "Alles";
+  return getStatusLabel(filter);
 }
 
 function formatEuro(value: number) {
@@ -257,15 +296,18 @@ function getRelistNoticeText(type: AuctionTabsPanelProps["type"]) {
   > = {
     paardenveilingen: {
       title: "Deze veiling is zonder winnaar geëindigd.",
-      description: "Je kunt dit paard opnieuw aanbieden met een automatisch verlaagde startprijs van",
+      description:
+        "Je kunt dit paard opnieuw aanbieden met een automatisch verlaagde startprijs van",
     },
     embryoveilingen: {
       title: "Deze embryoveiling is zonder winnaar geëindigd.",
-      description: "Je kunt dit embryo opnieuw aanbieden met een automatisch verlaagde startprijs van",
+      description:
+        "Je kunt dit embryo opnieuw aanbieden met een automatisch verlaagde startprijs van",
     },
     spermaveilingen: {
       title: "Deze spermaveiling is zonder winnaar geëindigd.",
-      description: "Je kunt dit sperma opnieuw aanbieden met een automatisch verlaagde startprijs van",
+      description:
+        "Je kunt dit sperma opnieuw aanbieden met een automatisch verlaagde startprijs van",
     },
   };
 
@@ -294,6 +336,59 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
   const content = contentMap[type];
   const items = dataMap[type];
 
+  const [activeFilter, setActiveFilter] = useState<AuctionFilter>("all");
+  const [searchValue, setSearchValue] = useState("");
+
+  const filterOptions = useMemo(() => {
+    return filterOrder
+      .map((filter) => {
+        const count =
+          filter === "all"
+            ? items.length
+            : items.filter((item) => item.status === filter).length;
+
+        return {
+          key: filter,
+          label: getFilterLabel(filter),
+          count,
+        };
+      })
+      .filter((filter) => filter.key === "all" || filter.count > 0);
+  }, [items]);
+
+  const filteredItems = useMemo(() => {
+    const keyword = searchValue.trim().toLowerCase();
+
+    return items.filter((item) => {
+      const matchesStatus =
+        activeFilter === "all" || item.status === activeFilter;
+
+      const searchableText = [
+        item.title,
+        item.subtitle,
+        item.category,
+        item.lotCode,
+        item.currentBid,
+        item.nextBid,
+        item.date,
+        item.time,
+      ]
+        .join(" ")
+        .toLowerCase();
+
+      const matchesSearch = !keyword || searchableText.includes(keyword);
+
+      return matchesStatus && matchesSearch;
+    });
+  }, [activeFilter, items, searchValue]);
+
+  const hasActiveFilter = activeFilter !== "all" || searchValue.trim() !== "";
+
+  function handleResetFilters() {
+    setActiveFilter("all");
+    setSearchValue("");
+  }
+
   return (
     <section className={styles.section}>
       <header className={styles.heading}>
@@ -302,104 +397,171 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
         <p>{content.description}</p>
       </header>
 
-      <div className={styles.list}>
-        {items.map((item) => {
-          const canRelist = item.status === "closed_no_winner";
+      <div className={styles.filterPanel}>
+        <div className={styles.filterHeader}>
+          <div>
+            <span>
+              <SlidersHorizontal size={15} strokeWidth={2.3} />
+              Filter veilingen
+            </span>
+            <strong>
+              {filteredItems.length} van {items.length} resultaten
+            </strong>
+          </div>
 
-          const reducedPrice = item.startPrice
-            ? Math.round(item.startPrice * 0.9)
-            : null;
+          {hasActiveFilter ? (
+            <button
+              type="button"
+              className={styles.resetButton}
+              onClick={handleResetFilters}
+            >
+              <X size={15} strokeWidth={2.4} />
+              Wissen
+            </button>
+          ) : null}
+        </div>
 
-          const relistNotice = getRelistNoticeText(type);
+        <div className={styles.filterControls}>
+          <label className={styles.searchBox}>
+            <Search size={18} strokeWidth={2.2} />
+            <input
+              type="search"
+              value={searchValue}
+              placeholder={content.searchPlaceholder}
+              onChange={(event) => setSearchValue(event.target.value)}
+            />
+          </label>
 
-          return (
-            <article key={item.id} className={styles.card}>
-              <div className={styles.imageWrap}>
-                <Image
-                  src={item.image}
-                  alt={item.title}
-                  width={220}
-                  height={180}
-                  className={styles.image}
-                />
-
-                <span
-                  className={`${styles.statusBadge} ${
-                    styles[`status_${item.status}`]
-                  }`}
-                >
-                  {getStatusLabel(item.status)}
-                </span>
-              </div>
-
-              <div className={styles.cardBody}>
-                <div className={styles.cardTop}>
-                  <div>
-                    <span className={styles.category}>{item.category}</span>
-                    <h3>{item.title}</h3>
-                    <p>{item.subtitle}</p>
-                  </div>
-
-                  <span className={styles.lotCode}>{item.lotCode}</span>
-                </div>
-
-                {canRelist && reducedPrice ? (
-                  <div className={styles.relistNotice}>
-                    <strong>{relistNotice.title}</strong>
-                    <span>
-                      {relistNotice.description} {formatEuro(reducedPrice)}.
-                    </span>
-                  </div>
-                ) : null}
-
-                <div className={styles.metaGrid}>
-                  <div>
-                    <span>Huidig bod</span>
-                    <strong>{item.currentBid}</strong>
-                  </div>
-
-                  <div>
-                    <span>Volgend bod</span>
-                    <strong>{item.nextBid}</strong>
-                  </div>
-
-                  <div>
-                    <span>Datum</span>
-                    <strong>{item.date}</strong>
-                  </div>
-
-                  <div>
-                    <span>Tijd</span>
-                    <strong>{item.time}</strong>
-                  </div>
-                </div>
-
-                <div className={styles.cardActions}>
-                  {canRelist ? (
-                    <a
-                      href={getRelistHref(item, type)}
-                      className={styles.relistAction}
-                    >
-                      <RefreshCcw size={16} strokeWidth={2.2} />
-                      <span>Opnieuw aanbieden</span>
-                    </a>
-                  ) : (
-                    <a href={item.href} className={styles.primaryAction}>
-                      <Gavel size={16} strokeWidth={2.2} />
-                      <span>Bieden bekijken</span>
-                    </a>
-                  )}
-
-                  <a href={item.href} className={styles.secondaryAction}>
-                    <Eye size={16} strokeWidth={2.2} />
-                    <span>Details</span>
-                  </a>
-                </div>
-              </div>
-            </article>
-          );
-        })}
+          <div className={styles.statusFilters} aria-label="Veilingstatus filter">
+            {filterOptions.map((filter) => (
+              <button
+                key={filter.key}
+                type="button"
+                className={`${styles.filterButton} ${
+                  activeFilter === filter.key ? styles.activeFilter : ""
+                }`}
+                onClick={() => setActiveFilter(filter.key)}
+              >
+                <span>{filter.label}</span>
+                <strong>{filter.count}</strong>
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
+
+      {filteredItems.length > 0 ? (
+        <div className={styles.list}>
+          {filteredItems.map((item) => {
+            const canRelist = item.status === "closed_no_winner";
+
+            const reducedPrice = item.startPrice
+              ? Math.round(item.startPrice * 0.9)
+              : null;
+
+            const relistNotice = getRelistNoticeText(type);
+
+            return (
+              <article key={item.id} className={styles.card}>
+                <div className={styles.imageWrap}>
+                  <Image
+                    src={item.image}
+                    alt={item.title}
+                    width={220}
+                    height={180}
+                    className={styles.image}
+                  />
+
+                  <span
+                    className={`${styles.statusBadge} ${
+                      styles[`status_${item.status}`]
+                    }`}
+                  >
+                    {getStatusLabel(item.status)}
+                  </span>
+                </div>
+
+                <div className={styles.cardBody}>
+                  <div className={styles.cardTop}>
+                    <div>
+                      <span className={styles.category}>{item.category}</span>
+                      <h3>{item.title}</h3>
+                      <p>{item.subtitle}</p>
+                    </div>
+
+                    <span className={styles.lotCode}>{item.lotCode}</span>
+                  </div>
+
+                  {canRelist && reducedPrice ? (
+                    <div className={styles.relistNotice}>
+                      <strong>{relistNotice.title}</strong>
+                      <span>
+                        {relistNotice.description} {formatEuro(reducedPrice)}.
+                      </span>
+                    </div>
+                  ) : null}
+
+                  <div className={styles.metaGrid}>
+                    <div>
+                      <span>Huidig bod</span>
+                      <strong>{item.currentBid}</strong>
+                    </div>
+
+                    <div>
+                      <span>Volgend bod</span>
+                      <strong>{item.nextBid}</strong>
+                    </div>
+
+                    <div>
+                      <span>Datum</span>
+                      <strong>{item.date}</strong>
+                    </div>
+
+                    <div>
+                      <span>Tijd</span>
+                      <strong>{item.time}</strong>
+                    </div>
+                  </div>
+
+                  <div className={styles.cardActions}>
+                    {canRelist ? (
+                      <a
+                        href={getRelistHref(item, type)}
+                        className={styles.relistAction}
+                      >
+                        <RefreshCcw size={16} strokeWidth={2.2} />
+                        <span>Opnieuw aanbieden</span>
+                      </a>
+                    ) : (
+                      <a href={item.href} className={styles.primaryAction}>
+                        <Gavel size={16} strokeWidth={2.2} />
+                        <span>Bieden bekijken</span>
+                      </a>
+                    )}
+
+                    <a href={item.href} className={styles.secondaryAction}>
+                      <Eye size={16} strokeWidth={2.2} />
+                      <span>Details</span>
+                    </a>
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      ) : (
+        <div className={styles.emptyState}>
+          <div>
+            <Search size={24} strokeWidth={2.2} />
+          </div>
+          <h3>{content.emptyTitle}</h3>
+          <p>{content.emptyDescription}</p>
+
+          <button type="button" onClick={handleResetFilters}>
+            Filters wissen
+          </button>
+        </div>
+      )}
     </section>
   );
 }

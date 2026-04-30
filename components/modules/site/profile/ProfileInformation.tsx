@@ -152,11 +152,6 @@ export default function ProfileInformation({
         </div>
       ) : null}
 
-      <header className={styles.pageHeader}>
-        <h1>Mijn profiel</h1>
-        <p>Persoonlijke gegevens en accountbeheer</p>
-      </header>
-
       <section className={styles.requirementBox}>
         <div className={styles.requirementIcon}>
           <Settings size={24} strokeWidth={2.4} />
