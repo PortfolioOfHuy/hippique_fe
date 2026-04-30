@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { Heart, MapPin, CalendarDays } from "lucide-react";
 import { horses } from "@/components/modules/site/home/data/horses";
@@ -15,6 +15,8 @@ type TopTabKey =
   | "results";
 
 type CategoryKey = "paarden" | "embryos" | "sperma";
+
+type CountdownMap = Record<string, number>;
 
 function getHorseHref(category: string, slug: string) {
   if (category === "elite") {
@@ -88,10 +90,27 @@ function getTimeLabel(category: string) {
   return "Eindigt over";
 }
 
-function getTimeValue(category: string) {
-  if (category === "ending-soon") return "00:08:42";
-  if (category === "newly-listed") return "2d 08u";
-  return "04:12:35";
+function getInitialCountdownSeconds(category: string) {
+  if (category === "ending-soon") return 8 * 60 + 42;
+  if (category === "newly-listed") return 2 * 24 * 60 * 60 + 8 * 60 * 60;
+  return 4 * 60 * 60 + 12 * 60 + 35;
+}
+
+function formatCountdown(totalSeconds: number) {
+  const safeSeconds = Math.max(0, totalSeconds);
+
+  const days = Math.floor(safeSeconds / 86400);
+  const hours = Math.floor((safeSeconds % 86400) / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const seconds = safeSeconds % 60;
+
+  const pad = (value: number) => String(value).padStart(2, "0");
+
+  if (days > 0) {
+    return `${days}d ${pad(hours)}u ${pad(minutes)}m`;
+  }
+
+  return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
 function getLocation(category: string) {
@@ -125,6 +144,7 @@ const categoryTabs: Array<{
 export default function VeilingenPage() {
   const [activeTopTab, setActiveTopTab] = useState<TopTabKey>("all");
   const [activeCategory, setActiveCategory] = useState<CategoryKey>("paarden");
+  const [countdowns, setCountdowns] = useState<CountdownMap>({});
 
   const auctionItems = useMemo(() => {
     return horses
@@ -141,6 +161,39 @@ export default function VeilingenPage() {
       })
       .slice(0, 9);
   }, [activeTopTab, activeCategory]);
+
+  useEffect(() => {
+    setCountdowns((prevCountdowns) => {
+      const nextCountdowns: CountdownMap = {};
+
+      auctionItems.forEach((horse) => {
+        const key = String(horse.id);
+
+        nextCountdowns[key] =
+          prevCountdowns[key] ?? getInitialCountdownSeconds(horse.category);
+      });
+
+      return nextCountdowns;
+    });
+  }, [auctionItems]);
+
+  useEffect(() => {
+    const timer = window.setInterval(() => {
+      setCountdowns((prevCountdowns) => {
+        const nextCountdowns: CountdownMap = {};
+
+        Object.entries(prevCountdowns).forEach(([key, value]) => {
+          nextCountdowns[key] = Math.max(0, value - 1);
+        });
+
+        return nextCountdowns;
+      });
+    }, 1000);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, []);
 
   return (
     <main className={styles.page}>
@@ -298,6 +351,10 @@ export default function VeilingenPage() {
             {auctionItems.map((horse) => {
               const variant = getCardVariant(horse.category);
               const href = getHorseHref(horse.category, horse.slug);
+              const countdownKey = String(horse.id);
+              const countdownValue =
+                countdowns[countdownKey] ??
+                getInitialCountdownSeconds(horse.category);
 
               return (
                 <article
@@ -374,7 +431,7 @@ export default function VeilingenPage() {
                               : ""
                           }`}
                         >
-                          {getTimeValue(horse.category)}
+                          {formatCountdown(countdownValue)}
                         </strong>
                       </div>
                     </div>

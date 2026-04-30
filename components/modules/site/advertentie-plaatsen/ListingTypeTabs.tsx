@@ -62,11 +62,6 @@ export default function ListingTypeTabs({
           );
         })}
       </div>
-
-      <div className={styles.info}>
-        <span>Omschrijving</span>
-        <p>{description}</p>
-      </div>
     </div>
   );
 }
