@@ -2150,3 +2150,66 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Vervang alleen het bestaande currency-blok door dit blok. De rest van EliteDetailPage.module.scss blijft hetzelfde. */
+.currencyRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  border-radius: var(--radius-card);
+  background: rgba(10, 25, 47, 0.03);
+
+  span {
+    color: var(--admin-text-muted);
+    font-size: var(--fs-caption);
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+}
+
+.currencySelect {
+  min-width: 190px;
+
+  :global(.ant-select-selector) {
+    min-height: 38px !important;
+    border-radius: var(--radius-button) !important;
+    border-color: rgba(10, 25, 47, 0.12) !important;
+    box-shadow: none !important;
+  }
+
+  :global(.ant-select-selection-item) {
+    color: var(--hippique-primary);
+    font-size: var(--fs-small);
+    font-weight: 800;
+  }
+}
+
+.currencyDropdown {
+  min-width: 230px !important;
+
+  :global(.ant-select-item-option-selected) {
+    background: rgba(197, 160, 89, 0.12) !important;
+  }
+
+  :global(.ant-select-item-option-content) {
+    font-weight: 700;
+  }
+}
+
+@media (max-width: 575px) {
+  .currencyRow {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .currencySelect {
+    width: 100%;
+    min-width: 0;
+  }
+}

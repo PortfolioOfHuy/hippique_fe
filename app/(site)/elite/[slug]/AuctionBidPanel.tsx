@@ -15,7 +15,19 @@ import {
 } from "lucide-react";
 import styles from "./EliteDetailPage.module.scss";
 
-type CurrencyCode = "EUR" | "USD" | "GBP" | "VND";
+type CurrencyCode =
+  | "EUR"
+  | "GBP"
+  | "CHF"
+  | "SEK"
+  | "NOK"
+  | "DKK"
+  | "PLN"
+  | "CZK"
+  | "HUF"
+  | "RON"
+  | "BGN"
+  | "ISK";
 
 type PopupType = "outbid" | "endingSoon" | "won";
 
@@ -24,7 +36,7 @@ type AuctionBidPanelProps = {
     title: string;
     image: string;
     imageAlt: string;
-    bid: string;
+    bid?: string | number | null;
     slug: string;
     breed?: string;
   };
@@ -33,51 +45,149 @@ type AuctionBidPanelProps = {
 const currencyOptions: Array<{
   value: CurrencyCode;
   label: string;
+  name: string;
   symbol: string;
   rate: number;
+  locale: string;
+  position?: "before" | "after";
 }> = [
   {
     value: "EUR",
     label: "EUR",
+    name: "Euro",
     symbol: "€",
     rate: 1,
-  },
-  {
-    value: "USD",
-    label: "USD",
-    symbol: "$",
-    rate: 1.08,
+    locale: "nl-NL",
+    position: "before",
   },
   {
     value: "GBP",
     label: "GBP",
+    name: "Britse pond",
     symbol: "£",
     rate: 0.86,
+    locale: "en-GB",
+    position: "before",
   },
   {
-    value: "VND",
-    label: "VND",
-    symbol: "₫",
-    rate: 27000,
+    value: "CHF",
+    label: "CHF",
+    name: "Zwitserse frank",
+    symbol: "CHF",
+    rate: 0.95,
+    locale: "de-CH",
+    position: "before",
+  },
+  {
+    value: "SEK",
+    label: "SEK",
+    name: "Zweedse kroon",
+    symbol: "kr",
+    rate: 11.2,
+    locale: "sv-SE",
+    position: "after",
+  },
+  {
+    value: "NOK",
+    label: "NOK",
+    name: "Noorse kroon",
+    symbol: "kr",
+    rate: 11.7,
+    locale: "nb-NO",
+    position: "after",
+  },
+  {
+    value: "DKK",
+    label: "DKK",
+    name: "Deense kroon",
+    symbol: "kr",
+    rate: 7.46,
+    locale: "da-DK",
+    position: "after",
+  },
+  {
+    value: "PLN",
+    label: "PLN",
+    name: "Poolse złoty",
+    symbol: "zł",
+    rate: 4.33,
+    locale: "pl-PL",
+    position: "after",
+  },
+  {
+    value: "CZK",
+    label: "CZK",
+    name: "Tsjechische kroon",
+    symbol: "Kč",
+    rate: 25.05,
+    locale: "cs-CZ",
+    position: "after",
+  },
+  {
+    value: "HUF",
+    label: "HUF",
+    name: "Hongaarse forint",
+    symbol: "Ft",
+    rate: 393,
+    locale: "hu-HU",
+    position: "after",
+  },
+  {
+    value: "RON",
+    label: "RON",
+    name: "Roemeense leu",
+    symbol: "lei",
+    rate: 4.97,
+    locale: "ro-RO",
+    position: "after",
+  },
+  {
+    value: "BGN",
+    label: "BGN",
+    name: "Bulgaarse lev",
+    symbol: "лв",
+    rate: 1.96,
+    locale: "bg-BG",
+    position: "after",
+  },
+  {
+    value: "ISK",
+    label: "ISK",
+    name: "IJslandse kroon",
+    symbol: "kr",
+    rate: 151,
+    locale: "is-IS",
+    position: "after",
   },
 ];
 
-function parseEuroAmount(value: string) {
-  const cleaned = value.replace(/[^\d]/g, "");
+function parseEuroAmount(value?: string | number | null) {
+  if (typeof value === "number") {
+    return Number.isFinite(value) ? value : 0;
+  }
+
+  if (!value) {
+    return 0;
+  }
+
+  const cleaned = String(value).replace(/[^\d]/g, "");
   const amount = Number(cleaned);
 
   return Number.isFinite(amount) ? amount : 0;
 }
 
 function formatCurrency(amount: number, currency: CurrencyCode) {
-  const option = currencyOptions.find((item) => item.value === currency);
-  const symbol = option?.symbol ?? "€";
+  const option =
+    currencyOptions.find((item) => item.value === currency) ??
+    currencyOptions[0];
 
-  if (currency === "VND") {
-    return `${Math.round(amount).toLocaleString("vi-VN")} ${symbol}`;
+  const formattedNumber = Math.round(amount).toLocaleString(option.locale);
+
+  if (option.position === "after") {
+    return `${formattedNumber} ${option.symbol}`;
   }
 
-  return `${symbol}${Math.round(amount).toLocaleString("nl-NL")}`;
+  return `${option.symbol} ${formattedNumber}`;
 }
 
 export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
@@ -88,8 +198,10 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
   const [popupIndex, setPopupIndex] = useState(0);
 
   const currentBidBase = useMemo(() => {
-    return parseEuroAmount(horse.bid);
-  }, [horse.bid]);
+    const parsedBid = parseEuroAmount(horse?.bid);
+
+    return parsedBid > 0 ? parsedBid : 64500;
+  }, [horse?.bid]);
 
   const selectedCurrency = useMemo(() => {
     return (
@@ -98,11 +210,13 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
     );
   }, [currency]);
 
+  const minimumBidBase = currentBidBase + 500;
+
   const convertedCurrentBid = currentBidBase * selectedCurrency.rate;
   const convertedLastBid = 12000 * selectedCurrency.rate;
   const convertedWinningBid = 18000 * selectedCurrency.rate;
   const convertedMaxBid = 9000 * selectedCurrency.rate;
-  const convertedMinimumBid = 65500 * selectedCurrency.rate;
+  const convertedMinimumBid = minimumBidBase * selectedCurrency.rate;
 
   const formattedCurrentBid = formatCurrency(convertedCurrentBid, currency);
   const formattedLastBid = formatCurrency(convertedLastBid, currency);
@@ -120,7 +234,7 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
   }
 
   function addQuickBid(amount: number) {
-    const currentAmount = Number(bidAmount.replace(/[^\d]/g, ""));
+    const currentAmount = Number(String(bidAmount).replace(/[^\d]/g, ""));
     const nextAmount = Number.isFinite(currentAmount)
       ? currentAmount + amount
       : amount;
@@ -444,7 +558,7 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
             onChange={(value: CurrencyCode) => setCurrency(value)}
             options={currencyOptions.map((item) => ({
               value: item.value,
-              label: `${item.label} ${item.symbol}`,
+              label: `${item.label} · ${item.name}`,
             }))}
             className={styles.currencySelect}
             classNames={{
@@ -465,7 +579,10 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
             type="text"
             value={bidAmount}
             onChange={(event) => setBidAmount(event.target.value)}
-            placeholder="Voer biedbedrag in"
+            placeholder={`Vanaf ${formatCurrency(
+              minimumBidBase * selectedCurrency.rate,
+              currency,
+            )}`}
             className={styles.bidInput}
           />
         </div>
@@ -506,7 +623,8 @@ export default function AuctionBidPanel({ horse }: AuctionBidPanelProps) {
 
         <p className={styles.bidNote}>
           *Door te bieden ga je akkoord met de veilingvoorwaarden. Alle biedingen
-          zijn exclusief btw en transportkosten.
+          zijn exclusief btw en transportkosten. Bedragen worden omgerekend
+          vanuit EUR. Alleen Europese valuta zijn beschikbaar voor deze veiling.
         </p>
       </div>
 
