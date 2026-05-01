@@ -59,7 +59,6 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "Elite", href: "/elite" },
   { label: "Veilingen", href: "/veilingen" },
-  { label: "Favorieten", href: "/favorieten" },
   { label: "Nieuws", href: "/nieuws" },
   { label: "Contact", href: "/contact" },
 ];
