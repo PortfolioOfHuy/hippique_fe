@@ -37,7 +37,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: clamp(16px, 1.6vw, 28px);
+  gap: clamp(12px, 1.2vw, 22px);
 }
 
 .navLink,
@@ -50,7 +50,7 @@
   height: 88px;
   color: var(--hippique-neutral);
   text-decoration: none;
-  font-size: 18px;
+  font-size: 17px;
   font-weight: 500;
   line-height: 1;
   white-space: nowrap;
@@ -96,7 +96,8 @@
 .desktopActions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 
 .languageDropdown,
@@ -584,10 +585,9 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: #ffffff !important;
-  min-width: 112px;
+  min-width: 104px;
   height: 44px;
-  padding: 0 18px;
+  padding: 0 16px;
   border-radius: var(--radius-button);
   text-decoration: none;
   font-size: var(--fs-body);
@@ -1001,7 +1001,7 @@
   .navLink,
   .navLink:link,
   .navLink:visited {
-    font-size: 17px;
+    font-size: 16px;
   }
 
   .registerButton,

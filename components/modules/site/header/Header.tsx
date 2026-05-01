@@ -8,6 +8,7 @@ import {
   Check,
   ChevronDown,
   Globe,
+  Heart,
   LogOut,
   Menu,
   PlusCircle,
@@ -58,6 +59,7 @@ const navItems = [
   { label: "Home", href: "/" },
   { label: "Elite", href: "/elite" },
   { label: "Veilingen", href: "/veilingen" },
+  { label: "Favorieten", href: "/favorieten" },
   { label: "Nieuws", href: "/nieuws" },
   { label: "Contact", href: "/contact" },
 ];
@@ -903,6 +905,14 @@ export default function Header() {
                 </HeaderLink>
 
                 <HeaderLink
+                  href="/favorieten"
+                  className={styles.profileDropdownItem}
+                >
+                  <Heart size={17} strokeWidth={2.1} />
+                  <span>Mijn favorieten</span>
+                </HeaderLink>
+
+                <HeaderLink
                   href="/advertentie-plaatsen"
                   className={styles.profileDropdownItem}
                 >
@@ -1085,6 +1095,15 @@ export default function Header() {
             >
               <UserRound size={18} strokeWidth={2} />
               <span>Mijn profiel</span>
+            </HeaderLink>
+
+            <HeaderLink
+              href="/favorieten"
+              className={styles.mobileProfileButton}
+              onClick={() => setMobileOpen(false)}
+            >
+              <Heart size={18} strokeWidth={2} />
+              <span>Mijn favorieten</span>
             </HeaderLink>
 
             <HeaderLink
