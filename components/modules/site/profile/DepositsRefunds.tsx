@@ -1,6 +1,6 @@
 "use client";
 
-import { Plus, Undo2 } from "lucide-react";
+import { Plus, BanknoteArrowDown } from "lucide-react";
 import styles from "./DepositsRefunds.module.scss";
 
 type DepositSummaryItem = {
@@ -242,7 +242,7 @@ export default function DepositsRefunds() {
               aria-label="Terugbetaling aanvragen"
               title="Terugbetaling aanvragen"
             >
-              <Undo2 size={16} strokeWidth={2.4} />
+              <BanknoteArrowDown size={16} strokeWidth={2.4} />
             </button>
           </div>
 

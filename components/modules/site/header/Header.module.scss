@@ -96,7 +96,7 @@
 .desktopActions {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .languageDropdown,
@@ -178,6 +178,16 @@
   border-radius: var(--radius-button);
   background: rgba(255, 255, 255, 0.02);
   color: var(--hippique-neutral);
+}
+
+.profileIconButton {
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.profileIconButtonOpen {
+  border-color: var(--hippique-secondary);
+  color: var(--hippique-secondary);
+  background: rgba(197, 160, 89, 0.08);
 }
 
 .languageToggleButton:hover,
@@ -574,20 +584,22 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-width: 132px;
+  color: #ffffff !important;
+  min-width: 112px;
   height: 44px;
-  padding: 0 22px;
+  padding: 0 18px;
   border-radius: var(--radius-button);
   text-decoration: none;
-  font-size: var(--fs-body-lg);
-  font-weight: 600;
+  font-size: var(--fs-body);
+  font-weight: 700;
   line-height: 1;
   white-space: nowrap;
   transition:
     background 0.25s ease,
     border-color 0.25s ease,
     color 0.25s ease,
-    transform 0.25s ease;
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
 }
 
 .registerButton {
@@ -607,6 +619,7 @@
   background: var(--hippique-secondary);
   border: 1px solid var(--hippique-secondary);
   color: var(--hippique-primary);
+  box-shadow: 0 10px 22px rgba(197, 160, 89, 0.16);
 }
 
 .loginButton:hover,
@@ -993,10 +1006,10 @@
 
   .registerButton,
   .loginButton {
-    min-width: 124px;
+    min-width: 104px;
     height: 42px;
-    padding: 0 18px;
-    font-size: var(--fs-body);
+    padding: 0 16px;
+    font-size: var(--fs-small);
   }
 
   .languageToggleButton {

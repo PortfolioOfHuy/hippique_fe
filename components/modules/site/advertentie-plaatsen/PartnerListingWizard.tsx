@@ -72,6 +72,25 @@ export default function PartnerListingWizard() {
 
   return (
     <div className={styles.wrapper}>
+      <section className={styles.stepProgress} aria-label="Voortgang">
+        <div className={styles.stepProgressTop}>
+          <span>Stap 01 / 03</span>
+          <span>Bezig</span>
+        </div>
+
+        <div className={styles.stepProgressBars}>
+          <span className={styles.stepBarActive} />
+          <span />
+          <span />
+        </div>
+
+        <div className={styles.stepProgressLabels}>
+          <span className={styles.stepLabelActive}>Informatie & media</span>
+          <span>Voorbeeld</span>
+          <span>Betaling</span>
+        </div>
+      </section>
+
       <div className={styles.sectionHeading}>
         <span>02</span>
         <h2>Partnerinformatie</h2>
@@ -322,7 +341,10 @@ function TextField({
   placeholder?: string;
   type?: string;
 }) {
-  const inputId = label.toLowerCase().replaceAll(" ", "-");
+  const inputId = label
+    .toLowerCase()
+    .replaceAll("/", "")
+    .replaceAll(" ", "-");
 
   return (
     <div className={styles.field}>

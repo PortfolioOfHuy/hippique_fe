@@ -1,7 +1,83 @@
 .wrapper {
+  width: min(1180px, calc(100% - 48px));
+  margin: 0 auto;
   display: flex;
   flex-direction: column;
   gap: 28px;
+}
+
+.stepProgress {
+  padding: 20px 0 4px;
+}
+
+.stepProgressTop,
+.stepProgressLabels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.stepProgressTop {
+  margin-bottom: 16px;
+
+  span {
+    color: #8a6419;
+    font-size: var(--fs-caption);
+    font-weight: 900;
+    line-height: 1.2;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  span:last-child {
+    grid-column: 3;
+    text-align: right;
+  }
+}
+
+.stepProgressBars {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+
+  span {
+    display: block;
+    height: 4px;
+    border-radius: var(--radius-pill);
+    background: rgba(10, 25, 47, 0.1);
+  }
+
+  .stepBarActive {
+    background: var(--hippique-secondary);
+  }
+}
+
+.stepProgressLabels {
+  margin-top: 14px;
+
+  span {
+    min-width: 0;
+    color: rgba(10, 25, 47, 0.28);
+    font-size: var(--fs-caption);
+    font-weight: 900;
+    line-height: 1.25;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    white-space: nowrap;
+  }
+
+  span:nth-child(2) {
+    text-align: left;
+  }
+
+  span:nth-child(3) {
+    text-align: left;
+  }
+
+  .stepLabelActive {
+    color: #8a6419;
+  }
 }
 
 .sectionHeading {
@@ -9,6 +85,7 @@
   display: flex;
   align-items: center;
   gap: 14px;
+  min-width: 0;
 
   span {
     width: 40px;
@@ -25,9 +102,13 @@
   }
 
   h2 {
+    min-width: 0;
     margin: 0;
-    font-size: clamp(26px, 2.4vw, 38px);
-    line-height: 1.1;
+    color: var(--hippique-primary);
+    font-size: clamp(30px, 3vw, 44px);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.05em;
   }
 }
 
@@ -49,16 +130,20 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 20px;
+  min-width: 0;
 
   h3 {
-    margin-top: 6px;
-    font-size: clamp(24px, 2.2vw, 34px);
-    line-height: 1.15;
+    margin: 6px 0 0;
+    color: var(--hippique-primary);
+    font-size: clamp(28px, 2.8vw, 42px);
+    font-weight: 900;
+    line-height: 1.08;
+    letter-spacing: -0.05em;
   }
 
   p {
     max-width: 760px;
-    margin-top: 8px;
+    margin: 8px 0 0;
     color: rgba(10, 25, 47, 0.66);
     font-size: var(--fs-small);
     line-height: 1.7;
@@ -76,6 +161,7 @@
 }
 
 .statusBadge {
+  flex: 0 0 auto;
   min-height: 38px;
   padding: 0 14px;
   border-radius: var(--radius-pill);
@@ -86,6 +172,7 @@
   gap: 8px;
   font-size: 12px;
   font-weight: 900;
+  line-height: 1;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   white-space: nowrap;
@@ -102,6 +189,7 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  min-width: 0;
 }
 
 .logoUpload {
@@ -115,6 +203,15 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease;
+
+  &:hover,
+  &:focus-within {
+    border-color: rgba(197, 160, 89, 0.48);
+    background: rgba(197, 160, 89, 0.07);
+  }
 
   input {
     position: absolute;
@@ -151,6 +248,7 @@
 }
 
 .uploadedFile {
+  min-width: 0;
   padding: 12px 14px;
   border-radius: var(--radius-md);
   background: rgba(197, 160, 89, 0.1);
@@ -160,9 +258,21 @@
   gap: 8px;
   font-size: var(--fs-small);
   font-weight: 800;
+
+  svg {
+    flex: 0 0 16px;
+  }
+
+  span {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
 }
 
 .formGrid {
+  min-width: 0;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px 28px;
@@ -173,6 +283,7 @@
 }
 
 .field {
+  min-width: 0;
   display: flex;
   flex-direction: column;
   gap: 9px;
@@ -181,6 +292,7 @@
     color: rgba(10, 25, 47, 0.62);
     font-size: 12px;
     font-weight: 900;
+    line-height: 1.25;
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
@@ -195,7 +307,22 @@
     border: 1px solid rgba(10, 25, 47, 0.08);
     background: rgba(245, 242, 237, 0.68);
     color: var(--hippique-primary);
+    font-size: var(--fs-small);
+    font-weight: 700;
+    line-height: 1.45;
     outline: none;
+    transition:
+      border-color 0.22s ease,
+      background 0.22s ease,
+      box-shadow 0.22s ease;
+  }
+
+  input:focus,
+  select:focus,
+  textarea:focus {
+    border-color: rgba(197, 160, 89, 0.58);
+    background: #ffffff;
+    box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.12);
   }
 
   textarea {
@@ -209,13 +336,17 @@
   margin-bottom: 28px;
 
   h3 {
+    margin: 0;
+    color: var(--hippique-primary);
     font-size: clamp(36px, 4vw, 64px);
+    font-weight: 900;
     line-height: 1.05;
     letter-spacing: -0.04em;
   }
 
   p {
-    margin-top: 10px;
+    margin: 10px auto 0;
+    max-width: 620px;
     color: rgba(10, 25, 47, 0.72);
     font-size: var(--fs-body-lg);
     line-height: 1.6;
@@ -229,6 +360,7 @@
 }
 
 .partnerLogoCard {
+  min-width: 0;
   min-height: 96px;
   padding: 18px;
   border-radius: var(--radius-md);
@@ -246,9 +378,13 @@
   }
 
   span {
+    max-width: 100%;
     color: rgba(10, 25, 47, 0.72);
     font-size: 17px;
-    font-weight: 700;
+    font-weight: 800;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 }
 
@@ -258,7 +394,6 @@
   border-radius: var(--radius-lg);
   background: rgba(10, 25, 47, 0.03);
   border: 1px solid rgba(10, 25, 47, 0.06);
-
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 14px;
@@ -277,6 +412,7 @@
     }
 
     span {
+      min-width: 0;
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
@@ -286,13 +422,17 @@
 
 .publishText {
   h3 {
+    margin: 0;
+    color: var(--hippique-primary);
     font-size: clamp(24px, 2.2vw, 34px);
+    font-weight: 900;
     line-height: 1.15;
+    letter-spacing: -0.04em;
   }
 
   p {
     max-width: 760px;
-    margin-top: 8px;
+    margin: 8px 0 0;
     color: rgba(10, 25, 47, 0.66);
     font-size: var(--fs-small);
     line-height: 1.7;
@@ -320,21 +460,26 @@
   width: 100%;
   min-height: 56px;
   margin-top: 22px;
+  border: 0;
   border-radius: var(--radius-button);
   background: var(--hippique-primary);
   color: #ffffff;
-
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 10px;
-
   font-size: 14px;
   font-weight: 900;
+  line-height: 1;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   cursor: pointer;
   box-shadow: 0 16px 34px rgba(10, 25, 47, 0.18);
+  transition:
+    background 0.22s ease,
+    color 0.22s ease,
+    transform 0.22s ease,
+    box-shadow 0.22s ease;
 
   &:disabled {
     opacity: 0.45;
@@ -342,13 +487,25 @@
     box-shadow: none;
   }
 
-  &:not(:disabled):hover {
+  &:not(:disabled):hover,
+  &:not(:disabled):focus-visible {
     background: var(--hippique-secondary);
     color: var(--hippique-primary);
+    transform: translateY(-1px);
+  }
+}
+
+@media (max-width: 1199px) {
+  .wrapper {
+    width: min(100%, calc(100% - 40px));
   }
 }
 
 @media (max-width: 991px) {
+  .wrapper {
+    width: calc(100% - 32px);
+  }
+
   .card,
   .previewCard,
   .publishCard {
@@ -357,6 +514,10 @@
 
   .intro {
     flex-direction: column;
+  }
+
+  .statusBadge {
+    width: fit-content;
   }
 
   .formLayout {
@@ -375,9 +536,47 @@
   .partnerPreviewRow {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+
+  .stepProgressTop span,
+  .stepProgressLabels span {
+    letter-spacing: 0.16em;
+  }
 }
 
 @media (max-width: 640px) {
+  .wrapper {
+    width: calc(100% - 24px);
+    gap: 22px;
+  }
+
+  .stepProgress {
+    padding-top: 12px;
+  }
+
+  .stepProgressTop {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .stepProgressTop span,
+  .stepProgressLabels span {
+    font-size: 10px;
+    letter-spacing: 0.1em;
+  }
+
+  .stepProgressBars {
+    gap: 6px;
+  }
+
+  .stepProgressLabels {
+    gap: 6px;
+  }
+
+  .stepProgressLabels span {
+    white-space: normal;
+  }
+
   .sectionHeading {
     align-items: flex-start;
 
@@ -386,12 +585,21 @@
       height: 36px;
       flex-basis: 36px;
     }
+
+    h2 {
+      font-size: clamp(28px, 9vw, 38px);
+    }
   }
 
   .card,
   .previewCard,
   .publishCard {
+    padding: 18px;
     border-radius: var(--radius-lg);
+  }
+
+  .intro h3 {
+    font-size: clamp(28px, 8.4vw, 36px);
   }
 
   .partnerPreviewRow {
@@ -404,9 +612,24 @@
     h3 {
       font-size: clamp(32px, 10vw, 44px);
     }
+
+    p {
+      margin-left: 0;
+      margin-right: 0;
+    }
   }
 
   .statusBadge {
     white-space: normal;
+    line-height: 1.25;
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+
+  .submitButton {
+    min-height: 54px;
+    padding: 0 14px;
+    font-size: 12px;
+    line-height: 1.25;
   }
 }

@@ -8,12 +8,10 @@ import {
   Check,
   ChevronDown,
   Globe,
-  LogIn,
   LogOut,
   Menu,
   PlusCircle,
   RotateCcw,
-  UserPlus,
   UserRound,
   X,
 } from "lucide-react";
@@ -408,9 +406,9 @@ export default function Header() {
 
   /**
    * TODO: Khi có auth thật, thay 2 giá trị này bằng session/user data.
-   * Ví dụ: const profileName = session?.user?.name || "Gast";
+   * Ví dụ: const profileName = session?.user?.name || "Gastgebruiker";
    */
-  const profileName = "Guest User";
+  const profileName = "Gastgebruiker";
   const profileInitials = getUserInitials(profileName);
 
   const languageOptions = useMemo<LanguageWithTimezone[]>(() => {
@@ -857,11 +855,19 @@ export default function Header() {
               </div>
             </div>
 
+            <HeaderLink href="/registreren" className={styles.registerButton}>
+              Registreren
+            </HeaderLink>
+
+            <HeaderLink href="/inloggen" className={styles.loginButton}>
+              Inloggen
+            </HeaderLink>
+
             <div className={styles.profileDropdown} ref={profileRef}>
               <button
                 type="button"
-                className={`${styles.profileButton} ${
-                  profileOpen ? styles.profileButtonOpen : ""
+                className={`${styles.profileIconButton} ${
+                  profileOpen ? styles.profileIconButtonOpen : ""
                 }`}
                 aria-label="Accountmenu openen"
                 aria-expanded={profileOpen}
@@ -871,17 +877,7 @@ export default function Header() {
                   setTimezoneOpen(false);
                 }}
               >
-                <span className={styles.profileAvatar}>{profileInitials}</span>
-
-                <span className={styles.profileButtonText}>
-                  <span className={styles.profileButtonName}>{profileName}</span>
-                </span>
-
-                <ChevronDown
-                  size={15}
-                  strokeWidth={2.2}
-                  className={styles.profileButtonChevron}
-                />
+                <UserRound size={19} strokeWidth={2.1} />
               </button>
 
               <div
@@ -915,22 +911,6 @@ export default function Header() {
                 </HeaderLink>
 
                 <div className={styles.profileDropdownDivider} />
-
-                <HeaderLink
-                  href="/inloggen"
-                  className={`${styles.profileDropdownItem} ${styles.profileDropdownLogin}`}
-                >
-                  <LogIn size={17} strokeWidth={2.1} />
-                  <span>Inloggen</span>
-                </HeaderLink>
-
-                <HeaderLink
-                  href="/registreren"
-                  className={`${styles.profileDropdownItem} ${styles.profileDropdownRegister}`}
-                >
-                  <UserPlus size={17} strokeWidth={2.1} />
-                  <span>Registreren</span>
-                </HeaderLink>
 
                 <HeaderLink
                   href="/inloggen"
@@ -1117,12 +1097,11 @@ export default function Header() {
             </HeaderLink>
 
             <HeaderLink
-              href="/opnieuw-verkopen"
-              className={styles.mobileProfileButton}
+              href="/registreren"
+              className={styles.registerButton}
               onClick={() => setMobileOpen(false)}
             >
-              <RotateCcw size={18} strokeWidth={2} />
-              <span>Opnieuw verkopen</span>
+              Registreren
             </HeaderLink>
 
             <HeaderLink
@@ -1131,14 +1110,6 @@ export default function Header() {
               onClick={() => setMobileOpen(false)}
             >
               Inloggen
-            </HeaderLink>
-
-            <HeaderLink
-              href="/registreren"
-              className={styles.registerButton}
-              onClick={() => setMobileOpen(false)}
-            >
-              Registreren
             </HeaderLink>
 
             <HeaderLink
