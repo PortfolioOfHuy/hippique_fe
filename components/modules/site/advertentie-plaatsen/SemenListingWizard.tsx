@@ -7,8 +7,11 @@ import {
   ArrowRight,
   Banknote,
   CheckCircle2,
+  CirclePlay,
   FileText,
+  Heart,
   ImageIcon,
+  Share2,
   ShieldCheck,
 } from "lucide-react";
 import styles from "./SemenListingWizard.module.scss";
@@ -135,6 +138,8 @@ export default function SemenListingWizard() {
     supportingDocuments: null,
   });
 
+  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
+
   function updateField<K extends keyof SemenFormState>(
     key: K,
     value: SemenFormState[K],
@@ -153,6 +158,10 @@ export default function SemenListingWizard() {
       ...prev,
       [key]: file.name,
     }));
+
+    if (key === "mainImages" && file.type.startsWith("image/")) {
+      setMainImagePreview(URL.createObjectURL(file));
+    }
   }
 
   function goToStep(step: WizardStep) {
@@ -174,6 +183,50 @@ export default function SemenListingWizard() {
   const filledUploadCount = useMemo(() => {
     return Object.values(uploads).filter(Boolean).length;
   }, [uploads]);
+
+  const completion = useMemo(() => {
+    const fields = [
+      form.listingTitle,
+      form.stallionName,
+      form.semenId,
+      form.breed,
+      form.collectionType,
+      form.freshFrozen,
+      form.quantity,
+      form.motility,
+      form.registry,
+      form.location,
+      form.startingBid,
+    ];
+
+    const completed = fields.filter((item) => item.trim() !== "").length;
+    return Math.round((completed / fields.length) * 100);
+  }, [
+    form.breed,
+    form.collectionType,
+    form.freshFrozen,
+    form.listingTitle,
+    form.location,
+    form.motility,
+    form.quantity,
+    form.registry,
+    form.semenId,
+    form.stallionName,
+    form.startingBid,
+  ]);
+
+  const previewTitle = form.listingTitle.trim() || "Premium sperma: hengstnaam";
+  const previewStallion = form.stallionName.trim() || "Chacco Blue";
+  const previewBreed = form.breed.trim() || "Oldenburger";
+  const previewRegistry = form.registry.trim() || "Hippique";
+  const previewLocation = form.location.trim() || "Brussel, België";
+  const previewCollectionType = form.collectionType.trim() || "ICSI";
+  const previewFreshFrozen = form.freshFrozen === "vers" ? "Vers" : "Bevroren";
+  const previewQuantity = form.quantity.trim() || "3 rietjes";
+  const previewMotility = form.motility.trim() || "70% progressieve motiliteit";
+  const previewBid = form.startingBid.trim()
+    ? `${form.currency} ${form.startingBid}`
+    : `${form.currency} 0`;
 
   return (
     <div className={styles.wrapper}>
@@ -352,77 +405,377 @@ export default function SemenListingWizard() {
 
       {currentStep === 2 ? (
         <>
-          <section className={styles.card}>
-            <SectionHeading number="02" title="Voorbeeld van je advertentie" />
+          <section className={styles.previewPage}>
+            <div className={styles.previewAuctionBar}>
+              <div className={styles.previewAuctionLeft}>
+                <div className={styles.previewAuctionMeta}>
+                  <span className={styles.previewLiveBadge}>Preview</span>
+                  <span className={styles.previewEventCode}>
+                    Event-ID: DRAFT-SPERMA
+                  </span>
+                </div>
 
-            <div className={styles.previewHero}>
-              <div className={styles.previewImageBox}>
-                <ImageIcon size={42} strokeWidth={1.7} />
-                <strong>{uploads.mainImages ?? "Nog geen hoofdafbeelding geüpload"}</strong>
-                <span>
-                  Dit blok toont later de hoofdafbeelding van je sperma listing.
-                </span>
+                <div>
+                  <h3 className={styles.previewCollectionTitle}>
+                    De Premium Sperma Collectie
+                  </h3>
+
+                  <p className={styles.previewCollectionSubtitle}>
+                    Dit is een voorbeeld van hoe je sperma-advertentie eruitziet
+                    op de veilingdetailpagina.
+                  </p>
+                </div>
               </div>
 
-              <div className={styles.previewHeroContent}>
-                <span className={styles.previewBadge}>Sperma listing preview</span>
-                <h3>{form.listingTitle || "Titel van de advertentie"}</h3>
-                <p>
-                  {form.description ||
-                    "Voeg een beschrijving toe om kopers duidelijkheid te geven over kwaliteit, opslag, verzending en fokvoorwaarden."}
-                </p>
+              <div className={styles.previewAuctionRight}>
+                <div className={styles.previewStatBox}>
+                  <span>Veiling eindigt over</span>
+                  <strong>14d 08u 22m</strong>
+                </div>
 
-                <div className={styles.previewMetaRow}>
-                  <span>{form.breed || "Ras onbekend"}</span>
-                  <span>{form.freshFrozen === "vers" ? "Vers" : "Bevroren"}</span>
-                  <span>{form.location || "Locatie onbekend"}</span>
+                <div className={styles.previewStatBox}>
+                  <span>Compleet</span>
+                  <strong>{completion}%</strong>
                 </div>
               </div>
             </div>
 
-            <div className={styles.previewGrid}>
-              <div className={styles.previewCard}>
-                <h4>Kerngegevens</h4>
-                <PreviewRow label="Hengstnaam" value={form.stallionName} />
-                <PreviewRow label="Sperma-ID" value={form.semenId} />
-                <PreviewRow label="Collectietype" value={form.collectionType || "Nog niet ingevuld"} />
-                <PreviewRow label="Aantal doses" value={form.quantity} />
-                <PreviewRow label="Motiliteit / kwaliteit" value={form.motility} />
-                <PreviewRow label="Collectiedatum" value={form.collectionDate || "Nog niet ingevuld"} />
-                <PreviewRow label="Stamboek / register" value={form.registry} />
-                <PreviewRow label="Pedigree URL" value={form.pedigreeUrl} />
-              </div>
+            <div className={styles.previewTopNav}>
+              <span>← Terug naar collectie</span>
 
-              <div className={styles.previewCard}>
-                <h4>Media & documenten</h4>
-                <PreviewRow label="Hoofdafbeelding" value={uploads.mainImages || "Nog niet geüpload"} />
-                <PreviewRow label="Pedigree documenten" value={uploads.pedigreeDocuments || "Nog niet geüpload"} />
-                <PreviewRow label="Gezondheid / fokcertificaten" value={uploads.healthCertificates || "Nog niet geüpload"} />
-                <PreviewRow label="Kwaliteitsanalyse" value={uploads.qualityAnalysis || "Nog niet geüpload"} />
-                <PreviewRow label="Overige documenten" value={uploads.supportingDocuments || "Nog niet geüpload"} />
-                <PreviewRow label="Video URL" value={form.videoUrl || "Geen video toegevoegd"} />
-                <PreviewRow label="Totaal uploads" value={`${filledUploadCount} bestand(en)`} />
-              </div>
-
-              <div className={styles.previewCard}>
-                <h4>Verkoper & publicatie</h4>
-                <PreviewRow label="Naam" value={form.fullName} />
-                <PreviewRow label="E-mail" value={form.email} />
-                <PreviewRow label="Telefoon" value={form.phone} />
-                <PreviewRow label="Bedrijf" value={form.companyName} />
-                <PreviewRow label="Adres" value={form.fullAddress} />
-                <PreviewRow label="Startbod" value={`${form.currency} ${form.startingBid || "0"}`} />
+              <div className={styles.previewTopNavRight}>
+                <span>{form.semenId || "Sperma #01"}</span>
+                <span>Biedperiode · Draft preview</span>
+                <span>Volgende sperma →</span>
               </div>
             </div>
+
+            <div className={styles.previewHeroGrid}>
+              <div className={styles.previewMainColumn}>
+                <div className={styles.previewTitleRow}>
+                  <div>
+                    <h3 className={styles.previewHorseTitle}>
+                      {previewTitle}
+                    </h3>
+
+                    <p className={styles.previewHorseSubtitle}>
+                      {previewStallion} · {previewFreshFrozen} ·{" "}
+                      {previewCollectionType}
+                    </p>
+                  </div>
+
+                  <div className={styles.previewTitleActions}>
+                    <button type="button" aria-label="Favoriet">
+                      <Heart size={17} strokeWidth={2.2} />
+                    </button>
+
+                    <button type="button" aria-label="Delen">
+                      <Share2 size={17} strokeWidth={2.2} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className={styles.previewGallery}>
+                  <div className={styles.previewMainImageWrap}>
+                    {mainImagePreview ? (
+                      <img
+                        src={mainImagePreview}
+                        alt={previewTitle}
+                        className={styles.previewImage}
+                      />
+                    ) : (
+                      <div className={styles.previewImagePlaceholder}>
+                        <ImageIcon size={38} strokeWidth={1.8} />
+                        <strong>Hoofdafbeelding preview</strong>
+                        <span>Upload een hoofdafbeelding in stap 1</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={styles.previewSideImages}>
+                    {[uploads.pedigreeDocuments, uploads.qualityAnalysis].map(
+                      (item, index) => (
+                        <div
+                          key={index}
+                          className={styles.previewSideImageWrap}
+                        >
+                          <div className={styles.previewSmallPlaceholder}>
+                            <FileText size={22} strokeWidth={1.8} />
+                            <span>{item || "Document"}</span>
+                          </div>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.previewSpecPanel}>
+                  <div>
+                    <span>Sperma-ID</span>
+                    <strong>{form.semenId || "Nog niet ingevuld"}</strong>
+                  </div>
+
+                  <div>
+                    <span>Hengst</span>
+                    <strong>{previewStallion}</strong>
+                  </div>
+
+                  <div>
+                    <span>Ras</span>
+                    <strong>{previewBreed}</strong>
+                  </div>
+
+                  <div>
+                    <span>Vers / bevroren</span>
+                    <strong>{previewFreshFrozen}</strong>
+                  </div>
+
+                  <div>
+                    <span>Hoeveelheid</span>
+                    <strong>{previewQuantity}</strong>
+                  </div>
+
+                  <div>
+                    <span>Locatie</span>
+                    <strong>{previewLocation}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <aside className={styles.previewSidebar}>
+                <div className={styles.previewBidCard}>
+                  <div className={styles.previewBidHeader}>
+                    <div>
+                      <span>Startbod</span>
+                      <strong>{previewBid}</strong>
+                    </div>
+
+                    <em>Bieden actief</em>
+                  </div>
+
+                  <div className={styles.previewMinimumBid}>
+                    <span>Volgend minimumbod</span>
+                    <strong>{previewBid}</strong>
+                  </div>
+
+                  <div className={styles.previewBidInput}>
+                    Voer biedbedrag in
+                  </div>
+
+                  <div className={styles.previewQuickBids}>
+                    <button type="button">+ 100</button>
+                    <button type="button">+ 500</button>
+                    <button type="button">+ 1.000</button>
+                  </div>
+
+                  <button type="button" className={styles.previewPrimaryBid}>
+                    Plaats bod nu
+                  </button>
+
+                  <button type="button" className={styles.previewSecondaryBid}>
+                    Vraag documentatie aan
+                  </button>
+
+                  <p>*Door te bieden ga je akkoord met de veilingvoorwaarden.</p>
+                </div>
+
+                <div className={styles.previewActivityCard}>
+                  <div className={styles.previewActivityTop}>
+                    Je hebt nog geen bod geplaatst
+                  </div>
+
+                  <h4>Recente biedactiviteit</h4>
+
+                  <div className={styles.previewActivityList}>
+                    <div>
+                      <span>
+                        <strong>Bieder #712</strong>
+                        <small>2 min geleden</small>
+                      </span>
+                      <strong>{previewBid}</strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        <strong>Bieder #104</strong>
+                        <small>5 min geleden</small>
+                      </span>
+                      <strong>{form.currency} 2.800</strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        <strong>Bieder #889</strong>
+                        <small>12 min geleden</small>
+                      </span>
+                      <strong>{form.currency} 2.500</strong>
+                    </div>
+                  </div>
+
+                  <button type="button">Bekijk alle biedingen</button>
+                </div>
+              </aside>
+            </div>
+
+            <section className={styles.previewSectionBlock}>
+              <h3>Fokvoorwaarden & beschrijving</h3>
+
+              <p>
+                {form.description.trim() ||
+                  `${previewTitle} is een premium sperma-aanbieding van ${previewStallion}. Voeg in stap 1 een beschrijving toe om kopers duidelijkheid te geven over kwaliteit, opslag, verzending en fokvoorwaarden.`}
+              </p>
+
+              <div className={styles.previewVideoCard}>
+                {mainImagePreview ? (
+                  <img src={mainImagePreview} alt={previewTitle} />
+                ) : null}
+
+                <div className={styles.previewVideoOverlay}>
+                  <CirclePlay size={44} strokeWidth={1.8} />
+                  <span>
+                    {form.videoUrl.trim()
+                      ? "Videopreview beschikbaar"
+                      : "Hengst presentatievideo"}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.previewSectionBlock}>
+              <div className={styles.previewDecorTitle}>
+                <span />
+                <h3>Kwaliteit & genetische waarde</h3>
+              </div>
+
+              <div className={styles.previewTextGrid}>
+                <div>
+                  <h4>Hengstlijn</h4>
+                  <p>
+                    {previewStallion} staat bekend om sportkwaliteit,
+                    betrouwbaarheid en sterke genetische vererving.
+                  </p>
+                </div>
+
+                <div>
+                  <h4>Kwaliteit</h4>
+                  <p>
+                    {previewMotility} ·{" "}
+                    {form.collectionDate
+                      ? `collectiedatum: ${form.collectionDate}.`
+                      : "collectiedatum nog niet ingevuld."}
+                  </p>
+                </div>
+
+                <div>
+                  <h4>Gebruik & opslag</h4>
+                  <p>
+                    {previewFreshFrozen} sperma · {previewQuantity}. Vermeld
+                    opslaginformatie, verzending en eventuele fokvoorwaarden.
+                  </p>
+                </div>
+
+                <div>
+                  <h4>Registratie</h4>
+                  <p>
+                    {previewRegistry} ·{" "}
+                    {form.pedigreeUrl
+                      ? `Pedigree beschikbaar via ${form.pedigreeUrl}`
+                      : "voeg een pedigree URL toe voor meer vertrouwen."}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.previewSectionBlock}>
+              <h3>Documentatie & rapporten</h3>
+
+              <div className={styles.previewDocumentList}>
+                <div>
+                  <span>Hoofdafbeelding</span>
+                  <strong>{uploads.mainImages || "Nog niet toegevoegd"}</strong>
+                </div>
+
+                <div>
+                  <span>Pedigree documenten</span>
+                  <strong>
+                    {uploads.pedigreeDocuments || "Nog niet toegevoegd"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Gezondheid / fokcertificaten</span>
+                  <strong>
+                    {uploads.healthCertificates || "Nog niet toegevoegd"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Kwaliteitsanalyse</span>
+                  <strong>
+                    {uploads.qualityAnalysis || "Nog niet toegevoegd"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Overige documenten</span>
+                  <strong>
+                    {uploads.supportingDocuments || "Nog niet toegevoegd"}
+                  </strong>
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.previewSectionBlock}>
+              <div className={styles.previewDecorTitle}>
+                <span />
+                <h3>Pedigree & afstamming</h3>
+              </div>
+
+              <div className={styles.previewPedigreePanel}>
+                <div>
+                  <span>Hengst</span>
+                  <strong>{previewStallion}</strong>
+                  <small>{previewBreed}</small>
+                </div>
+
+                <div>
+                  <span>Register</span>
+                  <strong>{previewRegistry}</strong>
+                  <small>{previewFreshFrozen}</small>
+                </div>
+
+                <div>
+                  <strong>Chacco Blue</strong>
+                  <strong>Baloubet du Rouet</strong>
+                  <strong>Heartbreaker</strong>
+                  <strong>Ratina Z</strong>
+                </div>
+
+                <div>
+                  <strong>Carthago Z</strong>
+                  <strong>Quidam de Revel</strong>
+                  <strong>Nabab de Reve</strong>
+                  <strong>Diamant de Semilly</strong>
+                </div>
+              </div>
+            </section>
           </section>
 
           <div className={styles.wizardActions}>
-            <button type="button" className={styles.secondaryStepButton} onClick={goPrev}>
+            <button
+              type="button"
+              className={styles.secondaryStepButton}
+              onClick={goPrev}
+            >
               <ArrowLeft size={18} strokeWidth={2} />
               Terug naar informatie
             </button>
 
-            <button type="button" className={styles.primaryStepButton} onClick={goNext}>
+            <button
+              type="button"
+              className={styles.primaryStepButton}
+              onClick={goNext}
+            >
               Doorgaan naar betaling
               <ArrowRight size={18} strokeWidth={2} />
             </button>

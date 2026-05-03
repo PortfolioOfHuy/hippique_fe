@@ -7,8 +7,11 @@ import {
   ArrowRight,
   Banknote,
   CheckCircle2,
+  CirclePlay,
   FileText,
+  Heart,
   ImageIcon,
+  Share2,
   ShieldCheck,
 } from "lucide-react";
 import styles from "./EmbryoListingWizard.module.scss";
@@ -114,12 +117,22 @@ const steps = [
   { step: 3 as WizardStep, label: "Betaling" },
 ];
 
+function formatEuroDetailed(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 export default function EmbryoListingWizard() {
   const [currentStep, setCurrentStep] = useState<WizardStep>(1);
   const [form, setForm] = useState<EmbryoFormState>(initialForm);
   const [cryptoEnabled, setCryptoEnabled] = useState(true);
   const [confirmedAccurate, setConfirmedAccurate] = useState(false);
   const [acceptedTerms, setAcceptedTerms] = useState(false);
+  const [mainImagePreview, setMainImagePreview] = useState<string | null>(null);
   const [uploads, setUploads] = useState<UploadState>({
     mainImages: null,
     pedigreeDocs: null,
@@ -145,6 +158,10 @@ export default function EmbryoListingWizard() {
       ...prev,
       [key]: file.name,
     }));
+
+    if (key === "mainImages" && file.type.startsWith("image/")) {
+      setMainImagePreview(URL.createObjectURL(file));
+    }
   }
 
   function goToStep(step: WizardStep) {
@@ -166,6 +183,44 @@ export default function EmbryoListingWizard() {
   const filledUploadCount = useMemo(() => {
     return Object.values(uploads).filter(Boolean).length;
   }, [uploads]);
+
+  const completion = useMemo(() => {
+    const fields = [
+      form.listingTitle,
+      form.embryoId,
+      form.sire,
+      form.dam,
+      form.breed,
+      form.embryoStage,
+      form.registry,
+      form.location,
+      form.startingBid,
+    ];
+
+    const completed = fields.filter((item) => item.trim() !== "").length;
+    return Math.round((completed / fields.length) * 100);
+  }, [
+    form.breed,
+    form.dam,
+    form.embryoId,
+    form.embryoStage,
+    form.listingTitle,
+    form.location,
+    form.registry,
+    form.sire,
+    form.startingBid,
+  ]);
+
+  const previewTitle = form.listingTitle.trim() || "Elite embryo: vader x moeder";
+  const previewBreed = form.breed.trim() || "KWPN";
+  const previewRegistry = form.registry.trim() || "KWPN";
+  const previewLocation = form.location.trim() || "Ermelo, Nederland";
+  const previewStage = form.embryoStage.trim() || "ICSI embryo";
+  const previewSire = form.sire.trim() || "Chacco Blue";
+  const previewDam = form.dam.trim() || "Ratina Z";
+  const previewBid = form.startingBid.trim()
+    ? `${form.currency} ${form.startingBid}`
+    : `${form.currency} 0`;
 
   return (
     <div className={styles.wrapper}>
@@ -244,9 +299,7 @@ export default function EmbryoListingWizard() {
                 <select
                   id="registry"
                   value={form.registry}
-                  onChange={(event) =>
-                    updateField("registry", event.target.value)
-                  }
+                  onChange={(event) => updateField("registry", event.target.value)}
                 >
                   <option>KWPN</option>
                   <option>Hippique</option>
@@ -298,12 +351,22 @@ export default function EmbryoListingWizard() {
                   onChange={(event) => handleUpload("mainImages", event)}
                 />
 
-                <ImageIcon size={34} strokeWidth={1.8} />
-                <strong>Hoofdafbeelding & galerij</strong>
-                <span>
-                  Upload beelden met hoge resolutie van vader, moeder of het
-                  certificaat van het embryo.
-                </span>
+                {mainImagePreview ? (
+                  <img
+                    src={mainImagePreview}
+                    alt="Hoofdafbeelding preview"
+                    className={styles.mainUploadPreview}
+                  />
+                ) : (
+                  <>
+                    <ImageIcon size={34} strokeWidth={1.8} />
+                    <strong>Hoofdafbeelding & galerij</strong>
+                    <span>
+                      Upload beelden met hoge resolutie van vader, moeder of het
+                      certificaat van het embryo.
+                    </span>
+                  </>
+                )}
 
                 {uploads.mainImages ? <em>{uploads.mainImages}</em> : null}
               </label>
@@ -314,9 +377,7 @@ export default function EmbryoListingWizard() {
                   <input
                     id="videoUrl"
                     value={form.videoUrl}
-                    onChange={(event) =>
-                      updateField("videoUrl", event.target.value)
-                    }
+                    onChange={(event) => updateField("videoUrl", event.target.value)}
                     placeholder="Plak YouTube/Vimeo URL hier..."
                   />
                 </div>
@@ -345,7 +406,11 @@ export default function EmbryoListingWizard() {
               controleert.
             </div>
 
-            <button type="button" className={styles.primaryStepButton} onClick={goNext}>
+            <button
+              type="button"
+              className={styles.primaryStepButton}
+              onClick={goNext}
+            >
               Doorgaan naar voorbeeld
               <ArrowRight size={18} strokeWidth={2} />
             </button>
@@ -355,102 +420,361 @@ export default function EmbryoListingWizard() {
 
       {currentStep === 2 ? (
         <>
-          <section className={styles.card}>
-            <SectionHeading number="02" title="Voorbeeld van je advertentie" />
+          <section className={styles.previewPage}>
+            <div className={styles.previewAuctionBar}>
+              <div className={styles.previewAuctionLeft}>
+                <div className={styles.previewAuctionMeta}>
+                  <span className={styles.previewLiveBadge}>Preview</span>
+                  <span className={styles.previewEventCode}>
+                    Event-ID: DRAFT-EMBRYO
+                  </span>
+                </div>
 
-            <div className={styles.previewHero}>
-              <div className={styles.previewImageBox}>
-                <ImageIcon size={42} strokeWidth={1.7} />
-                <strong>{uploads.mainImages ?? "Nog geen hoofdafbeelding geüpload"}</strong>
-                <span>
-                  Dit blok toont later de hoofdafbeelding van je embryo listing.
-                </span>
+                <div>
+                  <h3 className={styles.previewCollectionTitle}>
+                    De Premium Embryo Collectie
+                  </h3>
+
+                  <p className={styles.previewCollectionSubtitle}>
+                    Dit is een voorbeeld van hoe je embryo-advertentie eruitziet
+                    op de veilingdetailpagina.
+                  </p>
+                </div>
               </div>
 
-              <div className={styles.previewHeroContent}>
-                <span className={styles.previewBadge}>Embryo listing preview</span>
-                <h3>{form.listingTitle || "Titel van de advertentie"}</h3>
-                <p>
-                  {form.description ||
-                    "Voeg een beschrijving toe om kopers een duidelijk beeld te geven van de afstamming, fokwaarde en documentatie van dit embryo."}
-                </p>
+              <div className={styles.previewAuctionRight}>
+                <div className={styles.previewStatBox}>
+                  <span>Veiling eindigt over</span>
+                  <strong>14d 08u 22m</strong>
+                </div>
 
-                <div className={styles.previewMetaRow}>
-                  <span>{form.breed || "Ras onbekend"}</span>
-                  <span>{form.registry || "Geen register"}</span>
-                  <span>{form.location || "Locatie onbekend"}</span>
+                <div className={styles.previewStatBox}>
+                  <span>Compleet</span>
+                  <strong>{completion}%</strong>
                 </div>
               </div>
             </div>
 
-            <div className={styles.previewGrid}>
-              <div className={styles.previewCard}>
-                <h4>Kerngegevens</h4>
-                <PreviewRow label="Embryo-ID" value={form.embryoId} />
-                <PreviewRow label="Vader" value={form.sire} />
-                <PreviewRow label="Moeder" value={form.dam} />
-                <PreviewRow label="Embryostadium" value={form.embryoStage} />
-                <PreviewRow
-                  label="Verwachte geboortedatum"
-                  value={form.expectedBirthDate || "Nog niet ingevuld"}
-                />
-                <PreviewRow
-                  label="Collectie / transferdatum"
-                  value={form.collectionTransferDate || "Nog niet ingevuld"}
-                />
-                <PreviewRow label="Pedigree URL" value={form.pedigreeUrl} />
-              </div>
+            <div className={styles.previewTopNav}>
+              <span>← Terug naar collectie</span>
 
-              <div className={styles.previewCard}>
-                <h4>Media & documenten</h4>
-                <PreviewRow
-                  label="Hoofdafbeelding"
-                  value={uploads.mainImages || "Nog niet geüpload"}
-                />
-                <PreviewRow
-                  label="Pedigree documenten"
-                  value={uploads.pedigreeDocs || "Nog niet geüpload"}
-                />
-                <PreviewRow
-                  label="Dierenarts / fokcertificaten"
-                  value={uploads.vetBreedingCerts || "Nog niet geüpload"}
-                />
-                <PreviewRow
-                  label="Transfer / registratiedocumenten"
-                  value={uploads.transferRegDocs || "Nog niet geüpload"}
-                />
-                <PreviewRow
-                  label="Video URL"
-                  value={form.videoUrl || "Geen video toegevoegd"}
-                />
-                <PreviewRow
-                  label="Totaal uploads"
-                  value={`${filledUploadCount} bestand(en)`}
-                />
-              </div>
-
-              <div className={styles.previewCard}>
-                <h4>Verkoper & publicatie</h4>
-                <PreviewRow label="Naam" value={form.fullName} />
-                <PreviewRow label="E-mail" value={form.email} />
-                <PreviewRow label="Telefoon" value={form.phone} />
-                <PreviewRow label="Bedrijf" value={form.companyName} />
-                <PreviewRow label="Adres" value={form.fullAddress} />
-                <PreviewRow
-                  label="Startbod"
-                  value={`${form.currency} ${form.startingBid || "0"}`}
-                />
+              <div className={styles.previewTopNavRight}>
+                <span>{form.embryoId || "Embryo #01"}</span>
+                <span>Biedperiode · Draft preview</span>
+                <span>Volgende embryo →</span>
               </div>
             </div>
+
+            <div className={styles.previewHeroGrid}>
+              <div className={styles.previewMainColumn}>
+                <div className={styles.previewTitleRow}>
+                  <div>
+                    <h3 className={styles.previewHorseTitle}>{previewTitle}</h3>
+
+                    <p className={styles.previewHorseSubtitle}>
+                      {previewSire} x {previewDam} · {previewStage}
+                    </p>
+                  </div>
+
+                  <div className={styles.previewTitleActions}>
+                    <button type="button" aria-label="Favoriet">
+                      <Heart size={17} strokeWidth={2.2} />
+                    </button>
+
+                    <button type="button" aria-label="Delen">
+                      <Share2 size={17} strokeWidth={2.2} />
+                    </button>
+                  </div>
+                </div>
+
+                <div className={styles.previewGallery}>
+                  <div className={styles.previewMainImageWrap}>
+                    {mainImagePreview ? (
+                      <img
+                        src={mainImagePreview}
+                        alt={previewTitle}
+                        className={styles.previewImage}
+                      />
+                    ) : (
+                      <div className={styles.previewImagePlaceholder}>
+                        <ImageIcon size={38} strokeWidth={1.8} />
+                        <strong>Hoofdafbeelding preview</strong>
+                        <span>Upload een hoofdafbeelding in stap 1</span>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className={styles.previewSideImages}>
+                    {[uploads.pedigreeDocs, uploads.vetBreedingCerts].map(
+                      (item, index) => (
+                        <div
+                          key={`${item ?? "doc"}-${index}`}
+                          className={styles.previewSideImageWrap}
+                        >
+                          <div className={styles.previewSmallPlaceholder}>
+                            <FileText size={22} strokeWidth={1.8} />
+                            <span>{item || "Document"}</span>
+                          </div>
+                        </div>
+                      ),
+                    )}
+                  </div>
+                </div>
+
+                <div className={styles.previewSpecPanel}>
+                  <div>
+                    <span>Embryo-ID</span>
+                    <strong>{form.embryoId || "Nog niet ingevuld"}</strong>
+                  </div>
+
+                  <div>
+                    <span>Vader</span>
+                    <strong>{previewSire}</strong>
+                  </div>
+
+                  <div>
+                    <span>Moeder</span>
+                    <strong>{previewDam}</strong>
+                  </div>
+
+                  <div>
+                    <span>Stamboek</span>
+                    <strong>{previewRegistry}</strong>
+                  </div>
+
+                  <div>
+                    <span>Stadium</span>
+                    <strong>{previewStage}</strong>
+                  </div>
+
+                  <div>
+                    <span>Locatie</span>
+                    <strong>{previewLocation}</strong>
+                  </div>
+                </div>
+              </div>
+
+              <aside className={styles.previewSidebar}>
+                <div className={styles.previewBidCard}>
+                  <div className={styles.previewBidHeader}>
+                    <div>
+                      <span>Startbod</span>
+                      <strong>{previewBid}</strong>
+                    </div>
+
+                    <em>Bieden actief</em>
+                  </div>
+
+                  <div className={styles.previewMinimumBid}>
+                    <span>Volgend minimumbod</span>
+                    <strong>{previewBid}</strong>
+                  </div>
+
+                  <div className={styles.previewBidInput}>Voer biedbedrag in</div>
+
+                  <div className={styles.previewQuickBids}>
+                    <button type="button">+ 500</button>
+                    <button type="button">+ 1.000</button>
+                    <button type="button">+ 5.000</button>
+                  </div>
+
+                  <button type="button" className={styles.previewPrimaryBid}>
+                    Plaats bod nu
+                  </button>
+
+                  <button type="button" className={styles.previewSecondaryBid}>
+                    Vraag documentatie aan
+                  </button>
+
+                  <p>*Door te bieden ga je akkoord met de veilingvoorwaarden.</p>
+                </div>
+
+                <div className={styles.previewActivityCard}>
+                  <div className={styles.previewActivityTop}>
+                    Je hebt nog geen bod geplaatst
+                  </div>
+
+                  <h4>Recente biedactiviteit</h4>
+
+                  <div className={styles.previewActivityList}>
+                    <div>
+                      <span>
+                        <strong>Bieder #712</strong>
+                        <small>2 min geleden</small>
+                      </span>
+                      <strong>{previewBid}</strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        <strong>Bieder #104</strong>
+                        <small>5 min geleden</small>
+                      </span>
+                      <strong>{form.currency} 4.800</strong>
+                    </div>
+
+                    <div>
+                      <span>
+                        <strong>Bieder #889</strong>
+                        <small>12 min geleden</small>
+                      </span>
+                      <strong>{form.currency} 4.500</strong>
+                    </div>
+                  </div>
+
+                  <button type="button">Bekijk alle biedingen</button>
+                </div>
+              </aside>
+            </div>
+
+            <section className={styles.previewSectionBlock}>
+              <h3>Foknotities & beschrijving</h3>
+
+              <p>
+                {form.description.trim() ||
+                  `${previewTitle} is een veelbelovend embryo met een sterke combinatie van vader- en moederlijn. Voeg in stap 1 een beschrijving toe om kopers meer inzicht te geven in fokwaarde, genetische kwaliteit en documentatie.`}
+              </p>
+
+              <div className={styles.previewVideoCard}>
+                {mainImagePreview ? (
+                  <img src={mainImagePreview} alt={previewTitle} />
+                ) : null}
+
+                <div className={styles.previewVideoOverlay}>
+                  <CirclePlay size={44} strokeWidth={1.8} />
+                  <span>
+                    {form.videoUrl.trim()
+                      ? "Videopreview beschikbaar"
+                      : "Embryo presentatievideo"}
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.previewSectionBlock}>
+              <div className={styles.previewDecorTitle}>
+                <span />
+                <h3>Bloedlijn & genetische waarde</h3>
+              </div>
+
+              <div className={styles.previewTextGrid}>
+                <div>
+                  <h4>Vaderlijn</h4>
+                  <p>
+                    {previewSire} staat bekend om sportkwaliteit, vermogen en
+                    sterke genetische vererving.
+                  </p>
+                </div>
+
+                <div>
+                  <h4>Moederlijn</h4>
+                  <p>
+                    {previewDam} biedt een sterke basis voor fokwaarde,
+                    atletisch vermogen en commerciële aantrekkelijkheid.
+                  </p>
+                </div>
+
+                <div>
+                  <h4>Embryostadium</h4>
+                  <p>
+                    {previewStage} ·{" "}
+                    {form.expectedBirthDate
+                      ? `verwachte geboortedatum: ${form.expectedBirthDate}.`
+                      : "verwachte geboortedatum nog niet ingevuld."}
+                  </p>
+                </div>
+
+                <div>
+                  <h4>Registratie</h4>
+                  <p>
+                    {previewRegistry} ·{" "}
+                    {form.pedigreeUrl
+                      ? `Pedigree beschikbaar via ${form.pedigreeUrl}`
+                      : "voeg een pedigree URL toe voor meer vertrouwen."}
+                  </p>
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.previewSectionBlock}>
+              <h3>Documentatie & rapporten</h3>
+
+              <div className={styles.previewDocumentList}>
+                <div>
+                  <span>Hoofdafbeelding</span>
+                  <strong>{uploads.mainImages || "Nog niet toegevoegd"}</strong>
+                </div>
+
+                <div>
+                  <span>Pedigree documenten</span>
+                  <strong>{uploads.pedigreeDocs || "Nog niet toegevoegd"}</strong>
+                </div>
+
+                <div>
+                  <span>Dierenarts / fokcertificaten</span>
+                  <strong>
+                    {uploads.vetBreedingCerts || "Nog niet toegevoegd"}
+                  </strong>
+                </div>
+
+                <div>
+                  <span>Transfer / registratiedocumenten</span>
+                  <strong>{uploads.transferRegDocs || "Nog niet toegevoegd"}</strong>
+                </div>
+              </div>
+            </section>
+
+            <section className={styles.previewSectionBlock}>
+              <div className={styles.previewDecorTitle}>
+                <span />
+                <h3>Pedigree & afstamming</h3>
+              </div>
+
+              <div className={styles.previewPedigreePanel}>
+                <div>
+                  <span>Vader</span>
+                  <strong>{previewSire}</strong>
+                  <small>{previewBreed}</small>
+                </div>
+
+                <div>
+                  <span>Moeder</span>
+                  <strong>{previewDam}</strong>
+                  <small>{previewBreed}</small>
+                </div>
+
+                <div>
+                  <strong>Chacco Blue</strong>
+                  <strong>Baloubet du Rouet</strong>
+                  <strong>Heartbreaker</strong>
+                  <strong>Ratina Z</strong>
+                </div>
+
+                <div>
+                  <strong>Carthago Z</strong>
+                  <strong>Quidam de Revel</strong>
+                  <strong>Nabab de Reve</strong>
+                  <strong>Diamant de Semilly</strong>
+                </div>
+              </div>
+            </section>
           </section>
 
           <div className={styles.wizardActions}>
-            <button type="button" className={styles.secondaryStepButton} onClick={goPrev}>
+            <button
+              type="button"
+              className={styles.secondaryStepButton}
+              onClick={goPrev}
+            >
               <ArrowLeft size={18} strokeWidth={2} />
               Terug naar informatie
             </button>
 
-            <button type="button" className={styles.primaryStepButton} onClick={goNext}>
+            <button
+              type="button"
+              className={styles.primaryStepButton}
+              onClick={goNext}
+            >
               Doorgaan naar betaling
               <ArrowRight size={18} strokeWidth={2} />
             </button>
@@ -492,9 +816,7 @@ export default function EmbryoListingWizard() {
 
                 <button
                   type="button"
-                  className={`${styles.toggle} ${
-                    cryptoEnabled ? styles.toggleActive : ""
-                  }`}
+                  className={`${styles.toggle} ${cryptoEnabled ? styles.toggleActive : ""}`}
                   aria-pressed={cryptoEnabled}
                   onClick={() => setCryptoEnabled((prev) => !prev)}
                 >
@@ -591,17 +913,17 @@ export default function EmbryoListingWizard() {
               <div className={styles.feeRows}>
                 <div>
                   <span>Basis publicatiekosten</span>
-                  <strong>€{baseFee.toFixed(2).replace(".", ",")}</strong>
+                  <strong>{formatEuroDetailed(baseFee)}</strong>
                 </div>
 
                 <div>
                   <span>Optionele crypto servicekosten</span>
-                  <strong>€{cryptoFee.toFixed(2).replace(".", ",")}</strong>
+                  <strong>{formatEuroDetailed(cryptoFee)}</strong>
                 </div>
 
                 <div className={styles.totalRow}>
                   <span>Totaal nu te betalen</span>
-                  <strong>€{totalDue.toFixed(2).replace(".", ",")}</strong>
+                  <strong>{formatEuroDetailed(totalDue)}</strong>
                 </div>
               </div>
 
@@ -647,7 +969,11 @@ export default function EmbryoListingWizard() {
           </div>
 
           <div className={styles.wizardActions}>
-            <button type="button" className={styles.secondaryStepButton} onClick={goPrev}>
+            <button
+              type="button"
+              className={styles.secondaryStepButton}
+              onClick={goPrev}
+            >
               <ArrowLeft size={18} strokeWidth={2} />
               Terug naar voorbeeld
             </button>
@@ -713,15 +1039,6 @@ function SectionHeading({ number, title }: { number: string; title: string }) {
     <div className={styles.sectionHeading}>
       <span>{number}</span>
       <h2>{title}</h2>
-    </div>
-  );
-}
-
-function PreviewRow({ label, value }: { label: string; value: string }) {
-  return (
-    <div className={styles.previewRow}>
-      <span>{label}</span>
-      <strong>{value}</strong>
     </div>
   );
 }
