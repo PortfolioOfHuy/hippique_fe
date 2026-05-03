@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button, Modal } from "antd";
+import { Button, Input, Modal } from "antd";
 import {
   AlertCircle,
   CalendarDays,
@@ -30,8 +30,10 @@ type VerificationStatus = {
   depositVerified: boolean;
 };
 
+type VerificationId = "email" | "phone" | "deposit";
+
 type MissingVerification = {
-  id: "email" | "phone" | "deposit";
+  id: VerificationId;
   text: string;
   title: string;
   description: string;
@@ -54,6 +56,11 @@ export default function ProfileInformation({
   const [selectedVerification, setSelectedVerification] =
     useState<MissingVerification | null>(null);
 
+  const [emailStep, setEmailStep] = useState<"confirm" | "sent">("confirm");
+  const [phoneStep, setPhoneStep] = useState<"confirm" | "otp">("confirm");
+  const [otpCode, setOtpCode] = useState("");
+  const [verificationMessage, setVerificationMessage] = useState("");
+
   const missingVerifications = useMemo<MissingVerification[]>(() => {
     const items: MissingVerification[] = [];
 
@@ -63,8 +70,8 @@ export default function ProfileInformation({
         text: "Verifieer uw e-mailadres.",
         title: "E-mailadres verifiëren",
         description:
-          "Uw e-mailadres is nog niet bevestigd. Controleer uw inbox en klik op de verificatielink om uw account volledig te activeren.",
-        actionLabel: "E-mail opnieuw verzenden",
+          "Uw e-mailadres is nog niet bevestigd. Bevestig dat u een verificatie-e-mail wilt ontvangen.",
+        actionLabel: "Verificatie-e-mail verzenden",
       });
     }
 
@@ -74,8 +81,8 @@ export default function ProfileInformation({
         text: "Verifieer uw telefoonnummer.",
         title: "Telefoonnummer verifiëren",
         description:
-          "Uw telefoonnummer is nog niet geverifieerd. Verifieer uw nummer om beveiligingsmeldingen en veilingupdates te ontvangen.",
-        actionLabel: "Telefoonnummer verifiëren",
+          "Uw telefoonnummer is nog niet geverifieerd. Bevestig dat u een OTP-code wilt ontvangen.",
+        actionLabel: "OTP-code verzenden",
       });
     }
 
@@ -83,10 +90,10 @@ export default function ProfileInformation({
       items.push({
         id: "deposit",
         text: "Voltooi uw biedingsdeposito.",
-        title: "Biedingsdeposito voltooien",
+        title: "Biedingsdeposito toevoegen",
         description:
-          "Uw biedingsdeposito is nog niet voltooid. U kunt pas deelnemen aan veilingen wanneer alle verificatiestappen zijn afgerond.",
-        actionLabel: "Depositostap openen",
+          "Uw biedingsdeposito is nog niet voltooid. Voeg een deposito toe om volledig toegang te krijgen tot de veilingen.",
+        actionLabel: "Deposit toevoegen",
       });
     }
 
@@ -121,12 +128,235 @@ export default function ProfileInformation({
     }));
   }
 
+  function resetVerificationState() {
+    setEmailStep("confirm");
+    setPhoneStep("confirm");
+    setOtpCode("");
+    setVerificationMessage("");
+  }
+
   function openVerificationModal(item: MissingVerification) {
+    resetVerificationState();
     setSelectedVerification(item);
   }
 
   function closeVerificationModal() {
     setSelectedVerification(null);
+    resetVerificationState();
+  }
+
+  function handleEmailVerificationSend() {
+    setEmailStep("sent");
+    setVerificationMessage(
+      "De verificatie-e-mail is verzonden. Controleer uw inbox en klik op de bevestigingslink.",
+    );
+  }
+
+  function handlePhoneVerificationSend() {
+    setPhoneStep("otp");
+    setVerificationMessage(
+      "De OTP-code is verzonden. Voer de code in die u per sms heeft ontvangen.",
+    );
+  }
+
+  function handleOtpConfirm() {
+    if (!otpCode.trim()) {
+      setVerificationMessage("Voer eerst de OTP-code in om verder te gaan.");
+      return;
+    }
+
+    setVerificationMessage(
+      "Uw OTP-code is ontvangen. In een echte omgeving wordt deze code nu gecontroleerd.",
+    );
+  }
+
+  function handleDepositAdd() {
+    setVerificationMessage(
+      "U wordt doorgestuurd naar de depositostap. In een echte omgeving opent hier de betaal- of depositomodule.",
+    );
+  }
+
+  function renderVerificationModalContent() {
+    if (!selectedVerification) return null;
+
+    if (selectedVerification.id === "email") {
+      return (
+        <div className={styles.modalContent}>
+          <div className={styles.modalIcon}>
+            <Mail size={30} strokeWidth={2.3} />
+          </div>
+
+          <h3>{selectedVerification.title}</h3>
+
+          {emailStep === "confirm" ? (
+            <>
+              <p>
+                Wilt u een verificatie-e-mail ontvangen op{" "}
+                <strong>{profile.email}</strong>?
+              </p>
+
+              <div className={styles.modalActions}>
+                <Button
+                  type="primary"
+                  className={styles.modalPrimaryButton}
+                  onClick={handleEmailVerificationSend}
+                >
+                  Bevestigen
+                </Button>
+
+                <Button
+                  type="default"
+                  className={styles.modalGhostButton}
+                  onClick={closeVerificationModal}
+                >
+                  Sluiten
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p>
+                Controleer uw e-mail. We hebben een verificatielink verzonden
+                naar <strong>{profile.email}</strong>.
+              </p>
+
+              {verificationMessage ? (
+                <div className={styles.successBox}>{verificationMessage}</div>
+              ) : null}
+
+              <div className={styles.modalActions}>
+                <Button
+                  type="primary"
+                  className={styles.modalPrimaryButton}
+                  onClick={closeVerificationModal}
+                >
+                  Ik controleer mijn e-mail
+                </Button>
+
+                <Button
+                  type="default"
+                  className={styles.modalGhostButton}
+                  onClick={handleEmailVerificationSend}
+                >
+                  Opnieuw verzenden
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    if (selectedVerification.id === "phone") {
+      return (
+        <div className={styles.modalContent}>
+          <div className={styles.modalIcon}>
+            <Phone size={30} strokeWidth={2.3} />
+          </div>
+
+          <h3>{selectedVerification.title}</h3>
+
+          {phoneStep === "confirm" ? (
+            <>
+              <p>
+                Wilt u een OTP-code ontvangen op telefoonnummer{" "}
+                <strong>{profile.phone}</strong>?
+              </p>
+
+              <div className={styles.modalActions}>
+                <Button
+                  type="primary"
+                  className={styles.modalPrimaryButton}
+                  onClick={handlePhoneVerificationSend}
+                >
+                  Bevestigen
+                </Button>
+
+                <Button
+                  type="default"
+                  className={styles.modalGhostButton}
+                  onClick={closeVerificationModal}
+                >
+                  Sluiten
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <p>
+                Voer de OTP-code in die naar uw telefoonnummer is verzonden.
+              </p>
+
+              <div className={styles.otpField}>
+                <Input
+                  size="large"
+                  value={otpCode}
+                  maxLength={6}
+                  placeholder="Voer OTP-code in"
+                  onChange={(event) => setOtpCode(event.target.value)}
+                />
+              </div>
+
+              {verificationMessage ? (
+                <div className={styles.successBox}>{verificationMessage}</div>
+              ) : null}
+
+              <div className={styles.modalActions}>
+                <Button
+                  type="primary"
+                  className={styles.modalPrimaryButton}
+                  onClick={handleOtpConfirm}
+                >
+                  OTP bevestigen
+                </Button>
+
+                <Button
+                  type="default"
+                  className={styles.modalGhostButton}
+                  onClick={handlePhoneVerificationSend}
+                >
+                  Code opnieuw verzenden
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.modalContent}>
+        <div className={styles.modalIcon}>
+          <WalletCards size={30} strokeWidth={2.3} />
+        </div>
+
+        <h3>{selectedVerification.title}</h3>
+
+        <p>{selectedVerification.description}</p>
+
+        {verificationMessage ? (
+          <div className={styles.successBox}>{verificationMessage}</div>
+        ) : null}
+
+        <div className={styles.modalActions}>
+          <Button
+            type="primary"
+            className={styles.modalPrimaryButton}
+            onClick={handleDepositAdd}
+          >
+            Deposit toevoegen
+          </Button>
+
+          <Button
+            type="default"
+            className={styles.modalGhostButton}
+            onClick={closeVerificationModal}
+          >
+            Sluiten
+          </Button>
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -224,9 +454,7 @@ export default function ProfileInformation({
           <article className={styles.readinessCard}>
             <div className={styles.readinessTop}>
               <span>Depositostatus</span>
-              <strong className={styles.statusUnverified}>
-                Niet voltooid
-              </strong>
+              <strong className={styles.statusUnverified}>Niet voltooid</strong>
             </div>
 
             <div className={styles.readinessIcon}>
@@ -358,38 +586,11 @@ export default function ProfileInformation({
         onCancel={closeVerificationModal}
         footer={null}
         centered
-        width={520}
+        width={540}
         className={styles.verificationModal}
+        destroyOnHidden
       >
-        {selectedVerification ? (
-          <div className={styles.modalContent}>
-            <div className={styles.modalIcon}>
-              <AlertCircle size={30} strokeWidth={2.3} />
-            </div>
-
-            <h3>{selectedVerification.title}</h3>
-
-            <p>{selectedVerification.description}</p>
-
-            <div className={styles.modalActions}>
-              <Button
-                type="primary"
-                className={styles.modalPrimaryButton}
-                onClick={closeVerificationModal}
-              >
-                {selectedVerification.actionLabel}
-              </Button>
-
-              <Button
-                type="default"
-                className={styles.modalGhostButton}
-                onClick={closeVerificationModal}
-              >
-                Sluiten
-              </Button>
-            </div>
-          </div>
-        ) : null}
+        {renderVerificationModalContent()}
       </Modal>
     </div>
   );

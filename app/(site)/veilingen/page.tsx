@@ -113,7 +113,9 @@ function formatCountdown(totalSeconds: number) {
   return `${pad(hours)}:${pad(minutes)}:${pad(seconds)}`;
 }
 
-function getLocation(category: string) {
+function getLocation(category: string, fallbackLocation?: string) {
+  if (fallbackLocation) return fallbackLocation;
+
   if (category === "ending-soon") return "Wellington, VS";
   if (category === "newly-listed") return "Start op 12 nov., 18:00 CET";
   return "Deauville, Frankrijk";
@@ -148,6 +150,7 @@ export default function VeilingenPage() {
 
   const auctionItems = useMemo(() => {
     return horses
+      .filter((horse) => horse.category !== "elite")
       .filter((horse) => {
         const horseStatus = getAuctionStatus(horse.category);
         const horseType = getAuctionType(horse);
@@ -440,12 +443,16 @@ export default function VeilingenPage() {
                       {horse.category === "newly-listed" ? (
                         <>
                           <CalendarDays size={14} strokeWidth={1.8} />
-                          <span>{getLocation(horse.category)}</span>
+                          <span>
+                            {getLocation(horse.category, horse.location)}
+                          </span>
                         </>
                       ) : (
                         <>
                           <MapPin size={14} strokeWidth={1.8} />
-                          <span>{getLocation(horse.category)}</span>
+                          <span>
+                            {getLocation(horse.category, horse.location)}
+                          </span>
                         </>
                       )}
                     </div>

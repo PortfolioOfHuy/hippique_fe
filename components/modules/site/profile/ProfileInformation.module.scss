@@ -570,3 +570,15 @@
     flex-direction: column;
   }
 }
+
+.otpField {
+  width: 100%;
+  margin: 18px 0 0;
+}
+
+.otpField :global(.ant-input) {
+  height: 48px;
+  border-radius: var(--radius-button);
+  font-size: var(--fs-body);
+  font-weight: 700;
+}

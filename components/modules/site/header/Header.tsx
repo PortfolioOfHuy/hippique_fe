@@ -12,7 +12,6 @@ import {
   LogOut,
   Menu,
   PlusCircle,
-  RotateCcw,
   UserRound,
   X,
 } from "lucide-react";
@@ -57,10 +56,16 @@ const STORAGE_TIMEZONE_KEY = "site-timezone";
 
 const navItems = [
   { label: "Home", href: "/" },
-  { label: "Elite", href: "/elite" },
+  { label: "Elite", href: "/elite", hasDropdown: true },
   { label: "Veilingen", href: "/veilingen" },
   { label: "Nieuws", href: "/nieuws" },
   { label: "Contact", href: "/contact" },
+];
+
+const eliteDropdownItems = [
+  { label: "Elitepaarden", href: "/elite?category=all" },
+  { label: "Jonge paarden", href: "/elite?category=young" },
+  { label: "Sportpaarden", href: "/elite?category=sport" },
 ];
 
 const languageNameMap: Record<string, string> = {
@@ -385,6 +390,8 @@ export default function Header() {
   const [langOpen, setLangOpen] = useState(false);
   const [timezoneOpen, setTimezoneOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
+  const [eliteOpen, setEliteOpen] = useState(false);
+  const [mobileEliteOpen, setMobileEliteOpen] = useState(false);
   const [languages, setLanguages] = useState<LanguageItem[]>([
     {
       value: BASE_LANGUAGE,
@@ -403,6 +410,7 @@ export default function Header() {
   const timezoneRef = useRef<HTMLDivElement | null>(null);
   const mobileTimezoneRef = useRef<HTMLDivElement | null>(null);
   const profileRef = useRef<HTMLDivElement | null>(null);
+  const eliteRef = useRef<HTMLDivElement | null>(null);
   const pollRef = useRef<number | null>(null);
 
   /**
@@ -469,6 +477,8 @@ export default function Header() {
     setLangOpen(false);
     setTimezoneOpen(false);
     setProfileOpen(false);
+    setEliteOpen(false);
+    setMobileEliteOpen(false);
   }, [pathname]);
 
   useEffect(() => {
@@ -507,6 +517,10 @@ export default function Header() {
 
       if (profileRef.current && !profileRef.current.contains(target)) {
         setProfileOpen(false);
+      }
+
+      if (eliteRef.current && !eliteRef.current.contains(target)) {
+        setEliteOpen(false);
       }
     }
 
@@ -780,6 +794,58 @@ export default function Header() {
             {navItems.map((item) => {
               const active = isActivePath(pathname, item.href);
 
+              if (item.hasDropdown && item.href === "/elite") {
+                return (
+                  <div
+                    key={item.href}
+                    className={styles.navDropdown}
+                    ref={eliteRef}
+                    onMouseEnter={() => setEliteOpen(true)}
+                    onMouseLeave={() => setEliteOpen(false)}
+                  >
+                    <button
+                      type="button"
+                      className={`${styles.navLink} ${styles.navDropdownToggle} ${
+                        active || eliteOpen ? styles.active : ""
+                      }`}
+                      aria-haspopup="menu"
+                      aria-expanded={eliteOpen}
+                      onClick={() => {
+                        setEliteOpen((prev) => !prev);
+                        setLangOpen(false);
+                        setTimezoneOpen(false);
+                        setProfileOpen(false);
+                      }}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown size={15} strokeWidth={2.2} />
+                    </button>
+
+                    <div
+                      className={`${styles.navDropdownMenu} ${
+                        eliteOpen ? styles.navDropdownMenuOpen : ""
+                      }`}
+                      role="menu"
+                    >
+                      <div className={styles.navDropdownSection}>
+                        <div className={styles.navDropdownList}>
+                          {eliteDropdownItems.map((dropdownItem) => (
+                            <HeaderLink
+                              key={dropdownItem.href}
+                              href={dropdownItem.href}
+                              className={styles.navDropdownItem}
+                              onClick={() => setEliteOpen(false)}
+                            >
+                              <span>{dropdownItem.label}</span>
+                            </HeaderLink>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
               return (
                 <HeaderLink
                   key={item.href}
@@ -805,6 +871,7 @@ export default function Header() {
                   setLangOpen((prev) => !prev);
                   setTimezoneOpen(false);
                   setProfileOpen(false);
+                  setEliteOpen(false);
                 }}
               >
                 <span>{getLanguageShortCode(selectedLanguage)}</span>
@@ -840,6 +907,7 @@ export default function Header() {
                   setTimezoneOpen((prev) => !prev);
                   setLangOpen(false);
                   setProfileOpen(false);
+                  setEliteOpen(false);
                 }}
               >
                 <Globe size={18} strokeWidth={2} />
@@ -876,6 +944,7 @@ export default function Header() {
                   setProfileOpen((prev) => !prev);
                   setLangOpen(false);
                   setTimezoneOpen(false);
+                  setEliteOpen(false);
                 }}
               >
                 <UserRound size={19} strokeWidth={2.1} />
@@ -1070,6 +1139,46 @@ export default function Header() {
           <nav className={styles.mobileNav} aria-label="Hoofdnavigatie mobiel">
             {navItems.map((item) => {
               const active = isActivePath(pathname, item.href);
+
+              if (item.hasDropdown && item.href === "/elite") {
+                return (
+                  <div key={item.href} className={styles.mobileNavDropdown}>
+                    <button
+                      type="button"
+                      className={`${styles.mobileNavLink} ${styles.mobileNavDropdownToggle} ${
+                        active || mobileEliteOpen ? styles.mobileActive : ""
+                      }`}
+                      aria-expanded={mobileEliteOpen}
+                      onClick={() => setMobileEliteOpen((prev) => !prev)}
+                    >
+                      <span>{item.label}</span>
+                      <ChevronDown size={16} strokeWidth={2.2} />
+                    </button>
+
+                    <div
+                      className={`${styles.mobileNavDropdownMenu} ${
+                        mobileEliteOpen ? styles.mobileNavDropdownMenuOpen : ""
+                      }`}
+                    >
+                      <div className={styles.mobileNavDropdownSection}>
+                        {eliteDropdownItems.map((dropdownItem) => (
+                          <HeaderLink
+                            key={dropdownItem.href}
+                            href={dropdownItem.href}
+                            className={styles.mobileNavDropdownItem}
+                            onClick={() => {
+                              setMobileOpen(false);
+                              setMobileEliteOpen(false);
+                            }}
+                          >
+                            {dropdownItem.label}
+                          </HeaderLink>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
 
               return (
                 <HeaderLink

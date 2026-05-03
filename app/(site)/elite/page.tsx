@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 import { getEliteHorses } from "@/components/modules/site/home/data/horses";
 import styles from "./ElitePage.module.scss";
@@ -45,6 +45,16 @@ const categoryTabs: Array<{
   { key: "young", label: "Jonge paarden" },
   { key: "sport", label: "Sportpaarden" },
 ];
+
+function getValidTopTab(value: string | null): TopTabKey {
+  return topTabs.some((tab) => tab.key === value) ? (value as TopTabKey) : "all";
+}
+
+function getValidCategory(value: string | null): EliteCategoryKey {
+  return categoryTabs.some((category) => category.key === value)
+    ? (value as EliteCategoryKey)
+    : "all";
+}
 
 function getHorseSearchText(horse: ReturnType<typeof getEliteHorses>[number]) {
   return [
@@ -158,6 +168,17 @@ export default function ElitePage() {
     price: "any-price",
   });
 
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const params = new URLSearchParams(window.location.search);
+    const nextTopTab = getValidTopTab(params.get("status"));
+    const nextCategory = getValidCategory(params.get("category"));
+
+    setActiveTopTab(nextTopTab);
+    setActiveCategory(nextCategory);
+  }, []);
+
   const horses = useMemo(() => getEliteHorses(), []);
 
   const filteredHorses = useMemo(() => {
@@ -189,7 +210,6 @@ export default function ElitePage() {
   return (
     <main className={styles.page}>
       <div className={styles.inner}>
-
         <section className={styles.topbar}>
           <div className={styles.tabs} role="tablist" aria-label="Veilingstatus">
             {topTabs.map((tab) => {
@@ -234,31 +254,6 @@ export default function ElitePage() {
         </section>
 
         <section className={styles.filtersBox}>
-          <div
-            className={styles.categoryRow}
-            role="tablist"
-            aria-label="Elitepaarden categorie"
-          >
-            {categoryTabs.map((category) => {
-              const isActive = activeCategory === category.key;
-
-              return (
-                <button
-                  key={category.key}
-                  type="button"
-                  role="tab"
-                  aria-selected={isActive}
-                  className={`${styles.categoryChip} ${
-                    isActive ? styles.categoryChipActive : ""
-                  }`}
-                  onClick={() => setActiveCategory(category.key)}
-                >
-                  {category.label}
-                </button>
-              );
-            })}
-          </div>
-
           <div className={styles.filtersGrid}>
             <div className={styles.filterItem}>
               <span className={styles.filterLabel}>Ras</span>

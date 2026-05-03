@@ -24,7 +24,7 @@ const horses: HorseItem[] = [
     bid: "€2.850.000",
     badge: "Topselectie",
     endsAt: "2026-05-23T14:22:00",
-    image: "/img/home/elite/horse-1.webp",
+    image: "/img/elite/bb554bb1-ce99-4b1b-9a5d-943e4c1f7b2b.jpg",
     imageAlt: "Imperial Majesty",
     href: "/elite/imperial-majesty",
   },
@@ -35,7 +35,7 @@ const horses: HorseItem[] = [
     bid: "€1.675.000",
     badge: "Elite",
     endsAt: "2026-05-22T08:45:00",
-    image: "/img/home/elite/horse-2.webp",
+    image: "/img/elite/mqdefault.jpg",
     imageAlt: "Silver Sovereign",
     href: "/elite/silver-sovereign",
   },
@@ -46,7 +46,8 @@ const horses: HorseItem[] = [
     bid: "€1.520.000",
     badge: "Topselectie",
     endsAt: "2026-05-24T02:10:00",
-    image: "/img/home/elite/horse-3.webp",
+    image:
+      "/img/elite/pre-stallion-7years-161-hh-grey-eventinghorses-navas-del-madrono_08338f82-736a-4ac3-bda5-2550e4cc02d6.jpg",
     imageAlt: "Royal Vanguard",
     href: "/elite/royal-vanguard",
   },
@@ -70,10 +71,7 @@ function formatCountdown(targetDate: string, now: number) {
   return `${String(days).padStart(2, "0")}d ${String(hours).padStart(
     2,
     "0",
-  )}u ${String(minutes).padStart(2, "0")}m ${String(seconds).padStart(
-    2,
-    "0",
-  )}s`;
+  )}:${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
 }
 
 function useCountdown(targetDate: string) {
@@ -95,7 +93,7 @@ function useCountdown(targetDate: string) {
 
   return useMemo(() => {
     if (!mounted || now === 0) {
-      return "--d --u --m --s";
+      return "--d --:--:--";
     }
 
     return formatCountdown(targetDate, now);
@@ -121,6 +119,7 @@ function HorseCard({ horse }: { horse: HorseItem }) {
 
           <div className={styles.closingBox}>
             <span className={styles.closingLabel}>Sluit over</span>
+
             <strong className={styles.closingTime} suppressHydrationWarning>
               {countdown}
             </strong>
