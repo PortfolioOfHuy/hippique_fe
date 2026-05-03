@@ -529,28 +529,6 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
                       <strong>{item.time}</strong>
                     </div>
                   </div>
-
-                  <div className={styles.cardActions}>
-                    {canRelist ? (
-                      <a
-                        href={getRelistHref(item, type)}
-                        className={styles.relistAction}
-                      >
-                        <RefreshCcw size={16} strokeWidth={2.2} />
-                        <span>Opnieuw aanbieden</span>
-                      </a>
-                    ) : (
-                      <a href={item.href} className={styles.primaryAction}>
-                        <Gavel size={16} strokeWidth={2.2} />
-                        <span>Bieden bekijken</span>
-                      </a>
-                    )}
-
-                    <a href={item.href} className={styles.secondaryAction}>
-                      <Eye size={16} strokeWidth={2.2} />
-                      <span>Details</span>
-                    </a>
-                  </div>
                 </div>
               </article>
             );
