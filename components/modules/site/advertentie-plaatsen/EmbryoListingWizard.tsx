@@ -249,7 +249,7 @@ export default function EmbryoListingWizard() {
                   }
                 >
                   <option>KWPN</option>
-                  <option>Zangersheide</option>
+                  <option>Hippique</option>
                   <option>Oldenburger</option>
                   <option>Hannoveraner</option>
                 </select>

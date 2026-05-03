@@ -73,7 +73,7 @@ const initialForm: SemenFormState = {
   quantity: "3 rietjes",
   motility: "70% progressieve motiliteit",
   collectionDate: "",
-  registry: "Zangersheide",
+  registry: "Hippique",
   location: "Brussel, België",
   pedigreeUrl: "https://...",
   description: "",
@@ -256,7 +256,7 @@ export default function SemenListingWizard() {
                   value={form.registry}
                   onChange={(event) => updateField("registry", event.target.value)}
                 >
-                  <option>Zangersheide</option>
+                  <option>Hippique</option>
                   <option>KWPN</option>
                   <option>Oldenburger</option>
                   <option>Hannoveraner</option>

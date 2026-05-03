@@ -417,7 +417,7 @@ export default function OpnieuwVerkopenPage() {
                   </Form.Item>
 
                   <Form.Item label="Stamboek / ras" name="breed">
-                    <Input placeholder="Bijv. KWPN, Hannoveraan, Zangersheide" />
+                    <Input placeholder="Bijv. KWPN, Hannoveraan, Hippique" />
                   </Form.Item>
                 </div>
 

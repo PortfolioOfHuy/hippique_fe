@@ -111,7 +111,7 @@ const favoriteHorses: FavoriteHorse[] = [
     name: "Silver Orbit",
     image: "/img/hero/hero.webp",
     category: "young",
-    breed: "Zangersheide",
+    breed: "Hippique",
     age: 3,
     gender: "Hengst",
     location: "Eindhoven, Nederland",

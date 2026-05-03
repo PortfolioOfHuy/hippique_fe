@@ -31,7 +31,7 @@ const horses: HorseItem[] = [
   {
     id: 2,
     title: "Valentino Z",
-    subtitle: "Zangersheide / 8 jaar",
+    subtitle: "Hippique / 8 jaar",
     bid: "€320.000",
     badge: "Nieuw",
     endsAt: "2026-05-23T02:45:10",

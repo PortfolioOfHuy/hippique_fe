@@ -601,7 +601,7 @@ export default function RegistrerenPage() {
             <input type="checkbox" name="membership" />
 
             <span>
-              Ik wil lid worden van het stamboek Zangersheide. Het
+              Ik wil lid worden van het stamboek Hippique. Het
               lidmaatschap kost €74,20 per jaar binnen Europa en €95,40 per
               jaar voor de rest van de wereld.{" "}
               <a href="/informatie" target="_blank">

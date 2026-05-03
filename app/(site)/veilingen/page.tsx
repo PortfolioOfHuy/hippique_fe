@@ -277,7 +277,7 @@ export default function VeilingenPage() {
                 <option value="all-breeds">Alle rassen</option>
                 <option value="kwpn">KWPN</option>
                 <option value="hannoveraan">Hannoveraan</option>
-                <option value="zangersheide">Zangersheide</option>
+                <option value="Hippique">Hippique</option>
               </select>
             </div>
 

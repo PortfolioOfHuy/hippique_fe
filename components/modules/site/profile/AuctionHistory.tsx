@@ -25,7 +25,7 @@ const auctionRecords: AuctionRecord[] = [
   },
   {
     id: 2,
-    auctionName: "Zangersheide Quality Auction",
+    auctionName: "Hippique Quality Auction",
     lotName: "Chacco Blue x Ratina Z",
     image: "/img/horses/horse-2.jpg",
     status: "won",
