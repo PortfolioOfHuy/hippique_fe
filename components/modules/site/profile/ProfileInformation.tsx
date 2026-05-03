@@ -57,9 +57,13 @@ export default function ProfileInformation({
     useState<MissingVerification | null>(null);
 
   const [emailStep, setEmailStep] = useState<"confirm" | "sent">("confirm");
-  const [phoneStep, setPhoneStep] = useState<"confirm" | "otp">("confirm");
+  const [phoneStep, setPhoneStep] = useState<"phone" | "otp">("phone");
+  const [phoneNumber, setPhoneNumber] = useState(profile.phone || "");
   const [otpCode, setOtpCode] = useState("");
   const [verificationMessage, setVerificationMessage] = useState("");
+  const [verificationMessageType, setVerificationMessageType] = useState<
+    "success" | "error"
+  >("success");
 
   const missingVerifications = useMemo<MissingVerification[]>(() => {
     const items: MissingVerification[] = [];
@@ -81,7 +85,7 @@ export default function ProfileInformation({
         text: "Verifieer uw telefoonnummer.",
         title: "Telefoonnummer verifiëren",
         description:
-          "Uw telefoonnummer is nog niet geverifieerd. Bevestig dat u een OTP-code wilt ontvangen.",
+          "Uw telefoonnummer is nog niet geverifieerd. Voer uw telefoonnummer in om een OTP-code te ontvangen.",
         actionLabel: "OTP-code verzenden",
       });
     }
@@ -128,11 +132,23 @@ export default function ProfileInformation({
     }));
   }
 
+  function setSuccessMessage(value: string) {
+    setVerificationMessageType("success");
+    setVerificationMessage(value);
+  }
+
+  function setErrorMessage(value: string) {
+    setVerificationMessageType("error");
+    setVerificationMessage(value);
+  }
+
   function resetVerificationState() {
     setEmailStep("confirm");
-    setPhoneStep("confirm");
+    setPhoneStep("phone");
+    setPhoneNumber(profile.phone || "");
     setOtpCode("");
     setVerificationMessage("");
+    setVerificationMessageType("success");
   }
 
   function openVerificationModal(item: MissingVerification) {
@@ -147,32 +163,68 @@ export default function ProfileInformation({
 
   function handleEmailVerificationSend() {
     setEmailStep("sent");
-    setVerificationMessage(
+    setSuccessMessage(
       "De verificatie-e-mail is verzonden. Controleer uw inbox en klik op de bevestigingslink.",
     );
   }
 
-  function handlePhoneVerificationSend() {
+  function handlePhoneNumberSubmit() {
+    const cleanPhoneNumber = phoneNumber.trim();
+
+    if (!cleanPhoneNumber) {
+      setErrorMessage("Voer eerst uw telefoonnummer in.");
+      return;
+    }
+
+    if (cleanPhoneNumber.length < 8) {
+      setErrorMessage("Voer een geldig telefoonnummer in.");
+      return;
+    }
+
+    setOtpCode("");
     setPhoneStep("otp");
-    setVerificationMessage(
-      "De OTP-code is verzonden. Voer de code in die u per sms heeft ontvangen.",
+    setSuccessMessage(
+      `De OTP-code is verzonden naar ${cleanPhoneNumber}. Voer de code hieronder in.`,
     );
   }
 
   function handleOtpConfirm() {
-    if (!otpCode.trim()) {
-      setVerificationMessage("Voer eerst de OTP-code in om verder te gaan.");
+    const cleanOtpCode = otpCode.trim();
+
+    if (!cleanOtpCode) {
+      setErrorMessage("Voer eerst de OTP-code in om verder te gaan.");
       return;
     }
 
-    setVerificationMessage(
+    if (cleanOtpCode.length < 4) {
+      setErrorMessage("De OTP-code is te kort. Controleer de code opnieuw.");
+      return;
+    }
+
+    setSuccessMessage(
       "Uw OTP-code is ontvangen. In een echte omgeving wordt deze code nu gecontroleerd.",
     );
   }
 
   function handleDepositAdd() {
-    setVerificationMessage(
+    setSuccessMessage(
       "U wordt doorgestuurd naar de depositostap. In een echte omgeving opent hier de betaal- of depositomodule.",
+    );
+  }
+
+  function renderVerificationMessage() {
+    if (!verificationMessage) return null;
+
+    return (
+      <div
+        className={
+          verificationMessageType === "error"
+            ? styles.errorBox
+            : styles.successBox
+        }
+      >
+        {verificationMessage}
+      </div>
     );
   }
 
@@ -220,9 +272,7 @@ export default function ProfileInformation({
                 naar <strong>{profile.email}</strong>.
               </p>
 
-              {verificationMessage ? (
-                <div className={styles.successBox}>{verificationMessage}</div>
-              ) : null}
+              {renderVerificationMessage()}
 
               <div className={styles.modalActions}>
                 <Button
@@ -256,20 +306,35 @@ export default function ProfileInformation({
 
           <h3>{selectedVerification.title}</h3>
 
-          {phoneStep === "confirm" ? (
+          {phoneStep === "phone" ? (
             <>
               <p>
-                Wilt u een OTP-code ontvangen op telefoonnummer{" "}
-                <strong>{profile.phone}</strong>?
+                Voer uw telefoonnummer in. Wij sturen daarna een OTP-code per
+                sms.
               </p>
+
+              <div className={styles.phoneField}>
+                <Input
+                  size="large"
+                  value={phoneNumber}
+                  placeholder="Voer uw telefoonnummer in"
+                  onChange={(event) => {
+                    setPhoneNumber(event.target.value);
+                    setVerificationMessage("");
+                    setVerificationMessageType("success");
+                  }}
+                />
+              </div>
+
+              {renderVerificationMessage()}
 
               <div className={styles.modalActions}>
                 <Button
                   type="primary"
                   className={styles.modalPrimaryButton}
-                  onClick={handlePhoneVerificationSend}
+                  onClick={handlePhoneNumberSubmit}
                 >
-                  Bevestigen
+                  OTP-code verzenden
                 </Button>
 
                 <Button
@@ -284,7 +349,8 @@ export default function ProfileInformation({
           ) : (
             <>
               <p>
-                Voer de OTP-code in die naar uw telefoonnummer is verzonden.
+                Voer de OTP-code in die naar{" "}
+                <strong>{phoneNumber.trim()}</strong> is verzonden.
               </p>
 
               <div className={styles.otpField}>
@@ -293,13 +359,15 @@ export default function ProfileInformation({
                   value={otpCode}
                   maxLength={6}
                   placeholder="Voer OTP-code in"
-                  onChange={(event) => setOtpCode(event.target.value)}
+                  onChange={(event) => {
+                    setOtpCode(event.target.value);
+                    setVerificationMessage("");
+                    setVerificationMessageType("success");
+                  }}
                 />
               </div>
 
-              {verificationMessage ? (
-                <div className={styles.successBox}>{verificationMessage}</div>
-              ) : null}
+              {renderVerificationMessage()}
 
               <div className={styles.modalActions}>
                 <Button
@@ -313,9 +381,22 @@ export default function ProfileInformation({
                 <Button
                   type="default"
                   className={styles.modalGhostButton}
-                  onClick={handlePhoneVerificationSend}
+                  onClick={handlePhoneNumberSubmit}
                 >
                   Code opnieuw verzenden
+                </Button>
+
+                <Button
+                  type="default"
+                  className={styles.modalGhostButton}
+                  onClick={() => {
+                    setPhoneStep("phone");
+                    setOtpCode("");
+                    setVerificationMessage("");
+                    setVerificationMessageType("success");
+                  }}
+                >
+                  Nummer wijzigen
                 </Button>
               </div>
             </>
@@ -334,9 +415,7 @@ export default function ProfileInformation({
 
         <p>{selectedVerification.description}</p>
 
-        {verificationMessage ? (
-          <div className={styles.successBox}>{verificationMessage}</div>
-        ) : null}
+        {renderVerificationMessage()}
 
         <div className={styles.modalActions}>
           <Button
@@ -394,85 +473,6 @@ export default function ProfileInformation({
             premium veilingen. Uw e-mail, telefoonnummer en biedingsdeposito
             moeten allemaal zijn geverifieerd.
           </p>
-        </div>
-      </section>
-
-      <section className={styles.readinessSection}>
-        <h2>Accountstatus</h2>
-
-        <div className={styles.readinessGrid}>
-          <article className={styles.readinessCard}>
-            <div className={styles.readinessTop}>
-              <span>E-mailstatus</span>
-              <strong className={styles.statusUnverified}>
-                Niet geverifieerd
-              </strong>
-            </div>
-
-            <div className={styles.readinessIcon}>
-              <Mail size={26} strokeWidth={2} />
-            </div>
-
-            <h3>E-mailverificatie</h3>
-
-            <p>
-              Uw e-mailadres is nog niet bevestigd. Verifieer uw e-mailadres om
-              uw account volledig te activeren.
-            </p>
-
-            <div className={styles.warningText}>
-              <AlertCircle size={17} strokeWidth={2.3} />
-              <span>Verifieer uw e-mailadres om verder te gaan.</span>
-            </div>
-          </article>
-
-          <article className={styles.readinessCard}>
-            <div className={styles.readinessTop}>
-              <span>Telefoonstatus</span>
-              <strong className={styles.statusUnverified}>
-                Niet geverifieerd
-              </strong>
-            </div>
-
-            <div className={styles.readinessIcon}>
-              <Phone size={26} strokeWidth={2} />
-            </div>
-
-            <h3>Telefoonverificatie</h3>
-
-            <p>
-              Uw telefoonnummer is nog niet geverifieerd. Verifieer uw nummer
-              om beveiligingsmeldingen en veilingupdates te ontvangen.
-            </p>
-
-            <div className={styles.warningText}>
-              <AlertCircle size={17} strokeWidth={2.3} />
-              <span>Verifieer uw telefoonnummer.</span>
-            </div>
-          </article>
-
-          <article className={styles.readinessCard}>
-            <div className={styles.readinessTop}>
-              <span>Depositostatus</span>
-              <strong className={styles.statusUnverified}>Niet voltooid</strong>
-            </div>
-
-            <div className={styles.readinessIcon}>
-              <WalletCards size={26} strokeWidth={2} />
-            </div>
-
-            <h3>Biedingsdeposito</h3>
-
-            <p>
-              Uw biedingsdeposito is nog niet voltooid. U kunt pas deelnemen aan
-              veilingen wanneer alle verificatiestappen zijn afgerond.
-            </p>
-
-            <div className={styles.warningText}>
-              <AlertCircle size={17} strokeWidth={2.3} />
-              <span>Voltooi uw biedingsdeposito om mee te kunnen bieden.</span>
-            </div>
-          </article>
         </div>
       </section>
 

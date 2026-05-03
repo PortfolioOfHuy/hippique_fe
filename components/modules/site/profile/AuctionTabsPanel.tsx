@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import {
+  ChevronDown,
   Eye,
   Gavel,
   RefreshCcw,
@@ -432,21 +433,27 @@ export default function AuctionTabsPanel({ type }: AuctionTabsPanelProps) {
             />
           </label>
 
-          <div className={styles.statusFilters} aria-label="Veilingstatus filter">
-            {filterOptions.map((filter) => (
-              <button
-                key={filter.key}
-                type="button"
-                className={`${styles.filterButton} ${
-                  activeFilter === filter.key ? styles.activeFilter : ""
-                }`}
-                onClick={() => setActiveFilter(filter.key)}
+          <label className={styles.statusSelectBox}>
+            <span className={styles.statusSelectLabel}>Veilingstatus</span>
+
+            <span className={styles.statusSelectControl}>
+              <select
+                value={activeFilter}
+                aria-label="Veilingstatus filter"
+                onChange={(event) =>
+                  setActiveFilter(event.target.value as AuctionFilter)
+                }
               >
-                <span>{filter.label}</span>
-                <strong>{filter.count}</strong>
-              </button>
-            ))}
-          </div>
+                {filterOptions.map((filter) => (
+                  <option key={filter.key} value={filter.key}>
+                    {filter.label} ({filter.count})
+                  </option>
+                ))}
+              </select>
+
+              <ChevronDown size={17} strokeWidth={2.3} />
+            </span>
+          </label>
         </div>
       </div>
 

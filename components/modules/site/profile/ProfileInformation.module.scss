@@ -108,6 +108,7 @@
 .modalActions {
   display: flex;
   justify-content: center;
+  flex-wrap: wrap;
   gap: 12px;
   margin-top: 28px;
 }
@@ -115,13 +116,15 @@
 .modalPrimaryButton,
 .modalGhostButton {
   min-height: 44px;
-  padding: 0 22px;
+  max-width: 100%;
+  padding: 0 18px;
   border-radius: var(--radius-pill);
-  font-size: var(--fs-caption);
+  font-size: 12px;
   font-weight: 900;
   line-height: 1;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .modalPrimaryButton {
@@ -581,4 +584,30 @@
   border-radius: var(--radius-button);
   font-size: var(--fs-body);
   font-weight: 700;
+}
+.phoneField,
+.otpField {
+  width: 100%;
+  margin: 18px 0 0;
+}
+
+.phoneField :global(.ant-input),
+.otpField :global(.ant-input) {
+  height: 48px;
+  border-radius: var(--radius-button);
+  font-size: var(--fs-body);
+  font-weight: 700;
+}
+
+.errorBox {
+  margin: 16px auto 0;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  background: rgba(239, 68, 68, 0.08);
+  color: #dc2626;
+  font-size: var(--fs-small);
+  font-weight: 700;
+  line-height: 1.6;
+  text-align: left;
 }

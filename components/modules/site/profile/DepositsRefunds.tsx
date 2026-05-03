@@ -1,6 +1,8 @@
 "use client";
 
-import { Plus, BanknoteArrowDown } from "lucide-react";
+import { useMemo, useState } from "react";
+import { Button, Modal } from "antd";
+import { Plus, BanknoteArrowDown, AlertCircle, CheckCircle2 } from "lucide-react";
 import styles from "./DepositsRefunds.module.scss";
 
 type DepositSummaryItem = {
@@ -129,6 +131,29 @@ function getRefundStatusLabel(status: RefundStatus) {
 }
 
 export default function DepositsRefunds() {
+  const [refundModalOpen, setRefundModalOpen] = useState(false);
+  const [refundSubmitted, setRefundSubmitted] = useState(false);
+
+  const refundableDeposits = useMemo(() => {
+    return depositHistory.filter((item) => item.status === "refundbaar");
+  }, []);
+
+  const selectedRefundDeposit = refundableDeposits[0] ?? null;
+
+  function openRefundModal() {
+    setRefundSubmitted(false);
+    setRefundModalOpen(true);
+  }
+
+  function closeRefundModal() {
+    setRefundModalOpen(false);
+    setRefundSubmitted(false);
+  }
+
+  function confirmRefundRequest() {
+    setRefundSubmitted(true);
+  }
+
   return (
     <section className={styles.section}>
       <header className={styles.heading}>
@@ -241,6 +266,7 @@ export default function DepositsRefunds() {
               className={styles.refundButton}
               aria-label="Terugbetaling aanvragen"
               title="Terugbetaling aanvragen"
+              onClick={openRefundModal}
             >
               <BanknoteArrowDown size={16} strokeWidth={2.4} />
             </button>
@@ -289,6 +315,110 @@ export default function DepositsRefunds() {
           </div>
         </section>
       </div>
+
+      <Modal
+        open={refundModalOpen}
+        onCancel={closeRefundModal}
+        footer={null}
+        centered
+        width={520}
+        className={styles.refundModal}
+        destroyOnHidden
+      >
+        <div className={styles.refundModalContent}>
+          <div
+            className={`${styles.refundModalIcon} ${
+              refundSubmitted ? styles.refundModalIconSuccess : ""
+            }`}
+          >
+            {refundSubmitted ? (
+              <CheckCircle2 size={30} strokeWidth={2.3} />
+            ) : (
+              <AlertCircle size={30} strokeWidth={2.3} />
+            )}
+          </div>
+
+          {refundSubmitted ? (
+            <>
+              <h3>Terugbetaling aangevraagd</h3>
+              <p>
+                Uw terugbetalingsaanvraag is succesvol ingediend. Wij verwerken
+                uw aanvraag en houden u op de hoogte van de status.
+              </p>
+
+              <div className={styles.refundModalNotice}>
+                <strong>Status</strong>
+                <span>In behandeling</span>
+              </div>
+
+              <div className={styles.refundModalActions}>
+                <Button
+                  type="primary"
+                  className={styles.refundPrimaryButton}
+                  onClick={closeRefundModal}
+                >
+                  Sluiten
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h3>Terugbetaling bevestigen</h3>
+              <p>
+                Weet u zeker dat u een terugbetaling wilt aanvragen voor de
+                beschikbare storting? Na bevestiging wordt uw aanvraag ter
+                beoordeling ingediend.
+              </p>
+
+              {selectedRefundDeposit ? (
+                <div className={styles.refundModalDetails}>
+                  <div>
+                    <span>Gekoppelde storting</span>
+                    <strong>{selectedRefundDeposit.purpose}</strong>
+                  </div>
+
+                  <div>
+                    <span>Referentie</span>
+                    <strong>{selectedRefundDeposit.refCode}</strong>
+                  </div>
+
+                  <div>
+                    <span>Bedrag</span>
+                    <strong>{selectedRefundDeposit.amount}</strong>
+                  </div>
+                </div>
+              ) : (
+                <div className={styles.refundModalNotice}>
+                  <strong>Geen terugbetaalbare storting</strong>
+                  <span>
+                    Er is momenteel geen storting beschikbaar voor een nieuwe
+                    terugbetalingsaanvraag.
+                  </span>
+                </div>
+              )}
+
+              <div className={styles.refundModalActions}>
+                <Button
+                  type="primary"
+                  className={styles.refundPrimaryButton}
+                  disabled={!selectedRefundDeposit}
+                  onClick={confirmRefundRequest}
+                >
+                  Bevestigen
+                </Button>
+
+                <Button
+                  type="default"
+                  className={styles.refundGhostButton}
+                  onClick={closeRefundModal}
+                >
+                  Annuleren
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
     </section>
   );
 }
