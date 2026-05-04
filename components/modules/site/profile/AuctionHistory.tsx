@@ -117,6 +117,7 @@ export default function AuctionHistory() {
                             alt={record.lotName}
                             width={52}
                             height={52}
+                            sizes="52px"
                           />
                         </div>
                       ) : (
