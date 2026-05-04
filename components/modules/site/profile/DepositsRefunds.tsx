@@ -1,8 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button, Modal } from "antd";
-import { Plus, BanknoteArrowDown, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Button, InputNumber, Modal, Space } from "antd";
+import {
+  Plus,
+  BanknoteArrowDown,
+  AlertCircle,
+  CheckCircle2,
+  WalletCards,
+} from "lucide-react";
 import styles from "./DepositsRefunds.module.scss";
 
 type DepositSummaryItem = {
@@ -130,7 +136,20 @@ function getRefundStatusLabel(status: RefundStatus) {
   return labels[status];
 }
 
+function formatEuro(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
 export default function DepositsRefunds() {
+  const [depositModalOpen, setDepositModalOpen] = useState(false);
+  const [depositSubmitted, setDepositSubmitted] = useState(false);
+  const [depositAmount, setDepositAmount] = useState<number | null>(null);
+
   const [refundModalOpen, setRefundModalOpen] = useState(false);
   const [refundSubmitted, setRefundSubmitted] = useState(false);
 
@@ -139,6 +158,31 @@ export default function DepositsRefunds() {
   }, []);
 
   const selectedRefundDeposit = refundableDeposits[0] ?? null;
+
+  const formattedDepositAmount =
+    typeof depositAmount === "number" && depositAmount > 0
+      ? formatEuro(depositAmount)
+      : "€0,00";
+
+  function openDepositModal() {
+    setDepositSubmitted(false);
+    setDepositAmount(null);
+    setDepositModalOpen(true);
+  }
+
+  function closeDepositModal() {
+    setDepositModalOpen(false);
+    setDepositSubmitted(false);
+    setDepositAmount(null);
+  }
+
+  function confirmDepositRequest() {
+    if (!depositAmount || depositAmount <= 0) {
+      return;
+    }
+
+    setDepositSubmitted(true);
+  }
 
   function openRefundModal() {
     setRefundSubmitted(false);
@@ -197,8 +241,9 @@ export default function DepositsRefunds() {
               <button
                 type="button"
                 className={styles.requestButton}
-                aria-label="Cọc tiền"
-                title="Cọc tiền"
+                aria-label="Nieuwe storting toevoegen"
+                title="Nieuwe storting toevoegen"
+                onClick={openDepositModal}
               >
                 <Plus size={16} strokeWidth={2.4} />
               </button>
@@ -315,6 +360,119 @@ export default function DepositsRefunds() {
           </div>
         </section>
       </div>
+
+      <Modal
+        open={depositModalOpen}
+        onCancel={closeDepositModal}
+        footer={null}
+        centered
+        width={520}
+        className={styles.depositModal}
+        destroyOnHidden
+      >
+        <div className={styles.depositModalContent}>
+          <div
+            className={`${styles.depositModalIcon} ${
+              depositSubmitted ? styles.depositModalIconSuccess : ""
+            }`}
+          >
+            {depositSubmitted ? (
+              <CheckCircle2 size={30} strokeWidth={2.3} />
+            ) : (
+              <WalletCards size={30} strokeWidth={2.3} />
+            )}
+          </div>
+
+          {depositSubmitted ? (
+            <>
+              <h3>Storting bevestigd</h3>
+              <p>
+                Je stortingsaanvraag is succesvol aangemaakt. Volg de verdere
+                betaalinstructies om je waarborgsom te voltooien.
+              </p>
+
+              <div className={styles.depositModalNotice}>
+                <strong>Aangevraagd bedrag</strong>
+                <span>{formattedDepositAmount}</span>
+              </div>
+
+              <div className={styles.depositModalActions}>
+                <Button
+                  type="primary"
+                  className={styles.depositPrimaryButton}
+                  onClick={closeDepositModal}
+                >
+                  Sluiten
+                </Button>
+              </div>
+            </>
+          ) : (
+            <>
+              <h3>Nieuwe storting toevoegen</h3>
+              <p>
+                Vul het bedrag in dat je als waarborgsom wilt storten. Na
+                bevestiging wordt je aanvraag klaargezet voor verwerking.
+              </p>
+
+              <div className={styles.depositFormBox}>
+                <label htmlFor="deposit-amount">Bedrag</label>
+
+<Space.Compact className={styles.depositAmountGroup}>
+  <span className={styles.depositCurrencyPrefix}>€</span>
+
+  <InputNumber
+    id="deposit-amount"
+    className={styles.depositAmountInput}
+    min={1}
+    step={100}
+    value={depositAmount}
+    placeholder="Voer bedrag in"
+    controls={false}
+    decimalSeparator=","
+    onChange={(value) => {
+      if (typeof value === "number") {
+        setDepositAmount(value);
+        return;
+      }
+
+      setDepositAmount(null);
+    }}
+  />
+</Space.Compact>
+
+                <small>
+                  Controleer het bedrag zorgvuldig voordat je de storting
+                  bevestigt.
+                </small>
+              </div>
+
+              <div className={styles.depositPreview}>
+                <span>Te bevestigen bedrag</span>
+                <strong>{formattedDepositAmount}</strong>
+              </div>
+
+              <div className={styles.depositModalActions}>
+                <Button
+                  type="primary"
+                  className={styles.depositPrimaryButton}
+                  disabled={!depositAmount || depositAmount <= 0}
+                  onClick={confirmDepositRequest}
+                >
+                  Bevestigen
+                </Button>
+
+                <Button
+                  type="default"
+                  className={styles.depositGhostButton}
+                  onClick={closeDepositModal}
+                >
+                  Annuleren
+                </Button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
 
       <Modal
         open={refundModalOpen}

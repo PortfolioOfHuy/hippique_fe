@@ -415,6 +415,7 @@
   color: #16a34a;
 }
 
+.depositModal,
 .refundModal {
   :global(.ant-modal-content) {
     padding: 0;
@@ -435,6 +436,7 @@
   }
 }
 
+.depositModalContent,
 .refundModalContent {
   padding: 38px 34px 32px;
   text-align: center;
@@ -457,6 +459,7 @@
   }
 }
 
+.depositModalIcon,
 .refundModalIcon {
   display: inline-flex;
   align-items: center;
@@ -464,13 +467,169 @@
   width: 68px;
   height: 68px;
   border-radius: var(--radius-pill);
+}
+
+.depositModalIcon {
+  background: rgba(197, 160, 89, 0.16);
+  color: #8a6419;
+}
+
+.refundModalIcon {
   background: rgba(245, 158, 11, 0.12);
   color: #d97706;
 }
 
+.depositModalIconSuccess,
 .refundModalIconSuccess {
   background: rgba(34, 197, 94, 0.12);
   color: #16a34a;
+}
+
+.depositFormBox {
+  display: grid;
+  gap: 10px;
+  margin-top: 24px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(10, 25, 47, 0.08);
+  background: rgba(10, 25, 47, 0.025);
+  text-align: left;
+
+  label {
+    color: var(--hippique-primary);
+    font-size: var(--fs-caption);
+    font-weight: 900;
+    line-height: 1.4;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  small {
+    color: rgba(10, 25, 47, 0.5);
+    font-size: 12px;
+    font-weight: 650;
+    line-height: 1.55;
+  }
+}
+
+.depositAmountGroup {
+  width: 100%;
+  display: flex !important;
+
+  &:hover {
+    .depositCurrencyPrefix,
+    .depositAmountInput {
+      border-color: rgba(197, 160, 89, 0.7) !important;
+    }
+  }
+
+  &:focus-within {
+    .depositCurrencyPrefix,
+    .depositAmountInput {
+      border-color: var(--hippique-secondary) !important;
+    }
+
+    .depositAmountInput {
+      box-shadow: 0 0 0 3px rgba(197, 160, 89, 0.16) !important;
+    }
+  }
+}
+
+.depositCurrencyPrefix {
+  width: 52px;
+  min-height: 48px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  border: 1px solid rgba(10, 25, 47, 0.1);
+  border-right: 0;
+  border-radius: var(--radius-md) 0 0 var(--radius-md);
+  background: rgba(197, 160, 89, 0.16);
+  color: var(--hippique-primary);
+
+  font-size: 16px;
+  font-weight: 900;
+  line-height: 1;
+
+  transition:
+    border-color 0.22s ease,
+    background 0.22s ease,
+    color 0.22s ease;
+}
+
+.depositAmountInput {
+  width: 100% !important;
+  flex: 1;
+
+  border-color: rgba(10, 25, 47, 0.1) !important;
+  border-radius: 0 var(--radius-md) var(--radius-md) 0 !important;
+  box-shadow: none !important;
+
+  :global(.ant-input-number-input) {
+    height: 46px;
+    color: var(--hippique-primary);
+    font-size: 16px;
+    font-weight: 800;
+  }
+}
+
+.depositPreview {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  margin-top: 14px;
+  padding: 16px 18px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(197, 160, 89, 0.22);
+  background: rgba(197, 160, 89, 0.09);
+  text-align: left;
+
+  span {
+    color: rgba(10, 25, 47, 0.54);
+    font-size: 12px;
+    font-weight: 900;
+    line-height: 1.4;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  strong {
+    color: #8a6419;
+    font-size: 22px;
+    font-weight: 900;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+}
+
+.depositModalNotice,
+.refundModalNotice {
+  display: grid;
+  gap: 5px;
+  margin: 22px auto 0;
+  padding: 14px 16px;
+  border-radius: var(--radius-md);
+  border: 1px solid rgba(34, 197, 94, 0.16);
+  background: rgba(34, 197, 94, 0.08);
+  color: #15803d;
+  text-align: left;
+
+  strong {
+    color: #15803d;
+    font-size: var(--fs-small);
+    font-weight: 900;
+    line-height: 1.45;
+  }
+
+  span {
+    color: #15803d;
+    font-size: var(--fs-small);
+    font-weight: 650;
+    line-height: 1.55;
+  }
 }
 
 .refundModalDetails {
@@ -508,32 +667,7 @@
   }
 }
 
-.refundModalNotice {
-  display: grid;
-  gap: 5px;
-  margin: 22px auto 0;
-  padding: 14px 16px;
-  border-radius: var(--radius-md);
-  border: 1px solid rgba(34, 197, 94, 0.16);
-  background: rgba(34, 197, 94, 0.08);
-  color: #15803d;
-  text-align: left;
-
-  strong {
-    color: #15803d;
-    font-size: var(--fs-small);
-    font-weight: 900;
-    line-height: 1.45;
-  }
-
-  span {
-    color: #15803d;
-    font-size: var(--fs-small);
-    font-weight: 650;
-    line-height: 1.55;
-  }
-}
-
+.depositModalActions,
 .refundModalActions {
   display: flex;
   justify-content: center;
@@ -542,6 +676,8 @@
   margin-top: 28px;
 }
 
+.depositPrimaryButton,
+.depositGhostButton,
 .refundPrimaryButton,
 .refundGhostButton {
   min-height: 44px;
@@ -554,6 +690,7 @@
   text-transform: uppercase;
 }
 
+.depositPrimaryButton,
 .refundPrimaryButton {
   border-color: var(--hippique-primary) !important;
   background: var(--hippique-primary) !important;
@@ -573,6 +710,7 @@
   }
 }
 
+.depositGhostButton,
 .refundGhostButton {
   border-color: rgba(10, 25, 47, 0.14) !important;
   color: var(--hippique-primary) !important;
@@ -691,6 +829,15 @@
     }
   }
 
+  .panelHeaderActions {
+    gap: 10px;
+  }
+
+  .panelMeta {
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
+
   .requestButton,
   .refundButton {
     width: 40px;
@@ -742,15 +889,28 @@
     }
   }
 
+  .depositModalContent,
   .refundModalContent {
     padding: 34px 22px 28px;
   }
 
+  .depositPreview {
+    align-items: flex-start;
+    flex-direction: column;
+
+    strong {
+      font-size: 24px;
+    }
+  }
+
+  .depositModalActions,
   .refundModalActions {
     display: grid;
     grid-template-columns: 1fr;
   }
 
+  .depositPrimaryButton,
+  .depositGhostButton,
   .refundPrimaryButton,
   .refundGhostButton {
     width: 100%;
@@ -764,5 +924,13 @@
 
   .summaryValue {
     font-size: 30px;
+  }
+
+  .panelHeader {
+    gap: 10px;
+  }
+
+  .panelMeta {
+    display: none;
   }
 }
