@@ -1,13 +1,16 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button, InputNumber, Modal, Space } from "antd";
+import { Button, Checkbox, Modal } from "antd";
 import {
   Plus,
   BanknoteArrowDown,
   AlertCircle,
   CheckCircle2,
-  WalletCards,
+  FileText,
+  ShieldCheck,
+  Wallet,
+  ArrowRight,
 } from "lucide-react";
 import styles from "./DepositsRefunds.module.scss";
 
@@ -20,6 +23,7 @@ type DepositSummaryItem = {
 
 type DepositStatus = "refundbaar" | "toegepast" | "terugbetaald";
 type RefundStatus = "behandeling" | "goedgekeurd";
+type DepositModalStep = "bill" | "success";
 
 type DepositRecord = {
   id: string;
@@ -39,6 +43,9 @@ type RefundRecord = {
   linkedDeposit: string;
   status: RefundStatus;
 };
+
+const DEFAULT_DEPOSIT_AMOUNT = 50;
+const CRYPTO_SERVICE_FEE = 0;
 
 const summaryItems: DepositSummaryItem[] = [
   {
@@ -147,8 +154,10 @@ function formatEuro(value: number) {
 
 export default function DepositsRefunds() {
   const [depositModalOpen, setDepositModalOpen] = useState(false);
-  const [depositSubmitted, setDepositSubmitted] = useState(false);
-  const [depositAmount, setDepositAmount] = useState<number | null>(null);
+  const [depositModalStep, setDepositModalStep] =
+    useState<DepositModalStep>("bill");
+  const [depositInfoConfirmed, setDepositInfoConfirmed] = useState(false);
+  const [depositTermsConfirmed, setDepositTermsConfirmed] = useState(false);
 
   const [refundModalOpen, setRefundModalOpen] = useState(false);
   const [refundSubmitted, setRefundSubmitted] = useState(false);
@@ -159,29 +168,36 @@ export default function DepositsRefunds() {
 
   const selectedRefundDeposit = refundableDeposits[0] ?? null;
 
-  const formattedDepositAmount =
-    typeof depositAmount === "number" && depositAmount > 0
-      ? formatEuro(depositAmount)
-      : "€0,00";
+  const formattedDepositAmount = formatEuro(DEFAULT_DEPOSIT_AMOUNT);
+  const formattedCryptoServiceFee = formatEuro(CRYPTO_SERVICE_FEE);
+  const formattedTotalDepositPayment = formatEuro(
+    DEFAULT_DEPOSIT_AMOUNT + CRYPTO_SERVICE_FEE,
+  );
+
+  const canGoToStripe = depositInfoConfirmed && depositTermsConfirmed;
+
+  function resetDepositModal() {
+    setDepositModalStep("bill");
+    setDepositInfoConfirmed(false);
+    setDepositTermsConfirmed(false);
+  }
 
   function openDepositModal() {
-    setDepositSubmitted(false);
-    setDepositAmount(null);
+    resetDepositModal();
     setDepositModalOpen(true);
   }
 
   function closeDepositModal() {
     setDepositModalOpen(false);
-    setDepositSubmitted(false);
-    setDepositAmount(null);
+    resetDepositModal();
   }
 
-  function confirmDepositRequest() {
-    if (!depositAmount || depositAmount <= 0) {
+  function confirmStripeCheckout() {
+    if (!canGoToStripe) {
       return;
     }
 
-    setDepositSubmitted(true);
+    setDepositModalStep("success");
   }
 
   function openRefundModal() {
@@ -366,112 +382,130 @@ export default function DepositsRefunds() {
         onCancel={closeDepositModal}
         footer={null}
         centered
-        width={520}
-        className={styles.depositModal}
+        width={500}
+        className={`${styles.depositModal} ${styles.depositBillModal}`}
         destroyOnHidden
       >
-        <div className={styles.depositModalContent}>
-          <div
-            className={`${styles.depositModalIcon} ${
-              depositSubmitted ? styles.depositModalIconSuccess : ""
-            }`}
-          >
-            {depositSubmitted ? (
-              <CheckCircle2 size={30} strokeWidth={2.3} />
-            ) : (
-              <WalletCards size={30} strokeWidth={2.3} />
-            )}
-          </div>
+        {depositModalStep === "bill" && (
+          <div className={styles.billCard}>
+            <h3>Publicatiekostenoverzicht</h3>
 
-          {depositSubmitted ? (
-            <>
-              <h3>Storting bevestigd</h3>
-              <p>
-                Je stortingsaanvraag is succesvol aangemaakt. Volg de verdere
-                betaalinstructies om je waarborgsom te voltooien.
-              </p>
-
-              <div className={styles.depositModalNotice}>
-                <strong>Aangevraagd bedrag</strong>
-                <span>{formattedDepositAmount}</span>
-              </div>
-
-              <div className={styles.depositModalActions}>
-                <Button
-                  type="primary"
-                  className={styles.depositPrimaryButton}
-                  onClick={closeDepositModal}
-                >
-                  Sluiten
-                </Button>
-              </div>
-            </>
-          ) : (
-            <>
-              <h3>Nieuwe storting toevoegen</h3>
-              <p>
-                Vul het bedrag in dat je als waarborgsom wilt storten. Na
-                bevestiging wordt je aanvraag klaargezet voor verwerking.
-              </p>
-
-              <div className={styles.depositFormBox}>
-                <label htmlFor="deposit-amount">Bedrag</label>
-
-<Space.Compact className={styles.depositAmountGroup}>
-  <span className={styles.depositCurrencyPrefix}>€</span>
-
-  <InputNumber
-    id="deposit-amount"
-    className={styles.depositAmountInput}
-    min={1}
-    step={100}
-    value={depositAmount}
-    placeholder="Voer bedrag in"
-    controls={false}
-    decimalSeparator=","
-    onChange={(value) => {
-      if (typeof value === "number") {
-        setDepositAmount(value);
-        return;
-      }
-
-      setDepositAmount(null);
-    }}
-  />
-</Space.Compact>
-
-                <small>
-                  Controleer het bedrag zorgvuldig voordat je de storting
-                  bevestigt.
-                </small>
-              </div>
-
-              <div className={styles.depositPreview}>
-                <span>Te bevestigen bedrag</span>
+            <div className={styles.billRows}>
+              <div className={styles.billRow}>
+                <span>Basis listing fee</span>
                 <strong>{formattedDepositAmount}</strong>
               </div>
 
-              <div className={styles.depositModalActions}>
-                <Button
-                  type="primary"
-                  className={styles.depositPrimaryButton}
-                  disabled={!depositAmount || depositAmount <= 0}
-                  onClick={confirmDepositRequest}
-                >
-                  Bevestigen
-                </Button>
-
-                <Button
-                  type="default"
-                  className={styles.depositGhostButton}
-                  onClick={closeDepositModal}
-                >
-                  Annuleren
-                </Button>
+              <div className={styles.billRow}>
+                <span>Crypto service fee</span>
+                <strong>{formattedCryptoServiceFee}</strong>
               </div>
-            </>
-          )}
-        </div>
+            </div>
+
+            <div className={styles.billDivider} />
+
+            <div className={styles.billTotal}>
+              <span>Totaal nu te betalen</span>
+              <strong>{formattedTotalDepositPayment}</strong>
+            </div>
+
+            <div className={styles.billDivider} />
+
+            <div className={styles.billNotes}>
+              <div className={styles.billNote}>
+                <FileText size={16} strokeWidth={2} />
+                <span>
+                  De crypto service fee wordt alleen toegepast wanneer
+                  crypto-afwikkelingsgegevens zijn ingeschakeld.
+                </span>
+              </div>
+
+              <div className={styles.billNote}>
+                <ShieldCheck size={16} strokeWidth={2} />
+                <span>Alle publicatiekosten worden betaald via Stripe.</span>
+              </div>
+
+              <div className={styles.billNote}>
+                <Wallet size={16} strokeWidth={2} />
+                <span>
+                  Walletgegevens worden enkel opgeslagen als referentie voor
+                  off-platform afwikkeling.
+                </span>
+              </div>
+            </div>
+
+            <div className={styles.billDivider} />
+
+            <div className={styles.billChecks}>
+              <Checkbox
+                checked={depositInfoConfirmed}
+                onChange={(event) =>
+                  setDepositInfoConfirmed(event.target.checked)
+                }
+                className={styles.billCheckbox}
+              >
+                Ik bevestig dat alle verstrekte informatie correct is.
+              </Checkbox>
+
+              <Checkbox
+                checked={depositTermsConfirmed}
+                onChange={(event) =>
+                  setDepositTermsConfirmed(event.target.checked)
+                }
+                className={styles.billCheckbox}
+              >
+                Ik accepteer de Terms of Acquisition en het Auction Protocol.
+              </Checkbox>
+            </div>
+
+            <Button
+              type="primary"
+              className={styles.billCheckoutButton}
+              disabled={!canGoToStripe}
+              onClick={confirmStripeCheckout}
+            >
+              Doorgaan naar Stripe checkout
+              <ArrowRight size={18} strokeWidth={2.4} />
+            </Button>
+
+            {!canGoToStripe && (
+              <p className={styles.billWarning}>
+                Vink eerst beide bevestigingen aan om verder te gaan.
+              </p>
+            )}
+          </div>
+        )}
+
+        {depositModalStep === "success" && (
+          <div className={styles.depositModalContent}>
+            <div
+              className={`${styles.depositModalIcon} ${styles.depositModalIconSuccess}`}
+            >
+              <CheckCircle2 size={30} strokeWidth={2.3} />
+            </div>
+
+            <h3>Storting bevestigd</h3>
+            <p>
+              Je stortingsaanvraag is succesvol aangemaakt. Je kunt nu de
+              verdere betaalinstructies volgen om je waarborgsom te voltooien.
+            </p>
+
+            <div className={styles.depositModalNotice}>
+              <strong>Aangevraagd bedrag</strong>
+              <span>{formattedTotalDepositPayment}</span>
+            </div>
+
+            <div className={styles.depositModalActions}>
+              <Button
+                type="primary"
+                className={styles.depositPrimaryButton}
+                onClick={closeDepositModal}
+              >
+                Sluiten
+              </Button>
+            </div>
+          </div>
+        )}
       </Modal>
 
       <Modal

@@ -1,18 +1,22 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Button, Input, Modal } from "antd";
+import { Button, Checkbox, Input, Modal } from "antd";
 import {
   AlertCircle,
+  ArrowRight,
   CalendarDays,
   CheckCircle2,
+  FileText,
   Languages,
   LockKeyhole,
   Mail,
   PencilLine,
   Phone,
   Settings,
+  ShieldCheck,
   UserRound,
+  Wallet,
   WalletCards,
   X,
 } from "lucide-react";
@@ -40,11 +44,25 @@ type MissingVerification = {
   actionLabel: string;
 };
 
+type DepositStep = "bill" | "success";
+
+const DEFAULT_DEPOSIT_AMOUNT = 50;
+const CRYPTO_SERVICE_FEE = 0;
+
 const verificationStatus: VerificationStatus = {
   emailVerified: false,
   phoneVerified: false,
   depositVerified: false,
 };
+
+function formatEuro(value: number) {
+  return new Intl.NumberFormat("nl-NL", {
+    style: "currency",
+    currency: "EUR",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
 
 export default function ProfileInformation({
   profile,
@@ -64,6 +82,10 @@ export default function ProfileInformation({
   const [verificationMessageType, setVerificationMessageType] = useState<
     "success" | "error"
   >("success");
+
+  const [depositStep, setDepositStep] = useState<DepositStep>("bill");
+  const [depositInfoConfirmed, setDepositInfoConfirmed] = useState(false);
+  const [depositTermsConfirmed, setDepositTermsConfirmed] = useState(false);
 
   const missingVerifications = useMemo<MissingVerification[]>(() => {
     const items: MissingVerification[] = [];
@@ -94,15 +116,23 @@ export default function ProfileInformation({
       items.push({
         id: "deposit",
         text: "Voltooi uw biedingsdeposito.",
-        title: "Biedingsdeposito toevoegen",
+        title: "Publicatiekostenoverzicht",
         description:
-          "Uw biedingsdeposito is nog niet voltooid. Voeg een deposito toe om volledig toegang te krijgen tot de veilingen.",
+          "Uw biedingsdeposito is nog niet voltooid. Rond de betaling af via Stripe om volledig toegang te krijgen tot de veilingen.",
         actionLabel: "Deposit toevoegen",
       });
     }
 
     return items;
   }, []);
+
+  const formattedDepositAmount = formatEuro(DEFAULT_DEPOSIT_AMOUNT);
+  const formattedCryptoServiceFee = formatEuro(CRYPTO_SERVICE_FEE);
+  const formattedTotalDepositPayment = formatEuro(
+    DEFAULT_DEPOSIT_AMOUNT + CRYPTO_SERVICE_FEE,
+  );
+
+  const canGoToStripe = depositInfoConfirmed && depositTermsConfirmed;
 
   function startEdit() {
     setDraftProfile(profile);
@@ -142,6 +172,12 @@ export default function ProfileInformation({
     setVerificationMessage(value);
   }
 
+  function resetDepositState() {
+    setDepositStep("bill");
+    setDepositInfoConfirmed(false);
+    setDepositTermsConfirmed(false);
+  }
+
   function resetVerificationState() {
     setEmailStep("confirm");
     setPhoneStep("phone");
@@ -149,6 +185,7 @@ export default function ProfileInformation({
     setOtpCode("");
     setVerificationMessage("");
     setVerificationMessageType("success");
+    resetDepositState();
   }
 
   function openVerificationModal(item: MissingVerification) {
@@ -206,10 +243,12 @@ export default function ProfileInformation({
     );
   }
 
-  function handleDepositAdd() {
-    setSuccessMessage(
-      "U wordt doorgestuurd naar de depositostap. In een echte omgeving opent hier de betaal- of depositomodule.",
-    );
+  function confirmStripeCheckout() {
+    if (!canGoToStripe) {
+      return;
+    }
+
+    setDepositStep("success");
   }
 
   function renderVerificationMessage() {
@@ -224,6 +263,130 @@ export default function ProfileInformation({
         }
       >
         {verificationMessage}
+      </div>
+    );
+  }
+
+  function renderDepositBill() {
+    if (depositStep === "success") {
+      return (
+        <div className={styles.modalContent}>
+          <div className={`${styles.modalIcon} ${styles.modalIconSuccess}`}>
+            <CheckCircle2 size={30} strokeWidth={2.3} />
+          </div>
+
+          <h3>Deposit bevestigd</h3>
+
+          <p>
+            Uw depositaanvraag is succesvol aangemaakt. U kunt nu de verdere
+            betaalinstructies volgen om uw biedingsdeposito te voltooien.
+          </p>
+
+          <div className={styles.depositSuccessNotice}>
+            <strong>Aangevraagd bedrag</strong>
+            <span>{formattedTotalDepositPayment}</span>
+          </div>
+
+          <div className={styles.modalActions}>
+            <Button
+              type="primary"
+              className={styles.modalPrimaryButton}
+              onClick={closeVerificationModal}
+            >
+              Sluiten
+            </Button>
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <div className={styles.billCard}>
+        <h3>Publicatiekostenoverzicht</h3>
+
+        <div className={styles.billRows}>
+          <div className={styles.billRow}>
+            <span>Basis listing fee</span>
+            <strong>{formattedDepositAmount}</strong>
+          </div>
+
+          <div className={styles.billRow}>
+            <span>Crypto service fee</span>
+            <strong>{formattedCryptoServiceFee}</strong>
+          </div>
+        </div>
+
+        <div className={styles.billDivider} />
+
+        <div className={styles.billTotal}>
+          <span>Totaal nu te betalen</span>
+          <strong>{formattedTotalDepositPayment}</strong>
+        </div>
+
+        <div className={styles.billDivider} />
+
+        <div className={styles.billNotes}>
+          <div className={styles.billNote}>
+            <FileText size={16} strokeWidth={2} />
+            <span>
+              De crypto service fee wordt alleen toegepast wanneer
+              crypto-afwikkelingsgegevens zijn ingeschakeld.
+            </span>
+          </div>
+
+          <div className={styles.billNote}>
+            <ShieldCheck size={16} strokeWidth={2} />
+            <span>Alle publicatiekosten worden betaald via Stripe.</span>
+          </div>
+
+          <div className={styles.billNote}>
+            <Wallet size={16} strokeWidth={2} />
+            <span>
+              Walletgegevens worden enkel opgeslagen als referentie voor
+              off-platform afwikkeling.
+            </span>
+          </div>
+        </div>
+
+        <div className={styles.billDivider} />
+
+        <div className={styles.billChecks}>
+          <Checkbox
+            checked={depositInfoConfirmed}
+            onChange={(event) =>
+              setDepositInfoConfirmed(event.target.checked)
+            }
+            className={styles.billCheckbox}
+          >
+            Ik bevestig dat alle verstrekte informatie correct is.
+          </Checkbox>
+
+          <Checkbox
+            checked={depositTermsConfirmed}
+            onChange={(event) =>
+              setDepositTermsConfirmed(event.target.checked)
+            }
+            className={styles.billCheckbox}
+          >
+            Ik accepteer de Terms of Acquisition en het Auction Protocol.
+          </Checkbox>
+        </div>
+
+        <Button
+          type="primary"
+          className={styles.billCheckoutButton}
+          disabled={!canGoToStripe}
+          onClick={confirmStripeCheckout}
+        >
+          Doorgaan naar Stripe checkout
+          <ArrowRight size={18} strokeWidth={2.4} />
+        </Button>
+
+        {!canGoToStripe && (
+          <p className={styles.billWarning}>
+            Vink eerst beide bevestigingen aan om verder te gaan.
+          </p>
+        )}
       </div>
     );
   }
@@ -405,37 +568,7 @@ export default function ProfileInformation({
       );
     }
 
-    return (
-      <div className={styles.modalContent}>
-        <div className={styles.modalIcon}>
-          <WalletCards size={30} strokeWidth={2.3} />
-        </div>
-
-        <h3>{selectedVerification.title}</h3>
-
-        <p>{selectedVerification.description}</p>
-
-        {renderVerificationMessage()}
-
-        <div className={styles.modalActions}>
-          <Button
-            type="primary"
-            className={styles.modalPrimaryButton}
-            onClick={handleDepositAdd}
-          >
-            Deposit toevoegen
-          </Button>
-
-          <Button
-            type="default"
-            className={styles.modalGhostButton}
-            onClick={closeVerificationModal}
-          >
-            Sluiten
-          </Button>
-        </div>
-      </div>
-    );
+    return renderDepositBill();
   }
 
   return (
@@ -586,8 +719,10 @@ export default function ProfileInformation({
         onCancel={closeVerificationModal}
         footer={null}
         centered
-        width={540}
-        className={styles.verificationModal}
+        width={selectedVerification?.id === "deposit" ? 500 : 540}
+        className={`${styles.verificationModal} ${
+          selectedVerification?.id === "deposit" ? styles.depositBillModal : ""
+        }`}
         destroyOnHidden
       >
         {renderVerificationModalContent()}
